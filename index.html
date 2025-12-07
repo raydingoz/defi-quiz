@@ -197,8 +197,6 @@
       color: var(--muted);
     }
 
-    /* QR alanı */
-
     #qrcode {
       margin-top: 8px;
       display: flex;
@@ -213,8 +211,6 @@
       color: var(--accent-strong);
     }
 
-    /* Soru kutusu */
-
     .question-meta {
       display: flex;
       justify-content: space-between;
@@ -222,6 +218,8 @@
       font-size: 0.8rem;
       color: var(--muted);
       margin-bottom: 4px;
+      gap: 6px;
+      flex-wrap: wrap;
     }
 
     .question-text {
@@ -293,16 +291,21 @@
     }
 
     .timer-text {
-      font-size: 0.85rem;
-      margin-top: 8px;
+      font-size: 0.9rem;
+      margin-top: 4px;
       color: var(--muted);
     }
 
     .timer-hot {
       color: var(--accent-strong);
+      font-weight: 600;
     }
 
-    /* Tablo (leaderboard) */
+    .timer-critical {
+      color: var(--danger);
+      font-weight: 700;
+      font-size: 1.05rem;
+    }
 
     .table-wrapper {
       margin-top: 6px;
@@ -346,8 +349,6 @@
       background: rgba(15, 23, 42, 0.95);
     }
 
-    /* Küçük ekran optimizasyonları */
-
     @media (min-width: 768px) {
       body {
         padding: 24px;
@@ -369,7 +370,7 @@
     }
   </style>
 
-  <!-- QR code kütüphanesi (integrity'siz, mobil uyumlu çalışsın diye) -->
+  <!-- QR code -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
   <!-- Firebase v8 (app + realtime db) -->
@@ -382,7 +383,7 @@
 
     <!-- EĞİTMEN ALANI -->
     <div id="hostArea" class="hidden">
-      <h1>Defibrilasyon & Elektriksel Kardiyoversiyon Quiz</h1>
+      <h1>Defibrilasyon & Kardiyoversiyon Quiz</h1>
 
       <div class="host-layout">
         <div>
@@ -404,7 +405,7 @@
             <div class="card-header">
               <h2>Aktif Olgu</h2>
               <span class="badge">
-                5 sn cevap süresi
+                Süreli soru
               </span>
             </div>
             <div class="question-meta">
@@ -416,7 +417,7 @@
             </div>
             <div class="options-grid" id="hostOptionsList"></div>
             <button id="nextQuestionBtn" class="btn btn-primary" style="margin-top:10px;">
-              Sonraki olguyu başlat (5 sn)
+              Sonraki olguyu başlat
             </button>
           </div>
         </div>
@@ -533,29 +534,29 @@
   <script>
     /*************** 1) AYARLAR ***************/
 
-    // BURAYI kendi Firebase projenin config'i ile doldur:
+    // Senin Firebase config'in
     const firebaseConfig = {
-  apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
-  authDomain: "defi-quiz.firebaseapp.com",
-  databaseURL: "https://defi-quiz-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "defi-quiz",
-  storageBucket: "defi-quiz.firebasestorage.app",
-  messagingSenderId: "642741899462",
-  appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
-  measurementId: "G-SY348RPCVZ"
-};
+      apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
+      authDomain: "defi-quiz.firebaseapp.com",
+      databaseURL: "https://defi-quiz-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "defi-quiz",
+      storageBucket: "defi-quiz.firebasestorage.app",
+      messagingSenderId: "642741899462",
+      appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
+      measurementId: "G-SY348RPCVZ"
+    };
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
 
-    // Oturum kimliği (aynı dosyayı farklı workshoplarda da kullanmak istersen değiştirirsin)
+    // Oturum kimliği
     const SESSION_ID = "erc-quiz-als-2025";
 
-    // Soru süresi (5 sn)
-    const TIME_LIMIT_MS = 5000;
+    // Default süre (ms) – soru bazlı override edebilirsin
+    const DEFAULT_TIME_LIMIT_MS = 10000; // 10 sn
 
-    // SORULAR:
-    // options: metin listesi; correct: "A","B","C","D"
+    // SORU LİSTESİ
+    // Her soru için istersen timeLimitMs ekle (örn. 15000 = 15 sn)
     const QUESTIONS = [
       {
         text: "Olgu 1: 65 yaş, tanıklı VF arrest; 2. şok sonrası ritim hala VF. Ne yaparsın?",
@@ -565,7 +566,8 @@
           "Lidokain 1 mg/kg iv bolus, şok yok",
           "Atropin 1 mg iv veririm"
         ],
-        correct: "B"
+        correct: "B",
+        timeLimitMs: 8000   // 8 sn
       },
       {
         text: "Olgu 2: Stabil düzenli SVT, dar QRS, semptomlu. İlk yaklaşım?",
@@ -575,7 +577,8 @@
           "Vagal manevra, başarısızsa adenozin",
           "Magnezyum sülfat"
         ],
-        correct: "C"
+        correct: "C",
+        timeLimitMs: 12000  // 12 sn
       },
       {
         text: "Olgu 3: Bilinci kapalı, monitörde kaba VF. İlk yapılacak?",
@@ -585,7 +588,8 @@
           "Hemen defibrilasyon + KPR",
           "1 mg adrenalin iv"
         ],
-        correct: "C"
+        correct: "C",
+        timeLimitMs: 10000  // 10 sn
       }
       // Buraya toplam 15 olgu olacak şekilde aynı formatta devam et
     ];
@@ -650,22 +654,32 @@
         });
       });
 
+      // State: ended / waiting / running
       sessionRef("state").on("value", (snap) => {
         const st = snap.val();
-        if (st && st.status === "ended") {
+        if (!st) return;
+        if (st.status === "ended") {
           hostStatus.textContent = "Quiz bitti. Nihai skorlar tabloda.";
           hostStatus.className = "status-text success";
           if (hostCountdownInterval) clearInterval(hostCountdownInterval);
           if (gradeTimeout) clearTimeout(gradeTimeout);
           hostTimer.textContent = "";
+        } else if (st.status === "waiting") {
+          hostStatus.textContent = "Oturum hazır. Katılımcılar tekrar katılabilir.";
+          hostStatus.className = "status-text info";
         }
       });
 
+      // Reset: tüm session'ı temizle + state: waiting
       resetBtn.onclick = () => {
-        sessionRef("").set(null).then(() => {
+        const payload = {
+          state: {
+            status: "waiting",
+            resetAt: Date.now()
+          }
+        };
+        sessionRef("").set(payload).then(() => {
           currentQuestionIndex = -1;
-          hostStatus.textContent = "Oturum sıfırlandı. İlk olguya hazırsın.";
-          hostStatus.className = "status-text info";
           hostQuestionTitle.textContent = "Henüz soru başlatılmadı.";
           hostQuestionMeta.textContent = "Henüz soru yok";
           hostOptionsList.innerHTML = "";
@@ -686,12 +700,13 @@
       if (currentQuestionIndex >= QUESTIONS.length) {
         hostStatus.textContent = "Tüm olgular bitti. Yeni soru yok.";
         hostStatus.className = "status-text info";
-        sessionRef("state").set({ status: "ended", index: currentQuestionIndex });
+        sessionRef("state").set({ status: "ended", index: currentQuestionIndex, finishedAt: Date.now() });
         return;
       }
 
       const q = QUESTIONS[currentQuestionIndex];
       const qId = "q" + currentQuestionIndex;
+      const timeLimit = q.timeLimitMs || DEFAULT_TIME_LIMIT_MS;
       const startTime = Date.now();
 
       sessionRef("answers/" + qId).set(null);
@@ -704,7 +719,7 @@
         correct: q.correct,
         qId: qId,
         startTime: startTime,
-        timeLimitMs: TIME_LIMIT_MS
+        timeLimitMs: timeLimit
       };
 
       sessionRef("currentQuestion").set(qObj);
@@ -713,7 +728,8 @@
       hostStatus.textContent = "Soru " + (currentQuestionIndex + 1) + "/" + QUESTIONS.length + " başlatıldı.";
       hostStatus.className = "status-text success";
 
-      hostQuestionMeta.textContent = "Soru " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length;
+      const seconds = Math.round(timeLimit / 1000);
+      hostQuestionMeta.textContent = "Soru " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length + " • Süre: " + seconds + " sn";
       hostQuestionTitle.textContent = q.text;
       hostOptionsList.innerHTML = "";
 
@@ -729,8 +745,8 @@
       });
 
       if (hostCountdownInterval) clearInterval(hostCountdownInterval);
-      const endTime = startTime + TIME_LIMIT_MS;
-      function tick() {
+      const endTime = startTime + timeLimit;
+      function hostTick() {
         const now = Date.now();
         const remaining = endTime - now;
         if (remaining <= 0) {
@@ -740,19 +756,19 @@
         } else {
           const sec = Math.ceil(remaining / 1000);
           hostTimer.textContent = "Kalan süre: " + sec + " sn";
-          hostTimer.className = "timer-text timer-hot";
+          hostTimer.className = "timer-text " + (sec <= 3 ? "timer-critical" : "timer-hot");
         }
       }
-      tick();
-      hostCountdownInterval = setInterval(tick, 200);
+      hostTick();
+      hostCountdownInterval = setInterval(hostTick, 200);
 
       if (gradeTimeout) clearTimeout(gradeTimeout);
       gradeTimeout = setTimeout(() => {
-        gradeQuestion(qId, q.correct);
-      }, TIME_LIMIT_MS + 400);
+        gradeQuestion(qId, q.correct, timeLimit);
+      }, timeLimit + 500);
     }
 
-    function gradeQuestion(qId, correctLetter) {
+    function gradeQuestion(qId, correctLetter, timeLimit) {
       const answersPath = "answers/" + qId;
       sessionRef(answersPath).once("value").then((snap) => {
         const answers = [];
@@ -784,7 +800,7 @@
         });
 
         if (currentQuestionIndex === QUESTIONS.length - 1) {
-          sessionRef("state").set({ status: "ended", index: currentQuestionIndex });
+          sessionRef("state").set({ status: "ended", index: currentQuestionIndex, finishedAt: Date.now() });
         }
       }).catch(err => {
         console.error("Puanlama hatası:", err);
@@ -820,6 +836,31 @@
       const playerQuestionMeta = document.getElementById("playerQuestionMeta");
       const playerQuestionBadge = document.getElementById("playerQuestionBadge");
 
+      function handleResetOnPlayerSide() {
+        localStorage.removeItem("ercQuizPlayerKey");
+        playerKey = null;
+        myNickname = "";
+        currentQuestion = null;
+        hasAnsweredThisQuestion = false;
+        if (playerCountdownInterval) clearInterval(playerCountdownInterval);
+        playerTimer.textContent = "";
+        playerTimer.className = "timer-text";
+        answerBtn.disabled = true;
+        playerOptions.innerHTML = "";
+        playerQuestionTitle.textContent = "Soru bekleniyor...";
+        playerQuestionMeta.textContent = "";
+        playerQuestionBadge.textContent = "Soru bekleniyor";
+        helloPlayer.textContent = "";
+
+        playStep.classList.add("hidden");
+        finishedStep.classList.add("hidden");
+        joinStep.classList.remove("hidden");
+
+        joinMsg.textContent = "Oturum sıfırlandı. Yeni oturuma tekrar katılabilirsin.";
+        joinMsg.className = "status-text info";
+        nickInput.value = "";
+      }
+
       sessionRef("players").on("value", (snap) => {
         const list = [];
         snap.forEach((child) => {
@@ -841,10 +882,14 @@
 
       sessionRef("state").on("value", (snap) => {
         const st = snap.val();
-        if (st && st.status === "ended") {
+        if (!st) return;
+        if (st.status === "ended") {
           finishedStep.classList.remove("hidden");
           playerTimer.textContent = "";
           answerBtn.disabled = true;
+        } else if (st.status === "waiting") {
+          // Eğitmen reset'e bastığında herkesi başa al
+          handleResetOnPlayerSide();
         }
       });
 
@@ -874,7 +919,7 @@
         }).then(() => {
           joinStep.classList.add("hidden");
           playStep.classList.remove("hidden");
-          helloPlayer.textContent = "Hoş geldin, " + myNickname + ". Hazır ol, soru başlatıldığında 5 sn içinde cevaplayacaksın.";
+          helloPlayer.textContent = "Hoş geldin, " + myNickname + ". Soru başlatıldığında süren işlemeye başlayacak.";
           helloPlayer.className = "status-text success";
         }).catch(err => {
           joinMsg.textContent = "Katılırken bir hata oluştu: " + err.message;
@@ -888,6 +933,7 @@
           playerQuestionTitle.textContent = "Soru bekleniyor...";
           playerOptions.innerHTML = "";
           playerTimer.textContent = "";
+          playerTimer.className = "timer-text";
           playerQuestionMeta.textContent = "";
           playerQuestionBadge.textContent = "Soru bekleniyor";
           answerBtn.disabled = true;
@@ -899,7 +945,8 @@
         answerMsg.textContent = "";
         answerMsg.className = "status-text";
 
-        playerQuestionMeta.textContent = "Soru " + q.index + " / " + q.total;
+        const seconds = Math.round((q.timeLimitMs || DEFAULT_TIME_LIMIT_MS) / 1000);
+        playerQuestionMeta.textContent = "Soru " + q.index + " / " + q.total + " • Süre: " + seconds + " sn";
         playerQuestionBadge.textContent = "Aktif";
         playerQuestionTitle.textContent = q.text;
         playerOptions.innerHTML = "";
@@ -921,28 +968,28 @@
         });
 
         if (playerCountdownInterval) clearInterval(playerCountdownInterval);
-        const endTime = q.startTime + q.timeLimitMs;
+        const endTime = q.startTime + (q.timeLimitMs || DEFAULT_TIME_LIMIT_MS);
         playerQuestionEndTime = endTime;
 
-        function tick() {
+        function playerTick() {
           const now = Date.now();
           const remaining = endTime - now;
           if (remaining <= 0) {
-            playerTimer.textContent = "Süre doldu.";
+            playerTimer.textContent = "Süre doldu. Eğitmenin yeni olguyu başlatmasını bekle.";
             playerTimer.className = "timer-text";
             answerBtn.disabled = true;
             clearInterval(playerCountdownInterval);
           } else {
             const sec = Math.ceil(remaining / 1000);
             playerTimer.textContent = "Kalan süre: " + sec + " sn";
-            playerTimer.className = "timer-text timer-hot";
+            playerTimer.className = "timer-text " + (sec <= 3 ? "timer-critical" : "timer-hot");
             if (!hasAnsweredThisQuestion) {
               answerBtn.disabled = false;
             }
           }
         }
-        tick();
-        playerCountdownInterval = setInterval(tick, 200);
+        playerTick();
+        playerCountdownInterval = setInterval(playerTick, 200);
       });
 
       answerBtn.onclick = () => {
@@ -956,7 +1003,7 @@
 
         const now = Date.now();
         if (playerQuestionEndTime && now > playerQuestionEndTime) {
-          answerMsg.textContent = "Süre doldu, cevap gönderilemedi.";
+          answerMsg.textContent = "Süre doldu, cevap gönderilemedi. Bir sonraki olguyu bekle.";
           answerMsg.className = "status-text error";
           answerBtn.disabled = true;
           return;
@@ -978,7 +1025,7 @@
           answer: answer,
           ts: now
         }).then(() => {
-          answerMsg.textContent = "Cevabın kaydedildi.";
+          answerMsg.textContent = "Cevabın kaydedildi. Puanlama süre sonunda yapılacak.";
           answerMsg.className = "status-text success";
         }).catch(err => {
           answerMsg.textContent = "Cevap gönderilemedi: " + err.message;
