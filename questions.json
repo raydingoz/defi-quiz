@@ -1,0 +1,40 @@
+[
+  {
+    "text": "DEMO: Monitörde kaba VF, tanıklı arrest. İlk adım?",
+    "options": [
+      "Aralıklı ritim analizi, 1 dk içinde",
+      "Hemen defibrilasyon + KPR",
+      "1 mg adrenalin",
+      "Atropin"
+    ],
+    "correct": "B",
+    "timeLimitMs": 8000,
+    "explanation": "Tanıklı VF/pulssuz VT'de öncelik defibrilasyon, ardından KPR.",
+    "isDemo": true
+  },
+  {
+    "text": "Ritim: düzenli dar QRS taşikardi, semptomlu ama stabil. Yönetim?",
+    "options": [
+      "Senkronize kardiyoversiyon",
+      "Amiodaron yükleme",
+      "Vagal manevra, başarısızsa adenozin",
+      "Magnezyum sülfat"
+    ],
+    "correct": "C",
+    "timeLimitMs": 12000,
+    "explanation": "Stabil, dar QRS SVT'de vagal manevralar ilk basamak, ardından adenozin."
+  },
+  {
+    "text": "Ritim: çok geniş, düzensiz QRS, hemodinamik instabil. Yönetim?",
+    "options": [
+      "Senkronize kardiyoversiyon",
+      "Asenkron defibrilasyon",
+      "Adenozin bolus",
+      "Sadece KPR"
+    ],
+    "correct": "B",
+    "timeLimitMs": 10000,
+    "explanation": "Preşok AF + WPW / polimorf VT/pVT'de defibrilasyon tercih edilir.",
+    "imageUrl": "https://.../ekg1.png"
+  }
+]
