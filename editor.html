@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defi Quiz – Soru Editörü</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1120;
+      --border: #1e293b;
+      --accent: #22c55e;
+      --accent-strong: #4ade80;
+      --danger: #f97373;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --heading: #f9fafb;
+      --radius-lg: 18px;
+      --radius-pill: 999px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 12px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+      color: var(--text);
+    }
+    h1 {
+      margin: 4px 0 6px;
+      font-size: 1.4rem;
+      color: var(--heading);
+    }
+    p {
+      margin: 2px 0 8px;
+      font-size: 0.88rem;
+      color: var(--muted);
+    }
+    a { color: var(--accent-strong); }
+
+    .app-shell { max-width: 1100px; margin: 0 auto; }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    @media (min-width: 900px) {
+      .layout {
+        flex-direction: row;
+        align-items: stretch;
+      }
+    }
+
+    .panel {
+      background: linear-gradient(135deg, var(--card) 0%, #020617 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 10px 12px;
+      box-shadow: 0 18px 30px rgba(15,23,42,0.8);
+    }
+    .panel-left {
+      flex: 0.9;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .panel-right {
+      flex: 1.4;
+      min-width: 0;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+    .panel-header h2 {
+      margin: 0;
+      font-size: 1rem;
+      color: var(--heading);
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 7px 11px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+      color: #022c22;
+      box-shadow: 0 10px 20px rgba(34,197,94,0.35);
+    }
+    .btn-primary:active { transform: translateY(1px) scale(0.99); }
+    .btn-secondary {
+      background: rgba(15,23,42,0.9);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-secondary:active { transform: translateY(1px); }
+    .btn-danger {
+      background: rgba(127,29,29,0.9);
+      border: 1px solid #b91c1c;
+      color: #fee2e2;
+    }
+    .btn-danger:active { transform: translateY(1px); }
+
+    .btn-sm { padding: 5px 8px; font-size: 0.75rem; }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .question-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.95);
+      max-height: 420px;
+      overflow-y: auto;
+      font-size: 0.85rem;
+    }
+    .question-item {
+      padding: 6px 8px;
+      border-bottom: 1px solid rgba(30,41,59,0.7);
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+    .question-item:last-child { border-bottom: none; }
+    .question-item:hover {
+      background: rgba(30,64,175,0.35);
+    }
+    .question-item.selected {
+      background: rgba(34,197,94,0.15);
+      border-left: 3px solid var(--accent-strong);
+    }
+    .question-label-main {
+      flex: 1;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .question-label-meta {
+      font-size: 0.72rem;
+      color: var(--muted);
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .badge-demo {
+      padding: 2px 5px;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      border: 1px solid #fbbf24;
+      color: #facc15;
+      background: rgba(251,191,36,0.1);
+    }
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+      margin-bottom: 2px;
+    }
+    input[type="text"], input[type="number"], textarea {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.95);
+      color: var(--text);
+      font-size: 0.86rem;
+      padding: 6px 8px;
+      outline: none;
+    }
+    input[type="text"]::placeholder,
+    textarea::placeholder { color: #64748b; }
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px rgba(34,197,94,0.35);
+    }
+    textarea {
+      resize: vertical;
+      min-height: 60px;
+    }
+
+    .row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .row > .col {
+      flex: 1;
+      min-width: 0;
+    }
+    .row > .col-1-3 {
+      flex: 0.33;
+      min-width: 0;
+    }
+    .row > .col-2-3 {
+      flex: 0.67;
+      min-width: 0;
+    }
+
+    select {
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.95);
+      color: var(--text);
+      font-size: 0.86rem;
+      padding: 6px 8px;
+      outline: none;
+    }
+
+    .checkbox-inline {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+    .checkbox-inline input[type="checkbox"] {
+      width: 14px;
+      height: 14px;
+    }
+
+    .help-text {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .image-preview {
+      margin-top: 6px;
+      max-width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      display: none;
+    }
+
+    .json-output {
+      margin-top: 8px;
+    }
+    .json-output textarea {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 0.78rem;
+      min-height: 120px;
+      background: rgba(15,23,42,0.95);
+      color: var(--text);
+    }
+
+    .status-bar {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .status-bar strong {
+      color: var(--accent-strong);
+    }
+
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <div class="app-shell">
+    <h1>Defi Quiz – Soru Editörü</h1>
+    <p>
+      Bu sayfada sorularını oluşturup <code>questions.json</code> çıktısı alabilirsin.
+      Sağ tarafta soruyu düzenle, solda listeyi gör; aşağıdan JSON'u kopyalayıp <code>questions.json</code> dosyana yapıştır.
+    </p>
+
+    <div class="layout">
+      <!-- SOL PANEL: Soru Listesi ve JSON işlemleri -->
+      <div class="panel panel-left">
+        <div class="panel-header">
+          <h2>Soru Listesi</h2>
+        </div>
+
+        <div class="toolbar">
+          <button id="btnNew" class="btn btn-secondary btn-sm">Yeni soru</button>
+          <button id="btnMoveUp" class="btn btn-secondary btn-sm">Yukarı taşı</button>
+          <button id="btnMoveDown" class="btn btn-secondary btn-sm">Aşağı taşı</button>
+        </div>
+
+        <ul id="questionList" class="question-list"></ul>
+
+        <div class="toolbar">
+          <label for="fileInput" class="btn btn-secondary btn-sm">
+            JSON yükle
+            <input id="fileInput" type="file" accept=".json,application/json" style="display:none;">
+          </label>
+          <button id="btnCopyJson" class="btn btn-secondary btn-sm">JSON'u kopyala</button>
+          <button id="btnDownloadJson" class="btn btn-secondary btn-sm">JSON indir</button>
+        </div>
+
+        <div class="json-output">
+          <label for="jsonOutput">Önizleme (questions.json)</label>
+          <textarea id="jsonOutput" readonly></textarea>
+        </div>
+
+        <div id="status" class="status-bar">
+          Henüz soru yok. Sağ taraftan yeni bir soru ekleyebilirsin.
+        </div>
+      </div>
+
+      <!-- SAĞ PANEL: Soru Editörü -->
+      <div class="panel panel-right">
+        <div class="panel-header">
+          <h2>Soru Düzenleyici</h2>
+          <button id="btnTemplateShock" class="btn btn-secondary btn-sm">Şok / Şok yok şablonu</button>
+        </div>
+
+        <form id="questionForm">
+          <label for="text">Soru / Olgu metni</label>
+          <textarea id="text" placeholder="Örn: 65 yaş VF arrest, 2. şok sonrası hala VF. Ne yaparsın?"></textarea>
+
+          <div class="row">
+            <div class="col">
+              <label for="optionA">A şıkkı</label>
+              <input id="optionA" type="text" placeholder="A şıkkı">
+            </div>
+            <div class="col">
+              <label for="optionB">B şıkkı</label>
+              <input id="optionB" type="text" placeholder="B şıkkı">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <label for="optionC">C şıkkı (opsiyonel)</label>
+              <input id="optionC" type="text" placeholder="C şıkkı (boş bırakılabilir)">
+            </div>
+            <div class="col">
+              <label for="optionD">D şıkkı (opsiyonel)</label>
+              <input id="optionD" type="text" placeholder="D şıkkı (boş bırakılabilir)">
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-1-3">
+              <label for="correct">Doğru şık</label>
+              <select id="correct">
+                <option value="">Seç...</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+              </select>
+            </div>
+            <div class="col-1-3">
+              <label for="timeLimit">Süre (sn)</label>
+              <input id="timeLimit" type="number" min="1" step="1" placeholder="örn. 10">
+            </div>
+            <div class="col-1-3">
+              <label for="tag">Etiket (opsiyonel)</label>
+              <input id="tag" type="text" placeholder="örn. ritim, algoritma">
+            </div>
+          </div>
+
+          <div class="checkbox-inline">
+            <input id="isDemo" type="checkbox">
+            <label for="isDemo" style="margin:0;">Demo soru (puan yok)</label>
+          </div>
+
+          <hr style="border-color:#1e293b; margin:8px 0;">
+
+          <label for="imageUrl">Görsel URL (opsiyonel)</label>
+          <input id="imageUrl" type="text" placeholder="Örn: img/vf1.png veya tam URL">
+          <div class="help-text">
+            GitHub Pages için: resmi repo'da <code>img/</code> klasörüne koyup yolunu buraya yaz.
+            Alternatif olarak aşağıdan yerel dosya seçersen Data URL oluşturup JSON'a gömer (dosya boyutu artar).
+          </div>
+
+          <div class="row" style="margin-top:4px;">
+            <div class="col">
+              <label for="imageFile">Yerel görsel (Data URL üret)</label>
+              <input id="imageFile" type="file" accept="image/*">
+              <div class="help-text">
+                Küçük PNG/JPEG ritim görselleri için kullanılabilir. Büyük dosyalar JSON'u çok şişirebilir.
+              </div>
+            </div>
+          </div>
+
+          <img id="imagePreview" class="image-preview" alt="Görsel önizleme">
+
+          <label for="explanation" style="margin-top:8px;">Açıklama (explanation)</label>
+          <textarea id="explanation" placeholder="Kısa debrief: neden bu cevap doğru, 2025 ERC'den hangi nokta?"></textarea>
+
+          <div class="row" style="margin-top:10px;">
+            <div class="col">
+              <button id="btnSave" type="submit" class="btn btn-primary">Soruyu kaydet / ekle</button>
+            </div>
+            <div class="col">
+              <button id="btnDelete" type="button" class="btn btn-danger">Seçili soruyu sil</button>
+            </div>
+          </div>
+
+          <div class="help-text" style="margin-top:4px;">
+            Not: Şıkları boş bırakırsan sondaki boşlar otomatik silinir. En az 2 şık (A ve B) olmalı.
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Basit soru editörü – tarayıcı içinde çalışır
+
+    let questions = [];
+    let selectedIndex = -1;
+
+    const questionListEl = document.getElementById("questionList");
+    const statusEl = document.getElementById("status");
+    const jsonOutputEl = document.getElementById("jsonOutput");
+
+    const textEl = document.getElementById("text");
+    const optionAEl = document.getElementById("optionA");
+    const optionBEl = document.getElementById("optionB");
+    const optionCEl = document.getElementById("optionC");
+    const optionDEl = document.getElementById("optionD");
+    const correctEl = document.getElementById("correct");
+    const timeLimitEl = document.getElementById("timeLimit");
+    const tagEl = document.getElementById("tag");
+    const isDemoEl = document.getElementById("isDemo");
+    const imageUrlEl = document.getElementById("imageUrl");
+    const imageFileEl = document.getElementById("imageFile");
+    const imagePreviewEl = document.getElementById("imagePreview");
+    const explanationEl = document.getElementById("explanation");
+
+    const btnNew = document.getElementById("btnNew");
+    const btnMoveUp = document.getElementById("btnMoveUp");
+    const btnMoveDown = document.getElementById("btnMoveDown");
+    const btnCopyJson = document.getElementById("btnCopyJson");
+    const btnDownloadJson = document.getElementById("btnDownloadJson");
+    const fileInputEl = document.getElementById("fileInput");
+    const btnTemplateShock = document.getElementById("btnTemplateShock");
+    const questionForm = document.getElementById("questionForm");
+    const btnDelete = document.getElementById("btnDelete");
+
+    function renderList() {
+      questionListEl.innerHTML = "";
+      if (!questions.length) {
+        statusEl.innerHTML = "Henüz soru yok. Sağ taraftan yeni bir soru ekleyebilirsin.";
+      } else {
+        statusEl.innerHTML = `Toplam <strong>${questions.length}</strong> soru var. Seçili soru: <strong>${selectedIndex >= 0 ? (selectedIndex + 1) : "-"}</strong>`;
+      }
+
+      questions.forEach((q, idx) => {
+        const li = document.createElement("li");
+        li.className = "question-item" + (idx === selectedIndex ? " selected" : "");
+        li.dataset.index = idx;
+
+        const shortText = (q.text || "").replace(/\s+/g, " ").trim();
+        const labelMain = document.createElement("div");
+        labelMain.className = "question-label-main";
+        labelMain.textContent = (idx + 1) + ". " + (shortText.length > 60 ? shortText.slice(0, 60) + "…" : shortText || "(metin yok)");
+
+        const labelMeta = document.createElement("div");
+        labelMeta.className = "question-label-meta";
+        const parts = [];
+        if (q.timeLimitMs) {
+          parts.push(Math.round(q.timeLimitMs / 1000) + " sn");
+        }
+        if (q.correct) {
+          parts.push("Doğru: " + q.correct);
+        }
+        if (q.isDemo) {
+          const spanDemo = document.createElement("span");
+          spanDemo.className = "badge-demo";
+          spanDemo.textContent = "DEMO";
+          labelMeta.appendChild(spanDemo);
+        }
+        if (q.imageUrl) {
+          const spanImg = document.createElement("span");
+          spanImg.textContent = "img";
+          spanImg.style.border = "1px solid #38bdf8";
+          spanImg.style.borderRadius = "999px";
+          spanImg.style.padding = "1px 5px";
+          spanImg.style.fontSize = "0.7rem";
+          spanImg.style.color = "#7dd3fc";
+          labelMeta.appendChild(spanImg);
+        }
+        if (q.tag) {
+          const spanTag = document.createElement("span");
+          spanTag.textContent = q.tag;
+          spanTag.style.border = "1px solid #4b5563";
+          spanTag.style.borderRadius = "999px";
+          spanTag.style.padding = "1px 5px";
+          spanTag.style.fontSize = "0.7rem";
+          spanTag.style.color = "#9ca3af";
+          labelMeta.appendChild(spanTag);
+        }
+        if (!q.isDemo && (q.timeLimitMs || q.correct)) {
+          const spanInfo = document.createElement("span");
+          spanInfo.textContent = parts.join(" • ");
+          labelMeta.appendChild(spanInfo);
+        }
+
+        li.appendChild(labelMain);
+        li.appendChild(labelMeta);
+        li.addEventListener("click", () => {
+          selectQuestion(idx);
+        });
+        questionListEl.appendChild(li);
+      });
+
+      updateJsonOutput();
+    }
+
+    function updateJsonOutput() {
+      jsonOutputEl.value = JSON.stringify(questions, null, 2);
+    }
+
+    function clearForm() {
+      textEl.value = "";
+      optionAEl.value = "";
+      optionBEl.value = "";
+      optionCEl.value = "";
+      optionDEl.value = "";
+      correctEl.value = "";
+      timeLimitEl.value = "";
+      tagEl.value = "";
+      isDemoEl.checked = false;
+      imageUrlEl.value = "";
+      explanationEl.value = "";
+      imageFileEl.value = "";
+      updateImagePreview();
+    }
+
+    function fillFormFromQuestion(q) {
+      textEl.value = q.text || "";
+      optionAEl.value = (q.options && q.options[0]) || "";
+      optionBEl.value = (q.options && q.options[1]) || "";
+      optionCEl.value = (q.options && q.options[2]) || "";
+      optionDEl.value = (q.options && q.options[3]) || "";
+      correctEl.value = q.correct || "";
+      timeLimitEl.value = q.timeLimitMs ? Math.round(q.timeLimitMs / 1000) : "";
+      tagEl.value = q.tag || "";
+      isDemoEl.checked = !!q.isDemo;
+      imageUrlEl.value = q.imageUrl || "";
+      explanationEl.value = q.explanation || "";
+      imageFileEl.value = "";
+      updateImagePreview();
+    }
+
+    function selectQuestion(idx) {
+      selectedIndex = idx;
+      const q = questions[idx];
+      fillFormFromQuestion(q);
+      renderList();
+    }
+
+    function collectFromForm() {
+      const text = (textEl.value || "").trim();
+      const a = (optionAEl.value || "").trim();
+      const b = (optionBEl.value || "").trim();
+      const c = (optionCEl.value || "").trim();
+      const d = (optionDEl.value || "").trim();
+      const correct = (correctEl.value || "").trim();
+      const timeLimitSec = timeLimitEl.value ? parseInt(timeLimitEl.value, 10) : null;
+      const tag = (tagEl.value || "").trim();
+      const isDemo = isDemoEl.checked;
+      const imageUrl = (imageUrlEl.value || "").trim();
+      const explanation = (explanationEl.value || "").trim();
+
+      if (!text) {
+        alert("Soru/olgu metni boş olamaz.");
+        return null;
+      }
+      if (!a || !b) {
+        alert("En az A ve B şıkları dolu olmalı.");
+        return null;
+      }
+
+      // Şıkları topla ve sondaki boşları kırp
+      let options = [a, b, c, d];
+      while (options.length > 0 && !options[options.length - 1]) {
+        options.pop();
+      }
+      if (options.length < 2) {
+        alert("En az 2 şık olmalı.");
+        return null;
+      }
+
+      if (!correct) {
+        alert("Doğru şıkkı seç.");
+        return null;
+      }
+      const correctIndex = correct.charCodeAt(0) - 65; // 'A' -> 0
+      if (correctIndex < 0 || correctIndex >= options.length) {
+        alert("Doğru şık, boş bir seçeneğe karşılık geliyor. Lütfen şıkları ve doğru şıkkı kontrol et.");
+        return null;
+      }
+
+      let timeLimitMs = null;
+      if (timeLimitSec !== null && !isNaN(timeLimitSec) && timeLimitSec > 0) {
+        timeLimitMs = timeLimitSec * 1000;
+      }
+
+      const q = {
+        text: text,
+        options: options,
+        correct: correct
+      };
+      if (timeLimitMs) q.timeLimitMs = timeLimitMs;
+      if (tag) q.tag = tag;
+      if (isDemo) q.isDemo = true;
+      if (imageUrl) q.imageUrl = imageUrl;
+      if (explanation) q.explanation = explanation;
+
+      return q;
+    }
+
+    function updateImagePreview() {
+      const url = (imageUrlEl.value || "").trim();
+      if (!url) {
+        imagePreviewEl.style.display = "none";
+        imagePreviewEl.src = "";
+        return;
+      }
+      imagePreviewEl.src = url;
+      imagePreviewEl.style.display = "block";
+    }
+
+    // Eventler
+    btnNew.addEventListener("click", () => {
+      selectedIndex = -1;
+      clearForm();
+      renderList();
+    });
+
+    btnMoveUp.addEventListener("click", () => {
+      if (selectedIndex <= 0) return;
+      const i = selectedIndex;
+      const tmp = questions[i - 1];
+      questions[i - 1] = questions[i];
+      questions[i] = tmp;
+      selectedIndex = i - 1;
+      renderList();
+    });
+
+    btnMoveDown.addEventListener("click", () => {
+      if (selectedIndex < 0 || selectedIndex >= questions.length - 1) return;
+      const i = selectedIndex;
+      const tmp = questions[i + 1];
+      questions[i + 1] = questions[i];
+      questions[i] = tmp;
+      selectedIndex = i + 1;
+      renderList();
+    });
+
+    btnTemplateShock.addEventListener("click", () => {
+      optionAEl.value = "Şok";
+      optionBEl.value = "Şok yok";
+      optionCEl.value = "";
+      optionDEl.value = "";
+      correctEl.value = "A";
+    });
+
+    imageUrlEl.addEventListener("input", updateImagePreview);
+
+    imageFileEl.addEventListener("change", () => {
+      const file = imageFileEl.files && imageFileEl.files[0];
+      if (!file) return;
+      if (!file.type.startsWith("image/")) {
+        alert("Lütfen bir görsel dosyası seç.");
+        imageFileEl.value = "";
+        return;
+      }
+      // Uyarı: büyük dosyalar JSON boyutunu çok artırır
+      if (file.size > 800 * 1024) {
+        if (!confirm("Bu dosya 800KB'den büyük. Data URL olarak eklemek JSON'u oldukça büyütecek. Devam etmek istiyor musun?")) {
+          imageFileEl.value = "";
+          return;
+        }
+      }
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        imageUrlEl.value = e.target.result; // data URL
+        updateImagePreview();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    questionForm.addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = collectFromForm();
+      if (!q) return;
+
+      if (selectedIndex === -1) {
+        questions.push(q);
+        selectedIndex = questions.length - 1;
+      } else {
+        questions[selectedIndex] = q;
+      }
+      renderList();
+      alert("Soru kaydedildi.");
+    });
+
+    btnDelete.addEventListener("click", () => {
+      if (selectedIndex < 0 || selectedIndex >= questions.length) {
+        alert("Silmek için önce listeden bir soru seç.");
+        return;
+      }
+      if (!confirm("Bu soruyu silmek istediğine emin misin?")) return;
+      questions.splice(selectedIndex, 1);
+      selectedIndex = -1;
+      clearForm();
+      renderList();
+    });
+
+    btnCopyJson.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(jsonOutputEl.value);
+        alert("JSON panoya kopyalandı.");
+      } catch (err) {
+        alert("Kopyalama başarısız oldu. JSON'u elle seçip kopyalayabilirsin.");
+      }
+    });
+
+    btnDownloadJson.addEventListener("click", () => {
+      const blob = new Blob([jsonOutputEl.value], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "questions.json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    fileInputEl.addEventListener("change", () => {
+      const file = fileInputEl.files && fileInputEl.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (Array.isArray(data)) {
+            questions = data;
+          } else if (data && Array.isArray(data.questions)) {
+            questions = data.questions;
+          } else {
+            alert("JSON formatı beklenenden farklı. Bir dizi ([]) veya { questions: [] } olmalı.");
+            return;
+          }
+          selectedIndex = -1;
+          clearForm();
+          renderList();
+          alert("JSON başarıyla yüklendi.");
+        } catch (err) {
+          alert("JSON parse edilemedi: " + err.message);
+        }
+      };
+      reader.readAsText(file, "utf-8");
+    });
+
+    // Başlangıç
+    renderList();
+  </script>
+</body>
+</html>
