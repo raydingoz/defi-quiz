@@ -31,6 +31,7 @@
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
       color: var(--text);
+      font-size: 16px;
     }
 
     .app-shell {
@@ -494,6 +495,73 @@
         gap: 12px;
       }
     }
+
+    /* QR overlay (büyütülmüş QR için) */
+    .qr-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.9);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .qr-overlay-inner {
+      background: linear-gradient(135deg, #020617, #020617);
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      padding: 16px 18px;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 24px 40px rgba(0,0,0,0.8);
+    }
+    .qr-overlay-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      font-size: 0.9rem;
+      color: var(--heading);
+    }
+    #qrBig canvas,
+    #qrBig img {
+      width: 320px;
+      height: 320px;
+    }
+
+    /* Projeksiyon modu – daha büyük fontlar, daha geniş kabuk */
+    body.projection-mode {
+      font-size: 18px;
+    }
+    body.projection-mode .app-shell {
+      max-width: 1180px;
+    }
+    body.projection-mode h1 {
+      font-size: 2rem;
+    }
+    body.projection-mode h2 {
+      font-size: 1.35rem;
+    }
+    body.projection-mode .question-text {
+      font-size: 1.15rem;
+    }
+    body.projection-mode .option-text {
+      font-size: 1rem;
+    }
+    body.projection-mode .option-letter {
+      width: 30px;
+      height: 30px;
+      font-size: 0.95rem;
+    }
+    body.projection-mode .timer-text {
+      font-size: 1rem;
+    }
+    body.projection-mode .score-name-cell,
+    body.projection-mode .score-points {
+      font-size: 0.95rem;
+    }
   </style>
 
   <!-- QR code -->
@@ -511,6 +579,20 @@
 
     <div id="modeInfo"></div>
 
+    <!-- QR OVERLAY (BÜYÜTÜLMÜŞ) -->
+    <div id="qrOverlay" class="qr-overlay hidden">
+      <div class="qr-overlay-inner">
+        <div class="qr-overlay-header">
+          <span>Katılım QR Kodu</span>
+          <button id="qrOverlayClose" class="btn btn-secondary btn-sm">Kapat</button>
+        </div>
+        <div id="qrBig"></div>
+        <p class="status-text info" style="margin-top:8px; text-align:center;">
+          Katılmak için bu QR kodu telefonunuzla tarayın.
+        </p>
+      </div>
+    </div>
+
     <!-- EĞİTMEN ALANI -->
     <div id="hostArea" class="hidden">
       <h1>Defibrilasyon & Kardiyoversiyon Quiz</h1>
@@ -526,9 +608,14 @@
               </span>
             </div>
             <p id="hostStatus" class="status-text info">Hazır.</p>
-            <button id="resetBtn" class="btn btn-secondary btn-sm">
-              Oturumu Sıfırla
-            </button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
+              <button id="resetBtn" class="btn btn-secondary btn-sm">
+                Oturumu Sıfırla
+              </button>
+              <button id="projectionToggleBtn" class="btn btn-secondary btn-sm">
+                Projeksiyon modu
+              </button>
+            </div>
           </div>
 
           <div id="hostQuestionCard" class="card">
@@ -573,6 +660,9 @@
               Katılımcılar telefonlarından QR'ı okutarak katılabilir.
             </p>
             <div id="qrcode"></div>
+            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
+              <button id="qrEnlargeBtn" class="btn btn-secondary btn-sm">Büyüt</button>
+            </div>
             <p style="margin-top:10px;">Katılımcı adresi:</p>
             <p id="playerLink"></p>
           </div>
@@ -811,7 +901,12 @@
 
       const hostStatus = document.getElementById("hostStatus");
       const resetBtn = document.getElementById("resetBtn");
+      const projectionToggleBtn = document.getElementById("projectionToggleBtn");
       const qrcodeDiv = document.getElementById("qrcode");
+      const qrEnlargeBtn = document.getElementById("qrEnlargeBtn");
+      const qrOverlay = document.getElementById("qrOverlay");
+      const qrOverlayClose = document.getElementById("qrOverlayClose");
+      const qrBigDiv = document.getElementById("qrBig");
       const playerLinkSpan = document.getElementById("playerLink");
       const nextQuestionBtn = document.getElementById("nextQuestionBtn");
       const hostQuestionCard = document.getElementById("hostQuestionCard");
@@ -836,6 +931,31 @@
         width: 180,
         height: 180
       });
+
+      new QRCode(qrBigDiv, {
+        text: playerUrl,
+        width: 320,
+        height: 320
+      });
+
+      qrEnlargeBtn.onclick = () => {
+        qrOverlay.classList.remove("hidden");
+      };
+      qrOverlayClose.onclick = () => {
+        qrOverlay.classList.add("hidden");
+      };
+      qrOverlay.addEventListener("click", (e) => {
+        if (e.target === qrOverlay) {
+          qrOverlay.classList.add("hidden");
+        }
+      });
+
+      let projectionOn = false;
+      projectionToggleBtn.onclick = () => {
+        projectionOn = !projectionOn;
+        document.body.classList.toggle("projection-mode", projectionOn);
+        projectionToggleBtn.textContent = projectionOn ? "Projeksiyon modunu kapat" : "Projeksiyon modu";
+      };
 
       sessionRef("players").on("value", (snap) => {
         const list = [];
