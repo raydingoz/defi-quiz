@@ -496,7 +496,7 @@
       }
     }
 
-    /* QR overlay (büyütülmüş QR için) */
+    /* QR overlay (büyütülmüş) */
     .qr-overlay {
       position: fixed;
       inset: 0;
@@ -525,13 +525,23 @@
       font-size: 0.9rem;
       color: var(--heading);
     }
+
+    /* Beyaz zeminli büyük QR */
+    #qrBig {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      background: #ffffff;
+      border-radius: 16px;
+    }
     #qrBig canvas,
     #qrBig img {
       width: 320px;
       height: 320px;
     }
 
-    /* Projeksiyon modu – daha büyük fontlar, daha geniş kabuk */
+    /* Projeksiyon modu – daha büyük fontlar */
     body.projection-mode {
       font-size: 18px;
     }
@@ -562,6 +572,14 @@
     body.projection-mode .score-points {
       font-size: 0.95rem;
     }
+
+    /* Katılım adresini büyüt */
+    #playerLinkBig {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      word-break: break-all;
+    }
   </style>
 
   <!-- QR code -->
@@ -584,7 +602,13 @@
       <div class="qr-overlay-inner">
         <div class="qr-overlay-header">
           <span>Katılım QR Kodu</span>
-          <button id="qrOverlayClose" class="btn btn-secondary btn-sm">Kapat</button>
+          <button
+            id="qrOverlayClose"
+            class="btn btn-secondary btn-sm"
+            onclick="document.getElementById('qrOverlay').classList.add('hidden');"
+          >
+            Kapat
+          </button>
         </div>
         <div id="qrBig"></div>
         <p class="status-text info" style="margin-top:8px; text-align:center;">
@@ -610,10 +634,13 @@
             <p id="hostStatus" class="status-text info">Hazır.</p>
             <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
               <button id="resetBtn" class="btn btn-secondary btn-sm">
-                Oturumu Sıfırla
+                Oturumu Sıfırla (R)
               </button>
               <button id="projectionToggleBtn" class="btn btn-secondary btn-sm">
-                Projeksiyon modu
+                Projeksiyon modu (P)
+              </button>
+              <button id="hostViewToggleBtn" class="btn btn-secondary btn-sm">
+                Katılım ekranı
               </button>
             </div>
           </div>
@@ -646,25 +673,27 @@
             </div>
 
             <button id="nextQuestionBtn" class="btn btn-primary" style="margin-top:10px;">
-              Sonraki olguyu başlat
+              Sonraki olguyu başlat (N)
             </button>
           </div>
         </div>
 
         <div>
-          <div class="card">
+          <div id="hostQrCard" class="card">
             <div class="card-header">
               <h2>Katılım QR Kodu</h2>
             </div>
             <p class="status-text info">
-              Katılımcılar telefonlarından QR'ı okutarak katılabilir.
+              Katılımcılar telefonlarından QR'ı okutarak veya adresi yazarak katılabilir.
             </p>
             <div id="qrcode"></div>
             <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-              <button id="qrEnlargeBtn" class="btn btn-secondary btn-sm">Büyüt</button>
+              <button id="qrEnlargeBtn" class="btn btn-secondary btn-sm">Büyüt (Q)</button>
             </div>
-            <p style="margin-top:10px;">Katılımcı adresi:</p>
+            <p style="margin-top:10px;">Kısa adres:</p>
+            <p id="playerLinkBig"></p>
             <p id="playerLink"></p>
+            <p id="sessionCodeLabel" class="status-text info"></p>
           </div>
 
           <div class="card">
@@ -827,6 +856,12 @@
         correct: "C",
         timeLimitMs: 10000,
         explanation: "Tanıklı VF/pulssuz VT'de mümkün olan en kısa sürede defibrilasyon, ardından KPR."
+      },
+      {
+        type: "info",
+        text: "3'lü şok yok!\nHer şoktan sonra 2 dk KPR, sonra ritim değerlendirmesi.",
+        explanation: "ERC 2025 ALS algoritmasında ardışık 3'lü şok yerine; her defibrilasyondan sonra 2 dk yüksek kaliteli KPR, arada ritim ve nabız kontrolü önerilir.",
+        tag: "reminder"
       }
     ];
 
@@ -902,14 +937,17 @@
       const hostStatus = document.getElementById("hostStatus");
       const resetBtn = document.getElementById("resetBtn");
       const projectionToggleBtn = document.getElementById("projectionToggleBtn");
+      const hostViewToggleBtn = document.getElementById("hostViewToggleBtn");
       const qrcodeDiv = document.getElementById("qrcode");
       const qrEnlargeBtn = document.getElementById("qrEnlargeBtn");
       const qrOverlay = document.getElementById("qrOverlay");
-      const qrOverlayClose = document.getElementById("qrOverlayClose");
       const qrBigDiv = document.getElementById("qrBig");
       const playerLinkSpan = document.getElementById("playerLink");
+      const playerLinkBig = document.getElementById("playerLinkBig");
+      const sessionCodeLabel = document.getElementById("sessionCodeLabel");
       const nextQuestionBtn = document.getElementById("nextQuestionBtn");
       const hostQuestionCard = document.getElementById("hostQuestionCard");
+      const hostQrCard = document.getElementById("hostQrCard");
       const hostQuestionBadge = document.getElementById("hostQuestionBadge");
       const hostQuestionTitle = document.getElementById("hostQuestionTitle");
       const hostOptionsList = document.getElementById("hostOptionsList");
@@ -923,17 +961,20 @@
       const hostStats = document.getElementById("hostStats");
       const hostQuestionImage = document.getElementById("hostQuestionImage");
 
-      const playerUrl = window.location.origin + window.location.pathname;
-      playerLinkSpan.textContent = playerUrl;
+      const baseUrl = window.location.origin + window.location.pathname;
+      const displayUrl = baseUrl.replace(/^https?:\/\//, "");
+      playerLinkSpan.textContent = baseUrl;
+      playerLinkBig.textContent = displayUrl;
+      sessionCodeLabel.textContent = "Teknik oturum kimliği: " + SESSION_ID;
 
       new QRCode(qrcodeDiv, {
-        text: playerUrl,
+        text: baseUrl,
         width: 180,
         height: 180
       });
 
       new QRCode(qrBigDiv, {
-        text: playerUrl,
+        text: baseUrl,
         width: 320,
         height: 320
       });
@@ -941,9 +982,8 @@
       qrEnlargeBtn.onclick = () => {
         qrOverlay.classList.remove("hidden");
       };
-      qrOverlayClose.onclick = () => {
-        qrOverlay.classList.add("hidden");
-      };
+      // Kapama butonu inline onclick ile de bağlı (HTML tarafında)
+
       qrOverlay.addEventListener("click", (e) => {
         if (e.target === qrOverlay) {
           qrOverlay.classList.add("hidden");
@@ -954,8 +994,26 @@
       projectionToggleBtn.onclick = () => {
         projectionOn = !projectionOn;
         document.body.classList.toggle("projection-mode", projectionOn);
-        projectionToggleBtn.textContent = projectionOn ? "Projeksiyon modunu kapat" : "Projeksiyon modu";
+        projectionToggleBtn.textContent = projectionOn ? "Projeksiyon modunu kapat (P)" : "Projeksiyon modu (P)";
       };
+
+      let hostViewMode = "quiz";
+      function updateHostViewMode() {
+        if (hostViewMode === "join") {
+          hostQuestionCard.classList.add("hidden");
+          hostQrCard.classList.remove("hidden");
+          hostViewToggleBtn.textContent = "Quiz ekranı";
+        } else {
+          hostQuestionCard.classList.remove("hidden");
+          hostQrCard.classList.remove("hidden");
+          hostViewToggleBtn.textContent = "Katılım ekranı";
+        }
+      }
+      hostViewToggleBtn.onclick = () => {
+        hostViewMode = hostViewMode === "quiz" ? "join" : "quiz";
+        updateHostViewMode();
+      };
+      updateHostViewMode();
 
       sessionRef("players").on("value", (snap) => {
         const list = [];
@@ -1009,6 +1067,9 @@
           hostTimer.textContent = "";
         } else if (st.status === "waiting") {
           hostStatus.textContent = "Oturum hazır. Katılımcılar tekrar katılabilir.";
+          hostStatus.className = "status-text info";
+        } else if (st.status === "info") {
+          hostStatus.textContent = "Bilgi slaytı gösteriliyor (puan yok).";
           hostStatus.className = "status-text info";
         }
       });
@@ -1131,6 +1192,30 @@
           hostExplanationTag
         );
       };
+
+      // Klavye kısayolları
+      document.addEventListener("keydown", (e) => {
+        if (!IS_HOST) return;
+        if (e.altKey || e.ctrlKey || e.metaKey) return;
+        const tag = (e.target && e.target.tagName) || "";
+        if (tag === "INPUT" || tag === "TEXTAREA") return;
+
+        if (e.key === "n" || e.key === "N") {
+          e.preventDefault();
+          nextQuestionBtn.click();
+        } else if (e.key === "q" || e.key === "Q") {
+          e.preventDefault();
+          qrOverlay.classList.toggle("hidden");
+        } else if (e.key === "p" || e.key === "P") {
+          e.preventDefault();
+          projectionToggleBtn.click();
+        } else if (e.key === "r" || e.key === "R") {
+          e.preventDefault();
+          if (confirm("Oturumu gerçekten sıfırlamak istiyor musun?")) {
+            resetBtn.click();
+          }
+        }
+      });
     }
 
     function startNextQuestion(
@@ -1156,11 +1241,15 @@
         return;
       }
 
-      const q = QUESTIONS[currentQuestionIndex];
+      const q = QUESTIONS[currentQuestionIndex] || {};
       const qId = "q" + currentQuestionIndex;
+      const isInfo = q.type === "info";
       const timeLimit = q.timeLimitMs || DEFAULT_TIME_LIMIT_MS;
       const startTime = Date.now();
       hostCurrentQId = qId;
+
+      if (hostCountdownInterval) clearInterval(hostCountdownInterval);
+      if (gradeTimeout) clearTimeout(gradeTimeout);
 
       sessionRef("answers/" + qId).set(null);
 
@@ -1169,22 +1258,18 @@
         total: QUESTIONS.length,
         text: q.text,
         options: q.options || [],
-        correct: q.correct,
+        correct: q.correct || null,
         qId: qId,
         startTime: startTime,
-        timeLimitMs: timeLimit,
+        timeLimitMs: isInfo ? 0 : timeLimit,
         imageUrl: q.imageUrl || null,
-        tag: q.tag || null
+        tag: q.tag || null,
+        type: q.type || "question"
       };
 
       sessionRef("currentQuestion").set(qObj);
-      sessionRef("state").set({ status: "running", index: currentQuestionIndex });
+      sessionRef("state").set({ status: isInfo ? "info" : "running", index: currentQuestionIndex });
 
-      hostStatus.textContent = "Soru " + (currentQuestionIndex + 1) + "/" + QUESTIONS.length + " başlatıldı.";
-      hostStatus.className = "status-text success";
-
-      const seconds = Math.round(timeLimit / 1000);
-      hostQuestionMeta.textContent = "Soru " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length + " • Süre: " + seconds + " sn";
       hostQuestionTitle.textContent = q.text || "";
       hostOptionsList.innerHTML = "";
       hostExplanationCard.classList.add("hidden");
@@ -1193,10 +1278,14 @@
       hostStats.innerHTML = "";
       hostExplanationTag.textContent = "";
 
-      if (q.tag === "shock") {
+      if (q.tag === "shock" && !isInfo) {
         hostQuestionBadge.textContent = "Şok / Şok yok turu";
         hostQuestionBadge.classList.add("badge-shock");
         hostQuestionCard.classList.add("card-shock");
+      } else if (isInfo) {
+        hostQuestionBadge.textContent = "Bilgi slaytı";
+        hostQuestionBadge.classList.remove("badge-shock");
+        hostQuestionCard.classList.remove("card-shock");
       } else {
         hostQuestionBadge.textContent = "Süreli soru";
         hostQuestionBadge.classList.remove("badge-shock");
@@ -1211,6 +1300,23 @@
         hostQuestionImage.classList.add("hidden");
       }
 
+      if (isInfo) {
+        hostStatus.textContent = "Bilgi slaytı gösteriliyor (puan yok).";
+        hostStatus.className = "status-text info";
+        hostQuestionMeta.textContent = "Bilgi slaytı – Olgu " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length;
+        hostTimer.textContent = "";
+        hostTimer.className = "timer-text";
+        // İstersen info slaytında q.explanation'ı hemen oyunculara da göstermek için currentQuestion.explanation alanını kullandık;
+        // oyuncu tarafında q.explanation doğrudan gösteriliyor.
+        return;
+      }
+
+      hostStatus.textContent = "Soru " + (currentQuestionIndex + 1) + "/" + QUESTIONS.length + " başlatıldı.";
+      hostStatus.className = "status-text success";
+
+      const seconds = Math.round(timeLimit / 1000);
+      hostQuestionMeta.textContent = "Soru " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length + " • Süre: " + seconds + " sn";
+
       (q.options || []).forEach((opt, idx) => {
         const letter = String.fromCharCode(65 + idx);
         const div = document.createElement("div");
@@ -1223,7 +1329,6 @@
         hostOptionsList.appendChild(div);
       });
 
-      if (hostCountdownInterval) clearInterval(hostCountdownInterval);
       const endTime = startTime + timeLimit;
       function hostTick() {
         const now = Date.now();
@@ -1241,7 +1346,6 @@
       hostTick();
       hostCountdownInterval = setInterval(hostTick, 200);
 
-      if (gradeTimeout) clearTimeout(gradeTimeout);
       gradeTimeout = setTimeout(() => {
         gradeQuestion(qId, q.correct, timeLimit);
       }, timeLimit + 500);
@@ -1494,6 +1598,36 @@
         answerMsg.className = "status-text";
         playerExplanation.textContent = "";
 
+        const isInfo = q.type === "info";
+
+        if (q.imageUrl) {
+          playerQuestionImage.src = q.imageUrl;
+          playerQuestionImage.classList.remove("hidden");
+        } else {
+          playerQuestionImage.src = "";
+          playerQuestionImage.classList.add("hidden");
+        }
+
+        if (isInfo) {
+          playerQuestionMeta.textContent = "Bilgi slaytı – Eğitmenin açıklamasını dinleyin (puan yok).";
+          playerQuestionBadge.textContent = "Bilgi slaytı";
+          playerQuestionBadge.classList.remove("badge-shock");
+          playerQuestionTitle.textContent = q.text || "";
+          playerOptions.innerHTML = "";
+          playerTimer.textContent = "";
+          playerTimer.className = "timer-text";
+          answerBtn.disabled = true;
+
+          if (q.explanation) {
+            playerExplanation.textContent = q.explanation;
+          } else {
+            playerExplanation.textContent = "";
+          }
+
+          if (playerCountdownInterval) clearInterval(playerCountdownInterval);
+          return;
+        }
+
         const seconds = Math.round((q.timeLimitMs || DEFAULT_TIME_LIMIT_MS) / 1000);
         playerQuestionMeta.textContent = "Soru " + q.index + " / " + q.total + " • Süre: " + seconds + " sn";
 
@@ -1507,14 +1641,6 @@
 
         playerQuestionTitle.textContent = q.text || "";
         playerOptions.innerHTML = "";
-
-        if (q.imageUrl) {
-          playerQuestionImage.src = q.imageUrl;
-          playerQuestionImage.classList.remove("hidden");
-        } else {
-          playerQuestionImage.src = "";
-          playerQuestionImage.classList.add("hidden");
-        }
 
         (q.options || []).forEach((opt, idx) => {
           const letter = String.fromCharCode(65 + idx);
