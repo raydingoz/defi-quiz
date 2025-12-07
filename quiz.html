@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defibrilasyon & Kardiyoversiyon Quiz</title>
+
+  <!-- Basit stil -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 1000px;
+      margin: 20px auto;
+    }
+    .hidden { display: none; }
+    .box {
+      border: 1px solid #ccc;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    label { display: block; margin: 4px 0; }
+    button {
+      padding: 6px 12px;
+      margin-top: 6px;
+      cursor: pointer;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 4px 6px;
+      text-align: left;
+    }
+    th { background-color: #f0f0f0; }
+    #modeInfo {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+  </style>
+
+  <!-- QR code kütüphanesi -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"
+          integrity="sha512-Mm6G6ZrA3sygJqF9G7Q1f9R7j6tY9P2qxGn8p2B3F9lUFXAV/QBvB2ZBrYq6YBZZYBhQX40S/j2Ck46pU5TgVA=="
+          crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+  <!-- Firebase v8 (app + realtime db) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
+  <div id="modeInfo"></div>
+
+  <!-- EĞİTMEN ALANI -->
+  <div id="hostArea" class="hidden">
+    <h1>Defibrilasyon & Elektriksel Kardiyoversiyon Quiz – Eğitmen</h1>
+
+    <div class="box">
+      <p id="hostStatus">Hazır.</p>
+      <button id="resetBtn">Oturumu Sıfırla</button>
+    </div>
+
+    <div class="box">
+      <h2>Katılım QR Kodu</h2>
+      <div id="qrcode"></div>
+      <p>Katılımcı adresi: <span id="playerLink"></span></p>
+    </div>
+
+    <div class="box">
+      <h2>Aktif Olgu</h2>
+      <p id="hostQuestionTitle">Henüz soru başlatılmadı.</p>
+      <ul id="hostOptionsList"></ul>
+      <p id="hostTimer"></p>
+      <button id="nextQuestionBtn">Sonraki olguyu başlat (5 sn)</button>
+    </div>
+
+    <div class="box">
+      <h2>Liderlik Tablosu</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Sıra</th>
+            <th>Nick</th>
+            <th>Puan</th>
+          </tr>
+        </thead>
+        <tbody id="hostScoreBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- KATILIMCI ALANI -->
+  <div id="playerArea" class="hidden">
+    <h1>Quiz Katılım Ekranı</h1>
+
+    <div id="joinStep" class="box">
+      <label>
+        Nick:
+        <input type="text" id="nickInput" />
+      </label>
+      <button id="joinBtn">Katıl</button>
+      <p id="joinMsg"></p>
+    </div>
+
+    <div id="playStep" class="box hidden">
+      <p id="helloPlayer"></p>
+      <h2 id="playerQuestionTitle">Soru bekleniyor...</h2>
+      <div id="playerOptions"></div>
+      <p id="playerTimer"></p>
+      <button id="answerBtn" disabled>Cevapla</button>
+      <p id="answerMsg"></p>
+    </div>
+
+    <div class="box">
+      <h2>Liderlik (ilk 10)</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Sıra</th>
+            <th>Nick</th>
+            <th>Puan</th>
+          </tr>
+        </thead>
+        <tbody id="playerScoreBody"></tbody>
+      </table>
+    </div>
+
+    <div id="finishedStep" class="box hidden">
+      <h2>Quiz Tamamlandı</h2>
+      <p>Katıldığın için teşekkürler. Nihai skorlar tabloda.</p>
+    </div>
+  </div>
+
+  <script>
+    /*************** 1) AYARLAR ***************/
+
+    // BURAYI kendi Firebase projenin config'i ile değiştir:
+    const firebaseConfig = {
+      apiKey: "BURAYA_API_KEY",
+      authDomain: "BURAYA_AUTH_DOMAIN",
+      databaseURL: "BURAYA_DATABASE_URL",
+      projectId: "BURAYA_PROJECT_ID",
+      storageBucket: "BURAYA_STORAGE_BUCKET",
+      messagingSenderId: "BURAYA_SENDER_ID",
+      appId: "BURAYA_APP_ID"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Aynı dosyayı farklı oturumlar için kullanmak istersen bunu değiştir:
+    const SESSION_ID = "erc-quiz-als-2025";
+
+    // Soru süresi (5 sn)
+    const TIME_LIMIT_MS = 5000;
+
+    // BURAYA KENDİ 15 OLGUNU KOY:
+    // options dizisi: 4 şık; correct: "A", "B", "C" veya "D"
+    const QUESTIONS = [
+      {
+        text: "Olgu 1: 65 yaş, tanıklı VF arrest; 2. şok sonrası ritim hala VF. Ne yaparsın?",
+        options: [
+          "A) Hemen üçüncü şoku uygularım",
+          "B) 2 dk KPR, sonra ritim kontrolü ve uygun ise tekrar şok",
+          "C) Lidokain 1 mg/kg iv bolus, şok yok",
+          "D) Atropin 1 mg iv veririm"
+        ],
+        correct: "B"
+      },
+      {
+        text: "Olgu 2: Stabil düzenli SVT, geniş olmayan QRS, semptomlu. İlk yaklaşım?",
+        options: [
+          "A) Amiodaron yükleme",
+          "B) Senkronize kardiyoversiyon",
+          "C) Vagal manevra, başarısızsa adenozin",
+          "D) Magnezyum sülfat"
+        ],
+        correct: "C"
+      },
+      {
+        text: "Olgu 3: Bilinci kapalı, monitörde kaba VF. İlk yapılacak?",
+        options: [
+          "A) 1 dk ritim analizi",
+          "B) Senkronize kardiyoversiyon",
+          "C) Hemen defibrilasyon + KPR",
+          "D) 1 mg adrenalin iv"
+        ],
+        correct: "C"
+      }
+      // ... buraya toplam 15 olgu olacak şekilde devam et ...
+    ];
+
+    /*************** 2) GENEL DEĞİŞKENLER ***************/
+    const params = new URLSearchParams(window.location.search);
+    const IS_HOST = params.get("host") === "1";
+
+    const modeInfo = document.getElementById("modeInfo");
+    const hostArea = document.getElementById("hostArea");
+    const playerArea = document.getElementById("playerArea");
+
+    // Ortak DB path helper
+    function sessionRef(path) {
+      return db.ref("sessions/" + SESSION_ID + (path ? "/" + path : ""));
+    }
+
+    /*************** 3) EĞİTMEN TARAFI ***************/
+    let currentQuestionIndex = -1;
+    let hostCountdownInterval = null;
+    let gradeTimeout = null;
+
+    function initHost() {
+      hostArea.classList.remove("hidden");
+      modeInfo.textContent = "Mod: Eğitmen (projeksiyona bunu yansıt)";
+
+      // Elementler
+      const hostStatus = document.getElementById("hostStatus");
+      const resetBtn = document.getElementById("resetBtn");
+      const qrcodeDiv = document.getElementById("qrcode");
+      const playerLinkSpan = document.getElementById("playerLink");
+      const nextQuestionBtn = document.getElementById("nextQuestionBtn");
+      const hostQuestionTitle = document.getElementById("hostQuestionTitle");
+      const hostOptionsList = document.getElementById("hostOptionsList");
+      const hostTimer = document.getElementById("hostTimer");
+      const hostScoreBody = document.getElementById("hostScoreBody");
+
+      // Katılımcı linki (host parametresiz)
+      const playerUrl = window.location.origin + window.location.pathname;
+      playerLinkSpan.textContent = playerUrl;
+
+      // QR oluştur
+      new QRCode(qrcodeDiv, {
+        text: playerUrl,
+        width: 200,
+        height: 200
+      });
+
+      // Skor tablosu listener
+      sessionRef("players").on("value", (snap) => {
+        const list = [];
+        snap.forEach((child) => {
+          const val = child.val();
+          list.push({
+            nickname: val.nickname || "???",
+            score: val.score || 0
+          });
+        });
+        list.sort((a, b) => b.score - a.score);
+
+        hostScoreBody.innerHTML = "";
+        list.forEach((p, idx) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${idx + 1}</td><td>${p.nickname}</td><td>${p.score}</td>`;
+          hostScoreBody.appendChild(tr);
+        });
+      });
+
+      // Session durumunu izle (quiz bitti mi)
+      sessionRef("state").on("value", (snap) => {
+        const st = snap.val();
+        if (st && st.status === "ended") {
+          hostStatus.textContent = "Quiz bitti. Nihai skorlar tabloda.";
+          if (hostCountdownInterval) clearInterval(hostCountdownInterval);
+          if (gradeTimeout) clearTimeout(gradeTimeout);
+          hostTimer.textContent = "";
+        }
+      });
+
+      // Oturumu sıfırla
+      resetBtn.onclick = () => {
+        sessionRef("").set(null).then(() => {
+          currentQuestionIndex = -1;
+          hostStatus.textContent = "Oturum sıfırlandı. İlk olguya hazırsın.";
+          hostQuestionTitle.textContent = "Henüz soru başlatılmadı.";
+          hostOptionsList.innerHTML = "";
+          hostTimer.textContent = "";
+        });
+      };
+
+      // Sonraki soruyu başlat
+      nextQuestionBtn.onclick = () => {
+        startNextQuestion(hostStatus, hostQuestionTitle, hostOptionsList, hostTimer);
+      };
+    }
+
+    function startNextQuestion(hostStatus, hostQuestionTitle, hostOptionsList, hostTimer) {
+      currentQuestionIndex++;
+      if (currentQuestionIndex >= QUESTIONS.length) {
+        hostStatus.textContent = "Tüm olgular bitti. Yeni soru yok.";
+        sessionRef("state").set({ status: "ended", index: currentQuestionIndex });
+        return;
+      }
+
+      const q = QUESTIONS[currentQuestionIndex];
+      const qId = "q" + currentQuestionIndex;
+      const startTime = Date.now();
+
+      // Eski cevapları temizle
+      sessionRef("answers/" + qId).set(null);
+
+      // Şu anki soruyu DB'ye yaz
+      const qObj = {
+        index: currentQuestionIndex + 1,
+        total: QUESTIONS.length,
+        text: q.text,
+        options: q.options,
+        correct: q.correct,
+        qId: qId,
+        startTime: startTime,
+        timeLimitMs: TIME_LIMIT_MS
+      };
+
+      sessionRef("currentQuestion").set(qObj);
+      sessionRef("state").set({ status: "running", index: currentQuestionIndex });
+
+      // Eğitmen ekranında göster
+      hostStatus.textContent = "Soru " + (currentQuestionIndex + 1) + "/" + QUESTIONS.length + " başlatıldı.";
+      hostQuestionTitle.textContent = q.text;
+      hostOptionsList.innerHTML = "";
+      q.options.forEach((opt) => {
+        const li = document.createElement("li");
+        li.textContent = opt;
+        hostOptionsList.appendChild(li);
+      });
+
+      // Eğitmen geri sayım
+      if (hostCountdownInterval) clearInterval(hostCountdownInterval);
+      const endTime = startTime + TIME_LIMIT_MS;
+      function tick() {
+        const now = Date.now();
+        const remaining = endTime - now;
+        if (remaining <= 0) {
+          hostTimer.textContent = "Süre doldu (5 sn). Puanlama yapılıyor...";
+          clearInterval(hostCountdownInterval);
+        } else {
+          const sec = Math.ceil(remaining / 1000);
+          hostTimer.textContent = "Kalan süre: " + sec + " sn";
+        }
+      }
+      tick();
+      hostCountdownInterval = setInterval(tick, 200);
+
+      // 5 sn sonunda puanlama
+      if (gradeTimeout) clearTimeout(gradeTimeout);
+      gradeTimeout = setTimeout(() => {
+        gradeQuestion(qId, q.correct);
+      }, TIME_LIMIT_MS + 400); // küçük güvenlik payı
+    }
+
+    function gradeQuestion(qId, correctLetter) {
+      const answersPath = "answers/" + qId;
+      sessionRef(answersPath).once("value").then((snap) => {
+        const answers = [];
+        snap.forEach((child) => {
+          const val = child.val() || {};
+          answers.push({
+            playerId: child.key,
+            answer: val.answer,
+            ts: val.ts || 0
+          });
+        });
+
+        // Doğru cevapları zamana göre sırala
+        const correct = answers
+          .filter((a) => a.answer === correctLetter)
+          .sort((a, b) => a.ts - b.ts);
+
+        // İlk doğru 20, sonra 19, ... min 1
+        correct.forEach((a, idx) => {
+          const points = Math.max(20 - idx, 1);
+          const playerScoreRef = sessionRef("players/" + a.playerId + "/score");
+          playerScoreRef.transaction((current) => {
+            return (current || 0) + points;
+          });
+        });
+
+        // Sonucu da işaretleyelim (isteğe bağlı, burada sadece son graded soruyu yazıyoruz)
+        sessionRef("lastResult").set({
+          qId: qId,
+          correct: correctLetter,
+          gradedAt: Date.now()
+        });
+
+        // Son soruya geldiysek quiz'i bitir
+        if (currentQuestionIndex === QUESTIONS.length - 1) {
+          sessionRef("state").set({ status: "ended", index: currentQuestionIndex });
+        }
+      });
+    }
+
+    /*************** 4) KATILIMCI TARAFI ***************/
+    let playerKey = null;
+    let myNickname = "";
+    let currentQuestion = null;
+    let playerCountdownInterval = null;
+    let playerQuestionEndTime = null;
+    let hasAnsweredThisQuestion = false;
+
+    function initPlayer() {
+      playerArea.classList.remove("hidden");
+      modeInfo.textContent = "Mod: Katılımcı (telefonundan aç)";
+
+      const joinStep = document.getElementById("joinStep");
+      const playStep = document.getElementById("playStep");
+      const finishedStep = document.getElementById("finishedStep");
+
+      const nickInput = document.getElementById("nickInput");
+      const joinBtn = document.getElementById("joinBtn");
+      const joinMsg = document.getElementById("joinMsg");
+      const helloPlayer = document.getElementById("helloPlayer");
+      const playerQuestionTitle = document.getElementById("playerQuestionTitle");
+      const playerOptions = document.getElementById("playerOptions");
+      const playerTimer = document.getElementById("playerTimer");
+      const answerBtn = document.getElementById("answerBtn");
+      const answerMsg = document.getElementById("answerMsg");
+      const playerScoreBody = document.getElementById("playerScoreBody");
+
+      // Skor tablosu
+      sessionRef("players").on("value", (snap) => {
+        const list = [];
+        snap.forEach((child) => {
+          const val = child.val();
+          list.push({
+            nickname: val.nickname || "???",
+            score: val.score || 0
+          });
+        });
+        list.sort((a, b) => b.score - a.score);
+
+        playerScoreBody.innerHTML = "";
+        list.slice(0, 10).forEach((p, idx) => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `<td>${idx + 1}</td><td>${p.nickname}</td><td>${p.score}</td>`;
+          playerScoreBody.appendChild(tr);
+        });
+      });
+
+      // Quiz bitti mi?
+      sessionRef("state").on("value", (snap) => {
+        const st = snap.val();
+        if (st && st.status === "ended") {
+          finishedStep.classList.remove("hidden");
+          playerTimer.textContent = "";
+          answerBtn.disabled = true;
+        }
+      });
+
+      // Katıl butonu
+      joinBtn.onclick = () => {
+        const nick = (nickInput.value || "").trim();
+        if (!nick) {
+          joinMsg.textContent = "Lütfen bir nick gir.";
+          return;
+        }
+        myNickname = nick;
+
+        // Aynı cihazdan tekrar girerse aynı key'i kullan
+        const storedKey = localStorage.getItem("ercQuizPlayerKey");
+        if (storedKey) {
+          playerKey = storedKey;
+        } else {
+          const newRef = sessionRef("players").push();
+          playerKey = newRef.key;
+          localStorage.setItem("ercQuizPlayerKey", playerKey);
+        }
+
+        // Nick + skor kaydı
+        sessionRef("players/" + playerKey).update({
+          nickname: myNickname,
+          score: 0
+        }).then(() => {
+          joinStep.classList.add("hidden");
+          playStep.classList.remove("hidden");
+          helloPlayer.textContent = "Hoş geldin, " + myNickname;
+          joinMsg.textContent = "";
+        });
+      };
+
+      // Soruyu dinle
+      sessionRef("currentQuestion").on("value", (snap) => {
+        const q = snap.val();
+        if (!q) {
+          playerQuestionTitle.textContent = "Soru bekleniyor...";
+          playerOptions.innerHTML = "";
+          playerTimer.textContent = "";
+          answerBtn.disabled = true;
+          return;
+        }
+
+        currentQuestion = q;
+        hasAnsweredThisQuestion = false;
+        answerMsg.textContent = "";
+
+        playerQuestionTitle.textContent = "Soru " + q.index + "/" + q.total + ": " + q.text;
+        playerOptions.innerHTML = "";
+
+        q.options.forEach((opt, idx) => {
+          const letter = String.fromCharCode(65 + idx); // A,B,C,D
+          const id = "opt" + idx;
+          const label = document.createElement("label");
+          label.htmlFor = id;
+          label.innerHTML = `<input type="radio" name="answer" id="${id}" value="${letter}"> ${opt}`;
+          playerOptions.appendChild(label);
+        });
+
+        // Geri sayım
+        if (playerCountdownInterval) clearInterval(playerCountdownInterval);
+        const endTime = q.startTime + q.timeLimitMs;
+        playerQuestionEndTime = endTime;
+
+        function tick() {
+          const now = Date.now();
+          const remaining = endTime - now;
+          if (remaining <= 0) {
+            playerTimer.textContent = "Süre doldu.";
+            answerBtn.disabled = true;
+            clearInterval(playerCountdownInterval);
+          } else {
+            const sec = Math.ceil(remaining / 1000);
+            playerTimer.textContent = "Kalan süre: " + sec + " sn";
+            if (!hasAnsweredThisQuestion) {
+              answerBtn.disabled = false;
+            }
+          }
+        }
+        tick();
+        playerCountdownInterval = setInterval(tick, 200);
+      });
+
+      // Cevap gönder
+      answerBtn.onclick = () => {
+        if (!currentQuestion) return;
+        if (hasAnsweredThisQuestion) return;
+        if (!playerKey) {
+          answerMsg.textContent = "Önce katılman gerekiyor.";
+          return;
+        }
+
+        const now = Date.now();
+        if (playerQuestionEndTime && now > playerQuestionEndTime) {
+          answerMsg.textContent = "Süre doldu, cevap gönderilemedi.";
+          answerBtn.disabled = true;
+          return;
+        }
+
+        const selected = playerOptions.querySelector('input[name="answer"]:checked');
+        if (!selected) {
+          answerMsg.textContent = "Lütfen bir seçenek seç.";
+          return;
+        }
+
+        hasAnsweredThisQuestion = true;
+        answerBtn.disabled = true;
+        const answer = selected.value;
+        const qId = currentQuestion.qId;
+
+        sessionRef("answers/" + qId + "/" + playerKey).set({
+          answer: answer,
+          ts: now
+        }).then(() => {
+          answerMsg.textContent = "Cevabın kaydedildi.";
+        });
+      };
+    }
+
+    /*************** 5) BAŞLAT ***************/
+    if (IS_HOST) {
+      initHost();
+    } else {
+      initPlayer();
+    }
+  </script>
+</body>
+</html>
