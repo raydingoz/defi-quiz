@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>EKG SVG Tile Aracı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --border: #1f2937;
+      --accent: #22c55e;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --heading: #f9fafb;
+      --radius-lg: 14px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 8px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .app {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 800px) {
+      .app {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 10px;
+      box-shadow: 0 10px 20px rgba(15,23,42,0.9);
+      margin-top: 6px;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .brand {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--heading);
+    }
+
+    .pill {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      padding: 2px 8px;
+      font-size: 0.75rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.95);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(34,197,94,0.9);
+    }
+
+    .label-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 6px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .label-row input {
+      width: 70px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      padding: 3px 8px;
+      font-size: 0.8rem;
+      outline: none;
+    }
+
+    .label-row input[type="number"]::-webkit-inner-spin-button {
+      opacity: 0.3;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      transition: all 0.1s ease-out;
+    }
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-main {
+      background: radial-gradient(circle at top left, #22c55e, #15803d);
+      color: #0b1120;
+      border: none;
+      box-shadow: 0 8px 18px rgba(34,197,94,0.5);
+    }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    /* Çizim alanı */
+    .draw-wrapper {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at top, #020617 0, #000 90%);
+      padding: 6px;
+    }
+
+    .draw-inner {
+      background: #000;
+      border-radius: 10px;
+      border: 1px solid #0f172a;
+      overflow: hidden;
+    }
+
+    .preview-wrapper {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #020617;
+      padding: 6px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 120px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      font-size: 0.8rem;
+      padding: 6px 8px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
+
+    .code-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .small {
+      font-size: 0.75rem;
+    }
+
+    /* SVG grid & waveform */
+
+    .grid-lines {
+      stroke: rgba(15,23,42,0.8);
+      stroke-width: 1;
+    }
+
+    .grid-lines-thick {
+      stroke: rgba(30,64,175,0.5);
+      stroke-width: 1.2;
+    }
+
+    .baseline {
+      stroke: rgba(148,163,184,0.7);
+      stroke-width: 1;
+      stroke-dasharray: 3 3;
+    }
+
+    .wave {
+      fill: none;
+      stroke: #22c55e;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 4px rgba(34,197,94,0.8));
+    }
+
+    .point {
+      fill: #22c55e;
+      stroke: #0f172a;
+      stroke-width: 1;
+      cursor: pointer;
+    }
+
+    .point:hover {
+      fill: #a3e635;
+    }
+
+    @media (max-width: 500px) {
+      textarea {
+        min-height: 140px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- SOL: Çizim ve preview -->
+    <div>
+      <div class="card">
+        <div class="title-bar">
+          <div class="brand">EKG SVG Tile Aracı</div>
+          <div class="pill">
+            <span class="pill-dot"></span>
+            240×60 • seamless
+          </div>
+        </div>
+
+        <div class="label-row">
+          <span>Genişlik:</span>
+          <input type="number" id="widthInput" value="240" min="40" max="800" />
+          <span>Yükseklik:</span>
+          <input type="number" id="heightInput" value="60" min="30" max="400" />
+          <span>Baseline (y):</span>
+          <input type="number" id="baselineInput" value="30" min="0" max="400" />
+          <button id="applySizeBtn" class="btn btn-main">Uygula</button>
+          <button id="clearBtn" class="btn">Noktaları temizle</button>
+        </div>
+
+        <div class="draw-wrapper">
+          <div class="draw-inner">
+            <!-- Ana çizim SVG -->
+            <svg id="drawArea" width="100%" viewBox="0 0 240 60" preserveAspectRatio="none">
+              <!-- Grid ve baseline JS ile çizilecek -->
+            </svg>
+          </div>
+        </div>
+
+        <div class="hint">
+          • Alan içine <strong>tıklayarak</strong> nokta ekle (X’e göre sıralanır).<br />
+          • Kenarlar otomatik: <strong>(0, baseline)</strong> ve <strong>(width, baseline)</strong> → sorunsuz tile olur.<br />
+          • Bir noktayı <strong>Ctrl+click</strong ile silebilirsin.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="code-label">Tile önizleme (3× yan yana):</div>
+        <div class="preview-wrapper">
+          <svg id="previewArea" width="100%" viewBox="0 0 720 60" preserveAspectRatio="none">
+            <!-- JS ile doldurulacak -->
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <!-- SAĞ: Kod çıktısı -->
+    <div>
+      <div class="card">
+        <div class="code-label">Üretilen SVG kodu:</div>
+        <textarea id="svgOutput" spellcheck="false"></textarea>
+        <div class="hint small">
+          Bu kodu direkt CSS background ya da inline SVG içinde kullanabilirsin.<br />
+          Örn. <code>background-image: url("data:image/svg+xml;utf8,&lt;svg ...");</code>
+        </div>
+      </div>
+      <div class="card">
+        <div class="code-label">Sadece <code>&lt;polyline&gt;</code> kısmı:</div>
+        <textarea id="polylineOutput" spellcheck="false"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Config
+    let width = 240;
+    let height = 60;
+    let baseline = 30;
+    let userPoints = []; // {x, y} kullanıcının eklediği ara noktalar
+
+    const drawArea = document.getElementById("drawArea");
+    const previewArea = document.getElementById("previewArea");
+    const svgOutput = document.getElementById("svgOutput");
+    const polylineOutput = document.getElementById("polylineOutput");
+
+    const widthInput = document.getElementById("widthInput");
+    const heightInput = document.getElementById("heightInput");
+    const baselineInput = document.getElementById("baselineInput");
+    const applySizeBtn = document.getElementById("applySizeBtn");
+    const clearBtn = document.getElementById("clearBtn");
+
+    function clamp(val, min, max) {
+      return Math.min(max, Math.max(min, val));
+    }
+
+    function buildAllPoints() {
+      const pts = [];
+      // Sol kenar
+      pts.push({ x: 0, y: baseline });
+      // Orta noktalar
+      const interior = userPoints
+        .map(p => ({
+          x: clamp(p.x, 0, width),
+          y: clamp(p.y, 0, height)
+        }))
+        .filter(p => p.x > 0 && p.x < width);
+      interior.sort((a, b) => a.x - b.x);
+      interior.forEach(p => pts.push(p));
+      // Sağ kenar
+      pts.push({ x: width, y: baseline });
+      return pts;
+    }
+
+    function renderGrid(targetSvg, w, h) {
+      targetSvg.innerHTML = "";
+      const ns = "http://www.w3.org/2000/svg";
+
+      const bg = document.createElementNS(ns, "rect");
+      bg.setAttribute("x", 0);
+      bg.setAttribute("y", 0);
+      bg.setAttribute("width", w);
+      bg.setAttribute("height", h);
+      bg.setAttribute("fill", "#000000");
+      targetSvg.appendChild(bg);
+
+      // Küçük grid
+      for (let x = 0; x <= w; x += 5) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", 0);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", h);
+        line.setAttribute("class", "grid-lines");
+        targetSvg.appendChild(line);
+      }
+      for (let y = 0; y <= h; y += 5) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", 0);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", w);
+        line.setAttribute("y2", y);
+        line.setAttribute("class", "grid-lines");
+        targetSvg.appendChild(line);
+      }
+
+      // 5 karede bir kalın çizgi
+      for (let x = 0; x <= w; x += 25) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", 0);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", h);
+        line.setAttribute("class", "grid-lines-thick");
+        targetSvg.appendChild(line);
+      }
+      for (let y = 0; y <= h; y += 25) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", 0);
+        line.setAttribute("y1", y);
+        line.setAttribute("x2", w);
+        line.setAttribute("y2", y);
+        line.setAttribute("class", "grid-lines-thick");
+        targetSvg.appendChild(line);
+      }
+
+      // Baseline
+      const base = document.createElementNS(ns, "line");
+      base.setAttribute("x1", 0);
+      base.setAttribute("y1", baseline);
+      base.setAttribute("x2", w);
+      base.setAttribute("y2", baseline);
+      base.setAttribute("class", "baseline");
+      targetSvg.appendChild(base);
+
+      return ns;
+    }
+
+    function renderMain() {
+      const ns = renderGrid(drawArea, width, height);
+
+      const pts = buildAllPoints();
+      const pointsAttr = pts
+        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
+        .join(" ");
+
+      const poly = document.createElementNS(ns, "polyline");
+      poly.setAttribute("points", pointsAttr);
+      poly.setAttribute("class", "wave");
+      drawArea.appendChild(poly);
+
+      // Kullanıcı noktaları
+      userPoints.forEach((p, idx) => {
+        const c = document.createElementNS(ns, "circle");
+        c.setAttribute("cx", p.x);
+        c.setAttribute("cy", p.y);
+        c.setAttribute("r", 2.8);
+        c.setAttribute("class", "point");
+        c.dataset.index = idx;
+        drawArea.appendChild(c);
+      });
+    }
+
+    function renderPreview() {
+      const ns = renderGrid(previewArea, width * 3, height);
+      const pts = buildAllPoints();
+      const pointsAttr = pts
+        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
+        .join(" ");
+
+      // 3 kopya yan yana
+      for (let i = 0; i < 3; i++) {
+        const poly = document.createElementNS(ns, "polyline");
+        const shifted = pts
+          .map(p => `${Math.round(p.x + i * width)},${Math.round(p.y)}`)
+          .join(" ");
+        poly.setAttribute("points", shifted);
+        poly.setAttribute("class", "wave");
+        previewArea.appendChild(poly);
+      }
+    }
+
+    function updateCodeOutputs() {
+      const pts = buildAllPoints();
+      const pointsAttr = pts
+        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
+        .join(" ");
+
+      const svgCode =
+`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
+  <polyline points="${pointsAttr}"
+    fill="none"
+    stroke="#22c55e"
+    stroke-width="2"
+    stroke-linejoin="round"
+    stroke-linecap="round" />
+</svg>`;
+
+      svgOutput.value = svgCode;
+
+      const polylineCode =
+`<polyline points="${pointsAttr}"
+  fill="none"
+  stroke="#22c55e"
+  stroke-width="2"
+  stroke-linejoin="round"
+  stroke-linecap="round" />`;
+
+      polylineOutput.value = polylineCode;
+    }
+
+    function renderAll() {
+      drawArea.setAttribute("viewBox", `0 0 ${width} ${height}`);
+      previewArea.setAttribute("viewBox", `0 0 ${width * 3} ${height}`);
+      renderMain();
+      renderPreview();
+      updateCodeOutputs();
+    }
+
+    // Çizim alanına tıklama
+    function getSvgCoords(evt) {
+      const rect = drawArea.getBoundingClientRect();
+      const x = ((evt.clientX - rect.left) / rect.width) * width;
+      const y = ((evt.clientY - rect.top) / rect.height) * height;
+      return { x, y };
+    }
+
+    drawArea.addEventListener("click", (evt) => {
+      // Ctrl + click => nokta silme
+      if (evt.ctrlKey || evt.metaKey) {
+        const rect = drawArea.getBoundingClientRect();
+        const x = ((evt.clientX - rect.left) / rect.width) * width;
+        const y = ((evt.clientY - rect.top) / rect.height) * height;
+
+        let closestIdx = -1;
+        let closestDist = Infinity;
+        userPoints.forEach((p, idx) => {
+          const dx = p.x - x;
+          const dy = p.y - y;
+          const d2 = dx*dx + dy*dy;
+          if (d2 < closestDist) {
+            closestDist = d2;
+            closestIdx = idx;
+          }
+        });
+        if (closestIdx >= 0 && closestDist < (width*width)/2000) { // kaba bir eşik
+          userPoints.splice(closestIdx, 1);
+          renderAll();
+        }
+        return;
+      }
+
+      const pt = getSvgCoords(evt);
+      userPoints.push(pt);
+      userPoints.sort((a, b) => a.x - b.x);
+      renderAll();
+    });
+
+    applySizeBtn.addEventListener("click", () => {
+      const w = parseInt(widthInput.value, 10);
+      const h = parseInt(heightInput.value, 10);
+      const b = parseInt(baselineInput.value, 10);
+
+      if (!Number.isFinite(w) || !Number.isFinite(h) || !Number.isFinite(b)) return;
+      width = clamp(w, 40, 800);
+      height = clamp(h, 30, 400);
+      baseline = clamp(b, 0, height);
+
+      widthInput.value = width;
+      heightInput.value = height;
+      baselineInput.value = baseline;
+
+      // Noktaları yeni boyuta göre biraz normalize edelim (x ölçeklemek istersek burada yaparız)
+      userPoints = userPoints.map(p => ({
+        x: clamp(p.x, 0, width),
+        y: clamp(p.y, 0, height)
+      }));
+
+      renderAll();
+    });
+
+    clearBtn.addEventListener("click", () => {
+      if (!confirm("Tüm noktaları temizlemek istiyor musun?")) return;
+      userPoints = [];
+      renderAll();
+    });
+
+    // Başlangıç
+    renderAll();
+  </script>
+</body>
+</html>
