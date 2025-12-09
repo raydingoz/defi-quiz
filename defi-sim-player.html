@@ -613,12 +613,13 @@
 
       let body = "";
       if(c.correctAction === "shock"){
-        body += "Doğru yaklaşım: Şokla (VF/pVT algoritması)\n\n";
-      }else if(c.correctAction === "noShock"){
-        body += "Doğru yaklaşım: Şoklama (şoklanamaz ritim)\n\n";
-      }else if(c.correctAction === "cardioversion"){
-        body += "Doğru yaklaşım: Senkron kardiyoversiyon\n\n";
-      }
+  body += "Doğru yaklaşım: Defibrilasyon (VF/pVT algoritması)\n\n";
+}else if(c.correctAction === "noShock"){
+  body += "Doğru yaklaşım: Elektriksel tedavi yok (şoklanamaz ritim)\n\n";
+}else if(c.correctAction === "cardioversion"){
+  body += "Doğru yaklaşım: Kardiyoversiyon (senkronize)\n\n";
+}
+
       if(c.explanation) body += c.explanation;
 
       exModalBody.textContent = body;
