@@ -158,50 +158,51 @@
       position: absolute;
       inset: 0;
       background-repeat: repeat-x;
-      background-size: 120px 60px;
+      /* Daha geniş pattern + daha yavaş kayma → daha gerçekçi */
+      background-size: 240px 60px;
       background-position: 0 0;
-      animation: ekg-scroll 0.55s linear infinite;
+      animation: ekg-scroll 1.6s linear infinite;
       filter: drop-shadow(0 0 6px #22c55e);
     }
 
-    /* VF – ince dişli, fibrilatuar */
-    .ekg-vf::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 4,10 8,42 12,18 16,46 20,14 24,40 28,16 32,44 36,12 40,38 44,18 48,46 52,14 56,40 60,16 64,44 68,12 72,38 76,18 80,46 84,14 88,40 92,16 96,44 100,12 104,38 108,18 112,46 116,14 120,30' fill='none' stroke='%23f97373' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+    /* NSR – detaylı P-QRS-T, birden fazla kompleks */
+    .ekg-nsr::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 8,30 12,28 14,32 16,30 22,30 26,26 28,20 30,10 32,40 34,30 40,30 48,30 56,30 60,28 62,32 64,30 70,30 74,26 76,20 78,10 80,40 82,30 88,30 96,30 104,30 108,28 110,32 112,30 118,30 122,26 124,20 126,10 128,40 130,30 136,30 144,30 152,30 156,28 158,32 160,30 166,30 170,26 172,20 174,10 176,40 178,30 184,30 192,30 200,30 204,28 206,32 208,30 214,30 218,26 220,20 222,10 224,40 226,30 232,30 240,30' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* pVT – düzenli geniş kompleks */
+    /* VF – ince dişli, fibrilatuar, daha yoğun nokta */
+    .ekg-vf::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,10 8,42 12,18 16,46 20,12 24,40 28,14 32,46 36,18 40,38 44,20 48,44 52,16 56,40 60,14 64,46 68,18 72,38 76,22 80,44 84,16 88,40 92,12 96,46 100,18 104,38 108,20 112,44 116,16 120,40 124,14 128,48 132,18 136,38 140,22 144,44 148,16 152,40 156,12 160,46 164,18 168,38 172,20 176,44 180,16 184,40 188,14 192,48 196,18 200,38 204,22 208,44 212,16 216,40 220,12 224,46 228,18 232,38 236,20 240,30' fill='none' stroke='%23f97373' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    }
+
+    /* pVT – düzenli geniş monomorfik VT */
     .ekg-pvt::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 6,12 12,48 18,12 24,48 30,12 36,48 42,12 48,48 54,12 60,48 66,12 72,48 78,12 84,48 90,12 96,48 102,12 108,48 114,12 120,30' fill='none' stroke='%23fb923c' stroke-width='2.1' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 6,12 12,48 18,12 24,48 30,12 36,48 42,12 48,48 54,12 60,48 66,12 72,48 78,12 84,48 90,12 96,48 102,12 108,48 114,12 120,48 126,12 132,48 138,12 144,48 150,12 156,48 162,12 168,48 174,12 180,48 186,12 192,48 198,12 204,48 210,12 216,48 222,12 228,48 234,12 240,30' fill='none' stroke='%23fb923c' stroke-width='2.1' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
     /* Torsades de pointes – amplitüdü dalgalanan polimorfik VT */
     .ekg-torsades::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 4,12 8,48 12,10 16,50 20,8 24,46 28,12 32,44 36,18 40,42 44,22 48,40 52,26 56,38 60,30 64,34 68,38 72,42 76,46 80,48 84,44 88,40 92,36 96,32 100,30 104,28 108,32 112,36 116,30 120,30' fill='none' stroke='%23fb7185' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,12 8,48 12,8 16,52 20,6 24,50 28,10 32,46 36,14 40,42 44,18 48,38 52,22 56,34 60,26 64,30 68,34 72,38 76,42 80,46 84,48 88,46 92,44 96,40 100,36 104,32 108,30 112,28 116,32 120,36 124,40 128,44 132,48 136,50 140,48 144,44 148,40 152,36 156,32 160,30 164,28 168,26 172,24 176,22 180,20 184,18 188,22 192,26 196,30 200,34 204,38 208,42 212,46 216,48 220,46 224,42 228,38 232,34 236,30 240,30' fill='none' stroke='%23fb7185' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* NSR – düzenli dar QRS */
-    .ekg-nsr::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 8,30 14,22 16,36 18,30 40,30 46,22 48,36 50,30 72,30 78,22 80,36 82,30 104,30 110,22 112,36 114,30 120,30' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
-    }
-
-    /* Taşikardi – düzenli dar kompleks */
+    /* Düzenli dar kompleks taşikardi (SVT) */
     .ekg-tachy::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 4,18 6,36 8,30 20,30 24,18 26,36 28,30 40,30 44,18 46,36 48,30 60,30 64,18 66,36 68,30 80,30 84,18 86,36 88,30 100,30 104,18 106,36 108,30 120,30' fill='none' stroke='%23facc15' stroke-width='1.9' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,24 6,18 8,30 10,36 12,30 20,30 24,24 26,18 28,30 30,36 32,30 40,30 44,24 46,18 48,30 50,36 52,30 60,30 64,24 66,18 68,30 70,36 72,30 80,30 84,24 86,18 88,30 90,36 92,30 100,30 104,24 106,18 108,30 110,36 112,30 120,30 124,24 126,18 128,30 130,36 132,30 140,30 144,24 146,18 148,30 150,36 152,30 160,30 164,24 166,18 168,30 170,36 172,30 180,30 184,24 186,18 188,30 190,36 192,30 200,30 204,24 206,18 208,30 210,36 212,30 220,30 224,24 226,18 228,30 230,36 232,30 240,30' fill='none' stroke='%23facc15' stroke-width='1.9' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* Hızlı AF – düzensiz */
+    /* Hızlı AF – düzensiz dar kompleks taşikardi */
     .ekg-tachy-irreg::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 6,20 8,36 10,30 22,30 26,16 28,38 30,30 42,30 48,18 50,40 52,30 64,30 68,22 70,36 72,30 84,30 88,16 90,38 92,30 104,30 110,18 112,40 114,30 120,30' fill='none' stroke='%2381a7ff' stroke-width='1.8' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,26 6,20 8,32 10,28 12,30 18,30 22,22 24,16 26,34 28,30 30,32 36,30 40,24 42,18 44,32 46,28 48,30 54,30 58,20 60,16 62,36 64,30 66,32 72,30 76,26 78,18 80,34 82,30 84,32 90,30 94,22 96,18 98,34 100,30 102,32 108,30 112,24 114,20 116,32 118,28 120,30 126,30 130,22 132,16 134,34 136,30 138,32 144,30 148,26 150,18 152,34 154,30 156,32 162,30 166,24 168,20 170,32 172,28 174,30 180,30 184,22 186,16 188,34 190,30 192,32 198,30 202,26 204,18 206,34 208,30 210,32 216,30 220,24 222,20 224,32 226,28 228,30 234,30 238,22 240,30' fill='none' stroke='%2381a7ff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
     /* Asistol – düz çizgi */
     .ekg-asystole::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,30 120,30' fill='none' stroke='%236b7280' stroke-width='2'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 240,30' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
     /* PEA – düşük voltajlı, organizeli */
     .ekg-pea::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='60'%3E%3Cpolyline points='0,32 10,32 16,28 18,36 20,32 34,32 40,28 42,36 44,32 58,32 64,28 66,36 68,32 82,32 88,28 90,36 92,32 106,32 112,28 114,36 116,32 120,32' fill='none' stroke='%2393c5fd' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,32 8,32 12,30 14,26 16,34 18,32 24,32 28,30 30,26 32,34 34,32 40,32 44,30 46,26 48,34 50,32 56,32 60,30 62,26 64,34 66,32 72,32 76,30 78,26 80,34 82,32 88,32 92,30 94,26 96,34 98,32 104,32 108,30 110,26 112,34 114,32 120,32 124,30 126,26 128,34 130,32 136,32 140,30 142,26 144,34 146,32 152,32 156,30 158,26 160,34 162,32 168,32 172,30 174,26 176,34 178,32 184,32 188,30 190,26 192,34 194,32 200,32 204,30 206,26 208,34 210,32 216,32 220,30 222,26 224,34 226,32 232,32 236,30 240,32' fill='none' stroke='%2393c5fd' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
     .monitor-footer {
@@ -321,7 +322,7 @@
 
     .meta-row {
       display: flex;
-      justify-content: space-between;
+      justify-content: space_between;
       align-items: center;
       gap: 8px;
       font-size: 0.85rem;
@@ -377,7 +378,7 @@
 
     @keyframes ekg-scroll {
       from { background-position: 0 0; }
-      to   { background-position: -120px 0; }
+      to   { background-position: -240px 0; }
     }
 
     @keyframes led-pulse {
@@ -503,7 +504,6 @@
   <script>
     const TIME_LIMIT_MS = 5000;
 
-    // Olgular (defibrilasyon / kardiyoversiyon / şok yok + ilaçlar)
     const SCENES = [
       {
         id: 1,
@@ -886,7 +886,6 @@
     mgBtn.addEventListener("click", () => handleMed("mg"));
     lidoBtn.addEventListener("click", () => handleMed("lido"));
 
-    // Başlangıç
     renderScene();
   </script>
 </body>
