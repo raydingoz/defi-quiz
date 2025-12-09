@@ -2,487 +2,434 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defi Simülatörü – Host</title>
+  <title>Defi ALS Sim – Eğitmen</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Firebase v8 (kolay syntax) -->
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
+  <!-- QRCode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
-    :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --accent: #22c55e;
-      --danger: #f97373;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --heading: #f9fafb;
-      --radius-lg: 18px;
-      --radius-pill: 999px;
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --border:#1f2937;
+      --accent:#f97373;
+      --danger:#ef4444;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --heading:#fef2f2;
+      --radius-lg:20px;
+      --radius-pill:999px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      padding:10px;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      color:var(--text);
+      font-size:15px;
+    }
+    .app{max-width:1200px;margin:0 auto;}
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .brand{
+      font-size:1.05rem;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--heading);
+    }
+    .top-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      padding:4px 10px;
+      font-size:0.78rem;
+      color:var(--muted);
+      background:rgba(15,23,42,0.97);
+    }
+    .dot-live{
+      width:9px;height:9px;border-radius:999px;
+      background:var(--danger);
+      box-shadow:0 0 12px rgba(239,68,68,0.9);
+    }
+    .small{font-size:0.78rem;}
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+      gap:10px;
+    }
+    @media(max-width:900px){
+      .layout{grid-template-columns:minmax(0,1fr);}
     }
 
-    * { box-sizing: border-box; }
+    .card{
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border);
+      background:var(--card);
+      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
+      pointer-events:none;
+    }
+    .card-inner{position:relative;z-index:1;}
 
-    body {
-      margin: 0;
-      padding: 12px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
-      color: var(--text);
-      font-size: 15px;
+    .section-title{
+      font-size:0.9rem;
+      color:var(--muted);
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .case-title{
+      font-size:1rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
+    }
+    .case-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+      margin-bottom:6px;
+    }
+    .tag-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:5px;
+      margin-bottom:6px;
+    }
+    .tag{
+      border-radius:var(--radius-pill);
+      border:1px solid #374151;
+      padding:2px 8px;
+      font-size:0.76rem;
+      color:var(--muted);
+      background:rgba(15,23,42,0.98);
     }
 
-    .app {
-      max-width: 960px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: minmax(0, 2fr) minmax(0, 1.2fr);
-      gap: 10px;
+    .progress-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .progress-label{
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+    .progress-track{
+      flex:1;
+      height:4px;
+      border-radius:999px;
+      background:#0f172a;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#f97373,#facc15);
+      transition:width .3s ease-out;
     }
 
-    @media (max-width: 768px) {
-      .app {
-        grid-template-columns: minmax(0, 1fr);
-      }
+    .monitor{
+      margin-top:4px;
+      border-radius:18px;
+      border:1px solid #111827;
+      background:radial-gradient(circle at top,#0f172a,#020617 55%);
+      padding:8px;
+      box-shadow:0 10px 28px rgba(0,0,0,0.8);
+      position:relative;
+      overflow:hidden;
     }
-
-    .top-bar {
-      grid-column: 1 / -1;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .brand {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--heading);
-    }
-
-    .pill {
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      padding: 3px 9px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15,23,42,0.9);
-    }
-
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 10px rgba(34,197,94,0.9);
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 10px 10px;
-      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.9);
-      margin-top: 4px;
-    }
-
-    /* MONİTÖR */
-
-    .monitor-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      margin-bottom: 4px;
-      color: var(--muted);
-    }
-
-    .monitor-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .monitor-led {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: #22c55e;
-      box-shadow: 0 0 12px rgba(34,197,94,0.9);
-      animation: led-pulse 1.4s ease-in-out infinite;
-    }
-
-    .monitor-screen {
-      border-radius: 16px;
-      background: #000000;
-      border: 1px solid #0f172a;
-      padding: 6px 8px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .grid {
-      position: absolute;
-      inset: 0;
+    .monitor-grid{
+      position:absolute;
+      inset:0;
+      opacity:0.25;
       background-image:
-        linear-gradient(rgba(15,23,42,0.55) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15,23,42,0.55) 1px, transparent 1px);
-      background-size: 0.5rem 0.5rem;
-      opacity: 0.55;
-      pointer-events: none;
+        linear-gradient(to right,#1f2937 1px,transparent 1px),
+        linear-gradient(to bottom,#1f2937 1px,transparent 1px);
+      background-size:16px 10px;
+      pointer-events:none;
+    }
+    .monitor-header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:4px;
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+    .ekg-line{
+      position:relative;
+      height:80px;
+      overflow:hidden;
+    }
+    .ekg-strip{
+      position:absolute;
+      top:50%;
+      left:0;
+      transform:translate3d(0,-50%,0);
+      width:720px;
+      height:60px;
+      display:flex;
+    }
+    .ekg-strip svg{
+      width:240px;
+      height:60px;
+    }
+    .ekg-strip.sinus path{stroke:#22c55e;}
+    .ekg-strip.vf path{stroke:#f97373;}
+    .ekg-strip.vt path{stroke:#facc15;}
+    .ekg-strip.asystole path{stroke:#4b5563;}
+    .ekg-strip.pea path{stroke:#38bdf8;}
+    .ekg-strip.torsades path{stroke:#f97316;}
+
+    .ekg-strip.anim{
+      animation:ekg-move 1.2s linear infinite;
+    }
+    @keyframes ekg-move{
+      from{transform:translate3d(0,-50%,0);}
+      to{transform:translate3d(-240px,-50%,0);}
     }
 
-    .ekg-line {
-      position: relative;
-      height: 60px;
-      overflow: hidden;
+    .monitor-footer{
+      margin-top:2px;
+      font-size:0.8rem;
+      display:flex;
+      justify-content:space-between;
+      color:var(--muted);
     }
 
-    .ekg-line::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background-repeat: repeat-x;
-      background-size: 240px 60px;
-      background-position: 0 0;
-      animation: ekg-scroll 1.6s linear infinite;
-      filter: drop-shadow(0 0 6px #22c55e);
+    .timer-pill{
+      border-radius:var(--radius-pill);
+      border:1px solid #52525b;
+      font-size:0.8rem;
+      padding:3px 10px;
+      color:#fbbf24;
+      font-variant-numeric:tabular-nums;
     }
 
-    .ekg-off::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 240,30' fill='none' stroke='%231f2937' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-      filter: none;
+    .btn-row{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .btn{
+      border-radius:var(--radius-pill);
+      border:1px solid #374151;
+      background:rgba(15,23,42,0.97);
+      color:var(--text);
+      font-size:0.82rem;
+      font-weight:600;
+      padding:6px 10px;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      cursor:pointer;
+      transition:all .15s ease-out;
+    }
+    .btn-main{
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      border:none;
+      color:#fef2f2;
+      box-shadow:0 10px 24px rgba(239,68,68,0.7);
+    }
+    .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
+    .btn-danger{color:var(--danger);border-color:#4b5563;}
+
+    .meta-line{
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-top:4px;
     }
 
-    .ekg-nsr::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 8,30 12,28 14,32 16,30 22,30 26,26 28,20 30,10 32,40 34,30 40,30 48,30 56,30 60,28 62,32 64,30 70,30 74,26 76,20 78,10 80,40 82,30 88,30 96,30 104,30 108,28 110,32 112,30 118,30 122,26 124,20 126,10 128,40 130,30 136,30 144,30 152,30 156,28 158,32 160,30 166,30 170,26 172,20 174,10 176,40 178,30 184,30 192,30 200,30 204,28 206,32 208,30 214,30 218,26 220,20 222,10 224,40 226,30 232,30 240,30' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    .score-list{
+      margin-top:6px;
+      font-size:0.86rem;
+      max-height:260px;
+      overflow-y:auto;
+    }
+    .score-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:3px 0;
+      border-bottom:1px dashed #1f2937;
+    }
+    .score-row span:first-child{
+      max-width:160px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
 
-    .ekg-vf::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,10 8,42 12,18 16,46 20,12 24,40 28,14 32,46 36,18 40,38 44,20 48,44 52,16 56,40 60,14 64,46 68,18 72,38 76,22 80,44 84,16 88,40 92,12 96,46 100,18 104,38 108,20 112,44 116,16 120,40 124,14 128,48 132,18 136,38 140,22 144,44 148,16 152,40 156,12 160,46 164,18 168,38 172,20 176,44 180,16 184,40 188,14 192,48 196,18 200,38 204,22 208,44 212,16 216,40 220,12 224,46 228,18 232,38 236,20 240,30' fill='none' stroke='%23f97373' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    .qr-box{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
     }
-
-    .ekg-pvt::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 6,12 12,48 18,12 24,48 30,12 36,48 42,12 48,48 54,12 60,48 66,12 72,48 78,12 84,48 90,12 96,48 102,12 108,48 114,12 120,48 126,12 132,48 138,12 144,48 150,12 156,48 162,12 168,48 174,12 180,48 186,12 192,48 198,12 204,48 210,12 216,48 222,12 228,48 234,12 240,30' fill='none' stroke='%23fb923c' stroke-width='2.1' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    .qr-frame{
+      width:140px;
+      height:140px;
+      background:#f9fafb;
+      border-radius:16px;
+      border:2px solid #111827;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 10px 24px rgba(15,23,42,0.9);
     }
-
-    .ekg-torsades::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,12 8,48 12,8 16,52 20,6 24,50 28,10 32,46 36,14 40,42 44,18 48,38 52,22 56,34 60,26 64,30 68,34 72,38 76,42 80,46 84,48 88,46 92,44 96,40 100,36 104,32 108,30 112,28 116,32 120,36 124,40 128,44 132,48 136,50 140,48 144,44 148,40 152,36 156,32 160,30 164,28 168,26 172,24 176,22 180,20 184,18 188,22 192,26 196,30 200,34 204,38 208,42 212,46 216,48 220,46 224,42 228,38 232,34 236,30 240,30' fill='none' stroke='%23fb7185' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
+    #qrcodeSim{
+      width:120px;
+      height:120px;
     }
-
-    .ekg-tachy::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,24 6,18 8,30 10,36 12,30 20,30 24,24 26,18 28,30 30,36 32,30 40,30 44,24 46,18 48,30 50,36 52,30 60,30 64,24 66,18 68,30 70,36 72,30 80,30 84,24 86,18 88,30 90,36 92,30 100,30 104,24 106,18 108,30 110,36 112,30 120,30 124,24 126,18 128,30 130,36 132,30 140,30 144,24 146,18 148,30 150,36 152,30 160,30 164,24 166,18 168,30 170,36 172,30 180,30 184,24 186,18 188,30 190,36 192,30 200,30 204,24 206,18 208,30 210,36 212,30 220,30 224,24 226,18 228,30 230,36 232,30 240,30' fill='none' stroke='%23facc15' stroke-width='1.9' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
-    }
-
-    .ekg-tachy-irreg::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,26 6,20 8,32 10,28 12,30 18,30 22,22 24,16 26,34 28,30 30,32 36,30 40,24 42,18 44,32 46,28 48,30 54,30 58,20 60,16 62,36 64,30 66,32 72,30 76,26 78,18 80,34 82,30 84,32 90,30 94,22 96,18 98,34 100,30 102,32 108,30 112,24 114,20 116,32 118,28 120,30 126,30 130,22 132,16 134,34 136,30 138,32 144,30 148,26 150,18 152,34 154,30 156,32 162,30 166,24 168,20 170,32 172,28 174,30 180,30 184,22 186,16 188,34 190,30 192,32 198,30 202,26 204,18 206,34 208,30 210,32 216,30 220,24 222,20 224,32 226,28 228,30 234,30 238,22 240,30' fill='none' stroke='%2381a7ff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
-    }
-
-    .ekg-asystole::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 240,30' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
-    }
-
-    .ekg-pea::after {
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,32 8,32 12,30 14,26 16,34 18,32 24,32 28,30 30,26 32,34 34,32 40,32 44,30 46,26 48,34 50,32 56,32 60,30 62,26 64,34 66,32 72,32 76,30 78,26 80,34 82,32 88,32 92,30 94,26 96,34 98,32 104,32 108,30 110,26 112,34 114,32 120,32 124,30 126,26 128,34 130,32 136,32 140,30 142,26 144,34 146,32 152,32 156,30 158,26 160,34 162,32 168,32 172,30 174,26 176,34 178,32 184,32 188,30 190,26 192,34 194,32 200,32 204,30 206,26 208,34 210,32 216,32 220,30 222,26 224,34 226,32 232,32 236,30 240,32' fill='none' stroke='%2393c5fd' stroke-width='1.6' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
-    }
-
-    .monitor-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.78rem;
-      margin-top: 4px;
-      color: var(--muted);
-    }
-
-    .tag {
-      padding: 2px 8px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      font-size: 0.75rem;
-    }
-    .tag-postshock {
-      border-color: #22c55e;
-      color: #bbf7d0;
-      background: rgba(34,197,94,0.18);
-    }
-
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .btn {
-      border: none;
-      border-radius: var(--radius-pill);
-      padding: 10px 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease-out;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      outline: none;
-      width: 100%;
-    }
-
-    .btn-main {
-      background: radial-gradient(circle at top left, #fb923c, #f97316);
-      color: #0b1120;
-      box-shadow: 0 10px 20px rgba(248,113,22,0.55);
-    }
-
-    .btn-cardio {
-      background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-      color: #020617;
-      box-shadow: 0 10px 20px rgba(56,189,248,0.55);
-    }
-
-    .btn-sec {
-      background: rgba(15,23,42,0.95);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .btn-small {
-      font-size: 0.8rem;
-      padding: 6px 10px;
-    }
-
-    .btn[disabled] {
-      opacity: 0.45;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .scenario-title {
-      font-size: 0.92rem;
-      color: var(--heading);
-      margin-bottom: 3px;
-    }
-
-    .scenario-text {
-      font-size: 0.88rem;
-      color: var(--text);
-      margin-bottom: 2px;
-      max-height: 90px;
-      overflow-y: auto;
-    }
-
-    .helper {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      margin-top: 4px;
-      color: var(--muted);
-    }
-
-    .progress {
-      margin-top: 6px;
-      width: 100%;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(15,23,42,0.9);
-      overflow: hidden;
-      border: 1px solid var(--border);
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, #22c55e, #4ade80);
-      transform-origin: left;
-      transition: width 0.25s ease-out;
-    }
-
-    .shock-flash {
-      position: fixed;
-      inset: 0;
-      background: #ffffff;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.15s ease-out;
-      z-index: 900;
-    }
-
-    /* Skor tablosu */
-
-    .score-list {
-      margin-top: 6px;
-      font-size: 0.85rem;
-      max-height: 280px;
-      overflow-y: auto;
-    }
-
-    .score-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 3px 0;
-      border-bottom: 1px dashed rgba(30,41,59,0.6);
-    }
-
-    .score-row span {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .rank {
-      width: 22px;
-      text-align: center;
-      font-weight: 600;
-    }
-
-    .score-name {
-      flex: 1;
-      margin: 0 4px;
-    }
-
-    .score-points {
-      width: 40px;
-      text-align: right;
-    }
-
-    @keyframes ekg-scroll {
-      from { background-position: 0 0; }
-      to   { background-position: -240px 0; }
-    }
-
-    @keyframes led-pulse {
-      0%, 100% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.25); opacity: 1; }
+    .qr-text{
+      font-size:0.8rem;
+      color:var(--muted);
+      flex:1 1 120px;
+      word-wrap:break-word;
     }
   </style>
 </head>
 <body>
-  <div class="shock-flash" id="shockFlash"></div>
-
   <div class="app">
-    <div class="top-bar">
-      <div class="brand">Defi Simülatörü – Host</div>
-      <div class="pill">
-        <span class="pill-dot"></span>
-        Katılımcılar: <span id="playerCount">0</span>
+    <header class="top-bar">
+      <div class="brand">Defi ALS Sim – Eğitmen</div>
+      <div class="top-pill">
+        <span class="dot-live"></span>
+        <span>ALS ritim kararı</span>
+        <span id="sessionLabel" class="small"></span>
       </div>
-    </div>
+    </header>
 
-    <!-- SOL: Monitör + Olgu -->
-    <div>
-      <div class="card">
-        <div class="monitor-header">
-          <div class="monitor-label">
-            <span class="monitor-led"></span>
-            <span>Lead II</span>
+    <main class="layout">
+      <!-- SOL: Olgu + monitör -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="section-title">Olgu & Monitör</div>
+
+          <div class="progress-wrap">
+            <div class="progress-label" id="progressLabel">Olgu – / –</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
           </div>
-          <div>
-            HR: <span id="rateLabel">–</span> •
-            Süre: <span id="timerLabel">—</span> sn
+
+          <div class="case-title" id="caseTitle">Olgu başlığı</div>
+          <div class="case-body" id="caseNarrative">
+            Config yükleniyor (defi-als-config.json)…
+          </div>
+          <div class="tag-row" id="caseTags"></div>
+
+          <div class="monitor">
+            <div class="monitor-grid"></div>
+            <div class="monitor-header">
+              <span>Lead II</span>
+              <span class="timer-pill" id="timerLabel">Süre: –</span>
+            </div>
+            <div class="ekg-line">
+              <div class="ekg-strip asystole" id="ekgStrip">
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="ekgPath1" fill="none" stroke="#4b5563" stroke-width="2"
+                    stroke-linejoin="round" stroke-linecap="round"
+                    points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                </svg>
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="ekgPath2" fill="none" stroke="#4b5563" stroke-width="2"
+                    stroke-linejoin="round" stroke-linecap="round"
+                    points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                </svg>
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="ekgPath3" fill="none" stroke="#4b5563" stroke-width="2"
+                    stroke-linejoin="round" stroke-linecap="round"
+                    points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                </svg>
+              </div>
+            </div>
+            <div class="monitor-footer">
+              <span>HR: ?</span>
+              <span>SpO₂: ?</span>
+            </div>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnPrev" class="btn">⟵ Önceki olgu</button>
+            <button id="btnNext" class="btn">Sonraki olgu ⟶</button>
+            <button id="btnStartCase" class="btn btn-main">▶ Ritim + süreyi başlat</button>
+            <button id="btnReveal" class="btn">✅ Doğru yaklaşımı göster</button>
+          </div>
+          <div class="meta-line" id="statusLine">
+            Olguyu tanıt; hazır olduğunda “Ritim + süreyi başlat” ile hem sende hem katılımcılarda ritmi aç.
           </div>
         </div>
+      </section>
 
-        <div class="monitor-screen">
-          <div class="grid"></div>
-          <div id="ekgLine" class="ekg-line ekg-off"></div>
-        </div>
+      <!-- SAĞ: QR + skor -->
+      <aside class="card">
+        <div class="card-inner">
+          <div class="section-title">Katılımcılar & QR</div>
 
-        <div class="monitor-footer">
-          <span id="phaseLabel" class="tag">Olgu hazırlık</span>
-          <span id="modeHint" class="tag">Ritim gizli – başlatınca gözükecek</span>
-        </div>
-      </div>
+          <div class="qr-box">
+            <div class="qr-frame">
+              <div id="qrcodeSim"></div>
+            </div>
+            <div class="qr-text">
+              Katılımcılar bu QR’ı okutup <strong>ALS sim</strong> katılımcı sayfasına bağlanır.
+              <br/><br/>
+              Kısa URL:<br/>
+              <span id="playerUrlText" class="small"></span>
+            </div>
+          </div>
 
-      <div class="card">
-        <div class="meta-row">
-          <span class="pill">
-            Skor: <strong id="scoreValue">0</strong> (örn. toplam)
-          </span>
-          <span class="pill">
-            Olgu: <span id="sceneIndex">1</span>/<span id="sceneTotal">1</span>
-          </span>
-        </div>
-        <div class="progress">
-          <div id="progressFill" class="progress-fill"></div>
-        </div>
-      </div>
+          <div class="meta-line" style="margin-top:8px;">
+            Toplam katılımcı: <span id="playerCount">0</span>
+          </div>
 
-      <div class="card">
-        <div class="scenario-title" id="scenarioTitle">Olgu 1</div>
-        <div class="scenario-text" id="scenarioText">Yükleniyor...</div>
+          <div class="section-title" style="margin-top:8px;">Skor Tablosu</div>
+          <div id="scoreList" class="score-list"></div>
 
-        <div class="controls">
-          <button id="startBtn" class="btn btn-sec">
-            ▶ Ritmi göster & soruyu başlat (katılımcılara gönder)
-          </button>
-          <button id="defibBtn" class="btn btn-main" disabled>
-            ⚡ Defibrilasyon (200 J) – demo
-          </button>
-          <button id="cardioBtn" class="btn btn-cardio" disabled>
-            ⚡ Senkron kardiyoversiyon – demo
-          </button>
-          <button id="noShockBtn" class="btn btn-sec" disabled>
-            🤚 Şok yok / KPR / ilaç – demo
-          </button>
+          <div class="btn-row" style="margin-top:8px;">
+            <button id="btnResetSession" class="btn btn-danger small">
+              🔁 Oturumu sıfırla
+            </button>
+          </div>
+          <div class="meta-line small">
+            Oturumu sıfırladığında: tüm skorlar, yanıtlar ve eski nickler silinir.
+            QR aynı kalır; herkes yeniden nickname girer.
+          </div>
         </div>
-
-        <div class="controls" style="margin-top:8px;">
-          <button id="prevSceneBtn" class="btn btn-small btn-sec">
-            ⬅ Önceki olgu
-          </button>
-          <button id="nextSceneLocalBtn" class="btn btn-small btn-sec">
-            ➡ Sonraki olgu (hazırlık)
-          </button>
-        </div>
-
-        <div class="controls" style="margin-top:4px;">
-          <button id="resetSessionBtn" class="btn btn-small btn-sec">
-            🔁 Tüm oturumu ve skorları sıfırla
-          </button>
-        </div>
-
-        <div class="helper">
-          Katılımcılar <strong>defi-sim-player.html</strong> sayfasına girip nick yazarak
-          bağlanacak. Sen “Ritmi göster”e bastığında aynı olgu ve seçenekler onlara da gidecek.
-        </div>
-      </div>
-    </div>
-
-    <!-- SAĞ: Skor tablosu -->
-    <div>
-      <div class="card">
-        <div class="scenario-title">Skor Tablosu</div>
-        <div class="helper">
-          Doğru cevaplarda: 1. kişi 20, 2. 19, 3. 18, 4. 17, 5. 16, 6. ve sonrası 15 puan.
-          Yanlış cevap 0 puan.
-        </div>
-        <div id="scoreList" class="score-list">
-          <!-- Oyuncular buraya gelecek -->
-        </div>
-      </div>
-    </div>
+      </aside>
+    </main>
   </div>
 
   <script>
-    // === Firebase yapılandırması ===
+    // Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
       authDomain: "defi-quiz.firebaseapp.com",
@@ -493,306 +440,375 @@
       appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
       measurementId: "G-SY348RPCVZ"
     };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db     = firebase.database();
+    const rootRef= db.ref("defiSim");
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    // Diğer quiz ile karışmasın diye ayrı root:
-    const rootRef = db.ref("defiSim");
+    const CONFIG_URL = "defi-als-config.json";
 
-    // === Olgu seti (ritim ipucu yok) ===
-    const SCENES = [
-      {
-        id: 1,
-        title: "Olgu 1 – Ani kollaps",
-        text:
-          "65 yaş erkek, acil serviste triyaj sırasında aniden yere yığılıyor. Bilinci kapalı, solunum normal değil, palpabl nabız alınamıyor. Ekip olarak KPR başlatıyorsunuz ve monitöre bağlanıyorsunuz.",
-        wave: "vf",
-        hr: "—",
-        phase: "Resüsitasyon",
-        correctAction: "defib"
-      },
-      {
-        id: 2,
-        title: "Olgu 2 – Şok sonrası değerlendirme",
-        text:
-          "Aynı hastaya bir şok uygulandı ve 2 dk KPR yapıldı. Şimdi kısa ritim kontrolündesiniz. Hasta gözlerini açıyor, komut alıyor ve hareket etmeye başlıyor.",
-        wave: "nsr",
-        hr: "80",
-        phase: "Şok sonrası kontrol",
-        correctAction: "no-shock"
-      },
-      {
-        id: 3,
-        title: "Olgu 3 – Genç erişkin, hipotansif taşikardi",
-        text:
-          "35 yaş kadın, çarpıntı ve baş dönmesi ile geliyor. TA 70/40 mmHg, soğuk, soluk, bilinç bulanık. Nabız çok hızlı ve düzenli hissediliyor.",
-        wave: "tachy",
-        hr: "190",
-        phase: "Nabızlı taşikardi",
-        correctAction: "cardioversion"
-      },
-      {
-        id: 4,
-        title: "Olgu 4 – Yaşlı hasta, kronik aritmi öyküsü",
-        text:
-          "72 yaş erkek, uzun süredir düzensiz kalp atımı öyküsü var. Şimdi göğüs ağrısı, nefes darlığı ve sersemlik ile geliyor. TA 80/50 mmHg, nabız hızlı ve düzensiz.",
-        wave: "tachy-irreg",
-        hr: "150",
-        phase: "Nabızlı taşikardi",
-        correctAction: "cardioversion"
-      },
-      {
-        id: 5,
-        title: "Olgu 5 – Nabızsız, elektriksel aktivite belirsiz",
-        text:
-          "Acilde yatan bir hastaya çağrılıyorsunuz. Yatağında yanıtsız, normal solumuyor ve palpabl nabız alınamıyor. Ekip KPR başlatıyor, sen monitöre bakıyorsun.",
-        wave: "asystole",
-        hr: "0",
-        phase: "Arrest değerlendirme",
-        correctAction: "no-shock"
-      },
-      {
-        id: 6,
-        title: "Olgu 6 – Nabız yok, monitörde elektriksel aktivite",
-        text:
-          "İleri yaş bir hasta, serviste ani kötüleşme sonrası acile alınıyor. Monitörde bir ritim görüyorsun ancak nabız palpe edemiyorsun. Hasta yanıtsız ve apneik.",
-        wave: "pea",
-        hr: "40",
-        phase: "Arrest değerlendirme",
-        correctAction: "no-shock"
-      },
-      {
-        id: 7,
-        title: "Olgu 7 – Geniş kompleks, nabız alınamıyor",
-        text:
-          "50 yaş erkek, göğüs ağrısı sonrası aniden bilincini kaybediyor. Olay yerinde ve acilde nabız alınamıyor. Monitörde hızlı, geniş kompleksli elektriksel aktivite görüyorsun.",
-        wave: "pvt",
-        hr: "160",
-        phase: "Resüsitasyon",
-        correctAction: "defib"
-      },
-      {
-        id: 8,
-        title: "Olgu 8 – Uzamış QT öykülü hasta",
-        text:
-          "Uzamış QT öyküsü olan bir hasta, çarpıntı sonrası ani olarak bilincini kaybediyor. Nabız alınamıyor. Monitörde şekli zaman içinde değişen hızlı bir ritim görüyorsun.",
-        wave: "torsades",
-        hr: "220",
-        phase: "Resüsitasyon",
-        correctAction: "defib"
-      }
-    ];
+    let CONFIG       = null;
+    let CASES        = [];
+    let TOTAL_CASES  = 0;
+    let configLoaded = false;
 
-    const ekgLine = document.getElementById("ekgLine");
-    const rateLabel = document.getElementById("rateLabel");
-    const phaseLabel = document.getElementById("phaseLabel");
-    const modeHint = document.getElementById("modeHint");
-    const timerLabel = document.getElementById("timerLabel");
+    let sessionToken        = null;
+    let currentIndex        = 0;
+    let currentCaseId       = null;
+    let currentRhythmActive = false;
+    let currentReveal       = false;
 
-    const scenarioTitle = document.getElementById("scenarioTitle");
-    const scenarioText = document.getElementById("scenarioText");
-    const scoreValue = document.getElementById("scoreValue");
-    const sceneIndexSpan = document.getElementById("sceneIndex");
-    const sceneTotalSpan = document.getElementById("sceneTotal");
-    const progressFill = document.getElementById("progressFill");
-    const playerCountSpan = document.getElementById("playerCount");
-    const scoreList = document.getElementById("scoreList");
-
-    const startBtn = document.getElementById("startBtn");
-    const defibBtn = document.getElementById("defibBtn");
-    const cardioBtn = document.getElementById("cardioBtn");
-    const noShockBtn = document.getElementById("noShockBtn");
-    const prevSceneBtn = document.getElementById("prevSceneBtn");
-    const nextSceneLocalBtn = document.getElementById("nextSceneLocalBtn");
-    const resetSessionBtn = document.getElementById("resetSessionBtn");
-    const shockFlash = document.getElementById("shockFlash");
-
-    let currentSceneIndex = 0;
     let timerInterval = null;
-    let deadline = null;
-    let hasStarted = false;
-    const baseTimerColor = getComputedStyle(timerLabel).color;
+    let timerRemaining = 0;
 
-    sceneTotalSpan.textContent = SCENES.length;
+    // DOM
+    const caseTitleEl   = document.getElementById("caseTitle");
+    const caseNarrEl    = document.getElementById("caseNarrative");
+    const caseTagsEl    = document.getElementById("caseTags");
+    const timerLabel    = document.getElementById("timerLabel");
+    const statusLine    = document.getElementById("statusLine");
 
-    // Sadece görsel demo için: local timer
-    const TIME_LIMIT_MS = 5000;
+    const btnPrev       = document.getElementById("btnPrev");
+    const btnNext       = document.getElementById("btnNext");
+    const btnStart      = document.getElementById("btnStartCase");
+    const btnReveal     = document.getElementById("btnReveal");
+    const btnReset      = document.getElementById("btnResetSession");
 
-    function setAnswerButtonsDisabled(disabled) {
-      defibBtn.disabled = disabled;
-      cardioBtn.disabled = disabled;
-      noShockBtn.disabled = disabled;
+    const ekgStripEl    = document.getElementById("ekgStrip");
+    const ekgPath1      = document.getElementById("ekgPath1");
+    const ekgPath2      = document.getElementById("ekgPath2");
+    const ekgPath3      = document.getElementById("ekgPath3");
+
+    const sessionLabel  = document.getElementById("sessionLabel");
+    const playerCountEl = document.getElementById("playerCount");
+    const scoreListEl   = document.getElementById("scoreList");
+    const playerUrlText = document.getElementById("playerUrlText");
+
+    const progressLabel = document.getElementById("progressLabel");
+    const progressFill  = document.getElementById("progressFill");
+
+    // EKG şekilleri
+    const EKG_SHAPES = {
+      sinus: "0,30 10,30 20,30 30,20 32,40 34,10 36,50 38,25 40,30 50,30 60,30 70,30 80,30 90,20 92,40 94,12 96,50 98,25 100,30 110,30 120,30 130,30 140,20 142,40 144,10 146,50 148,25 150,30 160,30 170,30 180,30 190,20 192,40 194,12 196,50 198,25 200,30 210,30 220,30 230,30 240,30",
+      vf:   "0,30 6,35 8,26 13,26 18,36 20,37 26,25 28,24 31,33 34,36 38,26 40,26 46,34 53,36 58,30 61,26 68,26 75,27 77,37 78,34 83,33 88,27 92,29 96,37 103,37 109,29 112,26 120,25 127,29 127,35 128,32 135,33 138,26 139,33 141,41 143,28 146,36 148,38 154,28 160,32 164,41 171,36 173,29 179,37 183,42 186,41 189,28 193,25 199,27 204,35 207,33 212,25 216,28 218,37 220,37 227,27 233,23 236,28 240,30",
+      vt:   "0,30 5,30 10,20 15,10 20,50 25,40 30,30 35,30 40,20 45,10 50,50 55,40 60,30 65,30 70,20 75,10 80,50 85,40 90,30 95,30 100,20 105,10 110,50 115,40 120,30 125,30 130,20 135,10 140,50 145,40 150,30 155,30 160,20 165,10 170,50 175,40 180,30 185,30 190,20 195,10 200,50 205,40 210,30 215,30 220,20 225,10 230,50 235,40 240,30",
+      asystole: "0,30 40,30 80,30 120,30 160,30 200,30 240,30",
+      pea:  "0,30 10,30 20,30 28,20 30,18 32,40 34,22 36,30 46,30 56,30 64,22 66,40 68,18 70,30 80,30 90,30 98,22 100,40 102,18 104,30 114,30 124,30 132,22 134,40 136,18 138,30 148,30 158,30 166,22 168,40 170,18 172,30 182,30 192,30 200,22 202,40 204,18 206,30 216,30 226,30 234,22 236,40 238,18 240,30",
+      torsades: "0,30 5,25 10,20 15,15 20,10 25,15 30,20 35,25 40,30 45,35 50,40 55,45 60,50 65,45 70,40 75,35 80,30 85,25 90,20 95,15 100,10 105,15 110,20 115,25 120,30 125,35 130,40 135,45 140,50 145,45 150,40 155,35 160,30 165,25 170,20 175,15 180,10 185,15 190,20 195,25 200,30 205,35 210,40 215,45 220,50 225,45 230,40 235,35 240,30"
+    };
+
+    function safeCase(idx){
+      if(!CASES.length) return null;
+      if(idx<0) idx=0;
+      if(idx>=CASES.length) idx=CASES.length-1;
+      return CASES[idx];
     }
 
-    function updateMonitorPre(scene) {
-      ekgLine.className = "ekg-line ekg-off";
-      rateLabel.textContent = scene.hr || "–";
-      phaseLabel.textContent = "Olgu hazırlık";
-      modeHint.textContent = "Ritim gizli – başlatınca gözükecek";
-      modeHint.className = "tag";
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
     }
 
-    function updateMonitorActive(scene) {
-      ekgLine.className = "ekg-line ekg-" + (scene.wave || "nsr");
-      rateLabel.textContent = scene.hr || "–";
-      phaseLabel.textContent = scene.phase || "";
-      modeHint.textContent = "Ritim ekranı – katılımcılar cevaplıyor";
-      modeHint.className = "tag";
-    }
-
-    function resetTimer() {
-      if (timerInterval) clearInterval(timerInterval);
-      timerInterval = null;
-      timerLabel.style.color = baseTimerColor;
-    }
-
-    function startTimer() {
-      resetTimer();
-      deadline = Date.now() + TIME_LIMIT_MS;
-
-      function tick() {
-        const now = Date.now();
-        const remaining = deadline - now;
-        if (remaining <= 0) {
-          resetTimer();
-          timerLabel.textContent = "0.0";
-          timerLabel.style.color = baseTimerColor;
-        } else {
-          const sec = remaining / 1000;
-          timerLabel.textContent = sec.toFixed(1);
-          timerLabel.style.color = sec <= 2 ? "#f97373" : baseTimerColor;
+    function startTimerForCurrent(){
+      stopTimer();
+      const c = safeCase(currentIndex);
+      if(!c){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      timerRemaining = c.timeLimitSec || 8;
+      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+      timerInterval = setInterval(()=>{
+        timerRemaining -= 1;
+        if(timerRemaining <= 0){
+          stopTimer();
+          timerLabel.textContent = "Süre: 0 sn";
+          rootRef.update({ currentRhythmActive:false });
+        }else{
+          timerLabel.textContent="Süre: "+timerRemaining+" sn";
         }
+      },1000);
+    }
+
+    function applyRhythm(key, animate){
+      const k = key || "sinus";
+      const shape = EKG_SHAPES[k] || EKG_SHAPES["sinus"];
+      ekgPath1.setAttribute("points", shape);
+      ekgPath2.setAttribute("points", shape);
+      ekgPath3.setAttribute("points", shape);
+      ekgStripEl.className = "ekg-strip " + k + (animate ? " anim" : "");
+    }
+
+    function updateProgress(){
+      if(!TOTAL_CASES || currentIndex==null){
+        progressLabel.textContent = "Olgu – / –";
+        progressFill.style.width  = "0%";
+        return;
+      }
+      const idx = currentIndex + 1;
+      progressLabel.textContent = "Olgu " + idx + " / " + TOTAL_CASES;
+      const pct = Math.max(0, Math.min(1, idx / TOTAL_CASES));
+      progressFill.style.width = (pct * 100).toFixed(1) + "%";
+    }
+
+    function renderCase(){
+      if(!configLoaded) return;
+      const c = safeCase(currentIndex);
+      if(!c) return;
+
+      caseTitleEl.textContent = c.title || ("Olgu " + (currentIndex+1));
+      caseNarrEl.textContent  = c.narrative || "";
+      caseTagsEl.innerHTML = "";
+      (c.tags || []).forEach(t=>{
+        const span = document.createElement("span");
+        span.className = "tag";
+        span.textContent = t;
+        caseTagsEl.appendChild(span);
+      });
+
+      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "asystole";
+      applyRhythm(rhythmKey, !!currentRhythmActive);
+
+      if(!currentCaseId){
+        statusLine.textContent = "Olguyu tanıt, sonra 'Ritim + süreyi başlat' ile ritmi aç.";
+      }else if(!currentRhythmActive && !currentReveal){
+        statusLine.textContent = "Ritim kapalı. Aynı olguyu tekrar başlatabilir veya yeni olguya geçebilirsin.";
+      }else if(currentRhythmActive){
+        statusLine.textContent = "Ritim açık, katılımcılar karar veriyor.";
+      }else if(currentReveal){
+        statusLine.textContent = "Doğru yaklaşım gösterildi, olguyu tartışabilirsin.";
       }
 
-      timerLabel.textContent = (TIME_LIMIT_MS / 1000).toFixed(1);
-      timerInterval = setInterval(tick, 100);
+      updateProgress();
     }
 
-    function renderScene() {
-      const s = SCENES[currentSceneIndex];
-      sceneIndexSpan.textContent = currentSceneIndex + 1;
-      scenarioTitle.textContent = s.title;
-      scenarioText.textContent = s.text;
-      const progress = (currentSceneIndex / SCENES.length) * 100;
-      progressFill.style.width = progress + "%";
-      hasStarted = false;
-      startBtn.disabled = false;
-      setAnswerButtonsDisabled(true);
-      resetTimer();
-      timerLabel.textContent = "—";
-      updateMonitorPre(s);
+    function initQR(){
+      try{
+        let href = window.location.href;
+        const playerUrl = href.replace(/defi-sim-host(\.html)?/,"defi-sim-player.html");
+        playerUrlText.textContent = playerUrl;
+        const box = document.getElementById("qrcodeSim");
+        box.innerHTML = "";
+        new QRCode(box,{
+          text: playerUrl,
+          width:120,
+          height:120
+        });
+      }catch(e){console.error(e);}
     }
+    initQR();
 
-    function triggerShockFlash(actionType) {
-      shockFlash.style.background = actionType === "cardioversion" ? "#e0f2fe" : "#ffffff";
-      shockFlash.style.opacity = "1";
-      setTimeout(() => { shockFlash.style.opacity = "0"; }, 120);
-    }
-
-    // Sunucuya yeni soru duyur
-    function broadcastQuestion() {
-      const scene = SCENES[currentSceneIndex];
-      const counterRef = rootRef.child("questionCounter");
-
-      counterRef.transaction(cur => (cur || 0) + 1, (err, committed, snap) => {
-        if (!committed || !snap) return;
-        const qId = snap.val();
-        const updates = {};
-        updates["currentSceneIndex"] = currentSceneIndex;
-        updates["currentQuestionId"] = qId;
-        updates["status"] = "running";
-        updates["currentQuestionMeta"] = {
-          title: scene.title,
-          phase: scene.phase || "",
-          ts: Date.now()
-        };
-        updates["answerOrder/" + qId] = 0;
-        rootRef.update(updates);
+    // Butonlar
+    btnPrev.addEventListener("click",()=>{
+      if(!configLoaded) return;
+      currentIndex = Math.max(0, currentIndex-1);
+      currentCaseId = null;
+      currentRhythmActive = false;
+      currentReveal = false;
+      stopTimer();
+      timerRemaining = 0;
+      timerLabel.textContent = "Süre: –";
+      rootRef.update({
+        currentCaseIndex: currentIndex,
+        currentCaseId: null,
+        currentRhythmActive: false,
+        currentReveal: false
       });
-    }
+      renderCase();
+    });
 
-    // Skor tablosu dinleyicisi
-    rootRef.child("players").on("value", snap => {
-      const players = [];
-      snap.forEach(child => {
-        const val = child.val() || {};
-        players.push({
-          id: child.key,
-          name: val.nickname || "Anonim",
-          score: val.score || 0
+    btnNext.addEventListener("click",()=>{
+      if(!configLoaded) return;
+      currentIndex = Math.min(TOTAL_CASES-1, currentIndex+1);
+      currentCaseId = null;
+      currentRhythmActive = false;
+      currentReveal = false;
+      stopTimer();
+      timerRemaining = 0;
+      timerLabel.textContent = "Süre: –";
+      rootRef.update({
+        currentCaseIndex: currentIndex,
+        currentCaseId: null,
+        currentRhythmActive: false,
+        currentReveal: false
+      });
+      renderCase();
+    });
+
+    function startCase(){
+      if(!configLoaded) return;
+      const c = safeCase(currentIndex);
+      if(!c) return;
+      const newId = "c_" + c.id + "_" + Date.now();
+
+      currentCaseId       = newId;
+      currentRhythmActive = true;
+      currentReveal       = false;
+
+      stopTimer();
+      startTimerForCurrent();
+
+      const updates = {};
+      updates["currentCaseIndex"]       = currentIndex;
+      updates["currentCaseId"]          = currentCaseId;
+      updates["currentRhythmActive"]    = true;
+      updates["currentReveal"]          = false;
+      updates["answerOrder/"+currentCaseId] = 0;
+      updates["answers/"+currentCaseId]     = null;
+      rootRef.update(updates);
+
+      statusLine.textContent = "Ritim açıldı, süre başladı.";
+      renderCase();
+    }
+    btnStart.addEventListener("click", startCase);
+
+    btnReveal.addEventListener("click",()=>{
+      if(!currentCaseId) return;
+      rootRef.update({ currentReveal:true, currentRhythmActive:false });
+      stopTimer();
+      timerLabel.textContent = "Süre: 0 sn";
+    });
+
+    btnReset.addEventListener("click",()=>{
+      if(!confirm("Tüm skorlar, yanıtlar ve eski nickler silinecek. Emin misin?")) return;
+      stopTimer();
+      const newToken = Date.now();
+      const resetData = {
+        sessionToken:newToken,
+        currentCaseIndex:0,
+        currentCaseId:null,
+        currentRhythmActive:false,
+        currentReveal:false,
+        players:null,
+        answers:null,
+        answerOrder:null
+      };
+      rootRef.set(resetData);
+      sessionToken = newToken;
+      sessionLabel.textContent = "#" + String(newToken).slice(-4);
+
+      currentIndex        = 0;
+      currentCaseId       = null;
+      currentRhythmActive = false;
+      currentReveal       = false;
+      timerRemaining      = 0;
+      timerLabel.textContent = "Süre: –";
+      scoreListEl.innerHTML   = "";
+      playerCountEl.textContent = "0";
+      statusLine.textContent = "Yeni ALS sim oturumu başlatıldı.";
+      renderCase();
+    });
+
+    function attachDbListeners(){
+      rootRef.child("sessionToken").on("value",snap=>{
+        const val = snap.val();
+        if(val){
+          if(sessionToken && sessionToken !== val){
+            stopTimer();
+            timerRemaining = 0;
+            timerLabel.textContent = "Süre: –";
+            currentCaseId = null;
+            currentRhythmActive = false;
+            currentReveal = false;
+            statusLine.textContent = "Yeni oturum algılandı.";
+          }
+          sessionToken = val;
+          sessionLabel.textContent = "#" + String(val).slice(-4);
+        }
+      });
+
+      rootRef.child("currentCaseIndex").on("value",snap=>{
+        const idx = snap.val();
+        if(idx === null || idx === undefined) return;
+        currentIndex = idx;
+        renderCase();
+      });
+
+      rootRef.child("currentCaseId").on("value",snap=>{
+        currentCaseId = snap.val();
+        renderCase();
+      });
+
+      rootRef.child("currentRhythmActive").on("value",snap=>{
+        currentRhythmActive = !!snap.val();
+        if(currentRhythmActive){
+          startTimerForCurrent();
+        }else{
+          stopTimer();
+          if(currentCaseId){
+            timerLabel.textContent = "Süre: 0 sn";
+          }else{
+            timerLabel.textContent = "Süre: –";
+          }
+        }
+        renderCase();
+      });
+
+      rootRef.child("currentReveal").on("value",snap=>{
+        currentReveal = !!snap.val();
+        renderCase();
+      });
+
+      rootRef.child("players").on("value",snap=>{
+        const val = snap.val() || {};
+        const arr = Object.entries(val).map(([id,p])=>({
+          id,
+          nickname: p.nickname || "Anonim",
+          score:    p.score    || 0
+        }));
+        arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
+        playerCountEl.textContent = arr.length;
+        scoreListEl.innerHTML = "";
+        arr.forEach((p,idx)=>{
+          const row  = document.createElement("div");
+          row.className = "score-row";
+          const left  = document.createElement("span");
+          const right = document.createElement("span");
+          left.textContent  = (idx+1)+". "+p.nickname;
+          right.textContent = p.score+" p";
+          row.appendChild(left);
+          row.appendChild(right);
+          scoreListEl.appendChild(row);
         });
       });
-      players.sort((a,b) => b.score - a.score || a.name.localeCompare(b.name));
+    }
 
-      playerCountSpan.textContent = players.length;
-      scoreList.innerHTML = "";
-      let totalScore = 0;
+    async function loadConfig(){
+      try{
+        const res = await fetch(CONFIG_URL,{cache:"no-store"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        CONFIG = await res.json();
+        CASES  = (CONFIG.cases || []).slice();
+        TOTAL_CASES  = CASES.length;
+        configLoaded = true;
 
-      players.forEach((p, idx) => {
-        totalScore += p.score;
-        const row = document.createElement("div");
-        row.className = "score-row";
-        const rank = document.createElement("span");
-        rank.className = "rank";
-        rank.textContent = idx + 1;
-        const name = document.createElement("span");
-        name.className = "score-name";
-        name.textContent = p.name;
-        const pts = document.createElement("span");
-        pts.className = "score-points";
-        pts.textContent = p.score;
-        row.appendChild(rank);
-        row.appendChild(name);
-        row.appendChild(pts);
-        scoreList.appendChild(row);
-      });
+        attachDbListeners();
+        renderCase();
 
-      scoreValue.textContent = totalScore;
-    });
-
-    // Host kontrol butonları
-    startBtn.addEventListener("click", () => {
-      if (hasStarted) return;
-      hasStarted = true;
-      startBtn.disabled = true;
-      setAnswerButtonsDisabled(false);
-      const s = SCENES[currentSceneIndex];
-      updateMonitorActive(s);
-      startTimer();
-      broadcastQuestion();
-    });
-
-    // Demo amaçlı: sadece monitörde efekt
-    defibBtn.addEventListener("click", () => {
-      triggerShockFlash("defib");
-    });
-    cardioBtn.addEventListener("click", () => {
-      triggerShockFlash("cardioversion");
-    });
-
-    prevSceneBtn.addEventListener("click", () => {
-      if (currentSceneIndex > 0) {
-        currentSceneIndex--;
-        renderScene();
+        rootRef.child("currentCaseIndex").once("value",s=>{
+          if(!s.exists()){
+            rootRef.update({ currentCaseIndex:0 });
+          }
+        });
+        rootRef.child("sessionToken").once("value",snap=>{
+          if(!snap.exists()){
+            const t = Date.now();
+            rootRef.update({ sessionToken:t });
+            sessionToken = t;
+            sessionLabel.textContent = "#" + String(t).slice(-4);
+          }
+        });
+      }catch(e){
+        console.error(e);
+        caseTitleEl.textContent = "Config yüklenemedi";
+        caseNarrEl.textContent  = "defi-als-config.json dosyasını aynı klasöre koyduğundan emin ol.";
       }
-    });
+    }
 
-    nextSceneLocalBtn.addEventListener("click", () => {
-      if (currentSceneIndex < SCENES.length - 1) {
-        currentSceneIndex++;
-        renderScene();
-      }
-    });
-
-    resetSessionBtn.addEventListener("click", () => {
-      if (!confirm("Tüm skorları ve oturumu sıfırlamak istiyor musun?")) return;
-      rootRef.set({ questionCounter: 0 });
-      currentSceneIndex = 0;
-      renderScene();
-    });
-
-    // Başlangıç
-    renderScene();
+    loadConfig();
   </script>
 </body>
 </html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defi Quiz – Katılımcı</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --border:#1f2937;
+      --accent:#f97373;
+      --danger:#ef4444;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --heading:#fef2f2;
+      --radius-lg:18px;
+      --radius-pill:999px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      padding:8px;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      color:var(--text);
+      font-size:15px;
+    }
+    .app{max-width:480px;margin:0 auto;}
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .brand{
+      font-size:1.02rem;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:var(--heading);
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      padding:3px 9px;
+      font-size:0.78rem;
+      color:var(--muted);
+      background:rgba(15,23,42,0.97);
+    }
+    .pill-dot{
+      width:7px;height:7px;border-radius:999px;background:#22c55e;
+      box-shadow:0 0 10px rgba(34,197,94,0.95);
+    }
+
+    .card{
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border);
+      background:var(--card);
+      box-shadow:0 16px 32px rgba(15,23,42,0.9);
+      padding:10px;
+      margin-top:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
+      pointer-events:none;
+    }
+    .card-inner{position:relative;z-index:1;}
+
+    .question-title{
+      font-size:0.96rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
+    }
+    .question-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+      margin-bottom:6px;
+    }
+    .meta-line{
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-top:2px;
+    }
+
+    .input-row{
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+    }
+    input[type="text"]{
+      flex:1;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      padding:8px 10px;
+      font-size:0.9rem;
+      outline:none;
+    }
+    input::placeholder{color:var(--muted);}
+    .btn-join{
+      border-radius:var(--radius-pill);
+      border:none;
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      color:#fef2f2;
+      padding:8px 12px;
+      font-size:0.86rem;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 8px 16px rgba(239,68,68,0.6);
+    }
+
+    .option-list{
+      margin-top:4px;
+    }
+    .option-btn{
+      width:100%;
+      border-radius:14px;
+      border:1px solid #1f2937;
+      background:rgba(15,23,42,0.96);
+      padding:8px 9px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+      font-size:0.9rem;
+      color:var(--text);
+      cursor:pointer;
+      margin-bottom:5px;
+      transition:all .15s ease-out;
+    }
+    .option-btn.disabled{
+      opacity:0.55;
+      cursor:default;
+    }
+    .option-main{
+      display:flex;
+      gap:6px;
+      align-items:flex-start;
+    }
+    .option-badge{
+      width:20px;
+      height:20px;
+      border-radius:999px;
+      border:1px solid #4b5563;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0.8rem;
+      color:var(--muted);
+      flex-shrink:0;
+    }
+    .option-text{
+      text-align:left;
+    }
+    .option-btn.selected{
+      outline:2px solid #22c55e;
+      outline-offset:1px;
+      border-color:#22c55e;
+    }
+    .option-btn.correct{
+      border-color:#22c55e;
+      box-shadow:0 0 0 1px rgba(34,197,94,0.6);
+    }
+    .option-btn.correct .option-badge{
+      border-color:#22c55e;
+      color:#22c55e;
+    }
+
+    .timer-pill{
+      border-radius:var(--radius-pill);
+      border:1px solid #52525b;
+      padding:3px 9px;
+      font-size:0.8rem;
+      color:#fbbf24;
+      font-variant-numeric:tabular-nums;
+      display:inline-block;
+      margin-top:4px;
+    }
+
+    .feedback{
+      margin-top:4px;
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+    .feedback.ok{color:#22c55e;}
+    .feedback.bad{color:var(--danger);}
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
+    }
+    .modal.show{display:flex;}
+    .modal-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.75);
+    }
+    .modal-card{
+      position:relative;
+      background:#020617;
+      border-radius:18px;
+      border:1px solid #374151;
+      padding:14px;
+      width:min(420px,90vw);
+      box-shadow:0 20px 40px rgba(0,0,0,0.8);
+    }
+    .modal-title{
+      font-size:0.92rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
+    }
+    .modal-body{
+      font-size:0.85rem;
+      color:var(--text);
+      max-height:220px;
+      overflow-y:auto;
+      white-space:pre-wrap;
+    }
+    .btn-modal{
+      margin-top:8px;
+      border-radius:var(--radius-pill);
+      border:none;
+      padding:7px 12px;
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      color:#fef2f2;
+      font-size:0.84rem;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      margin-left:auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <div class="brand">Defi Quiz</div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        Skorun: <span id="myScore">0</span> p
+      </div>
+    </header>
+
+    <!-- Katıl kartı -->
+    <section class="card" id="joinCard">
+      <div class="card-inner">
+        <div class="question-title">Katıl</div>
+        <div class="question-body">
+          Nickini yaz ve <strong>Defi Quiz</strong> oturumuna bağlan.
+        </div>
+        <div class="input-row">
+          <input id="nicknameInput" type="text" maxlength="20" placeholder="Örn. ShockDoc" />
+          <button id="joinBtn" class="btn-join">Katıl</button>
+        </div>
+        <div id="joinFeedback" class="feedback"></div>
+      </div>
+    </section>
+
+    <!-- Quiz kartı -->
+    <section class="card" id="quizCard" style="display:none;">
+      <div class="card-inner">
+        <div class="question-title" id="questionTitle">Soru başlığı</div>
+        <div class="question-body" id="questionStem">
+          Eğitmen soruyu başlattığında burada göreceksin.
+        </div>
+
+        <div id="optionsList" class="option-list"></div>
+
+        <span id="timerLabel" class="timer-pill">Süre: –</span>
+        <div id="answerStatus" class="feedback">
+          Eğitmen soruyu başlattığında 5–15 sn içinde yanıt ver.
+        </div>
+      </div>
+    </section>
+
+    <!-- Bilgi kartı -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="question-title">Bilgi</div>
+        <div class="feedback">
+          İlk doğru yanıt 20 puan, sonra 19–18… en az 15 puan.
+          Süre bittiğinde yeni yanıt kabul edilmez.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Açıklama popup -->
+  <div id="exModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-title" id="exModalTitle">Soru açıklaması</div>
+      <div class="modal-body" id="exModalBody"></div>
+      <button id="exModalClose" class="btn-modal">Tamam</button>
+    </div>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
+      authDomain: "defi-quiz.firebaseapp.com",
+      databaseURL: "https://defi-quiz-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "defi-quiz",
+      storageBucket: "defi-quiz.firebasestorage.app",
+      messagingSenderId: "642741899462",
+      appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
+      measurementId: "G-SY348RPCVZ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db      = firebase.database();
+    const rootRef = db.ref("defiQuiz");
+
+    const CONFIG_URL = "defi-quiz-config.json";
+
+    let CONFIG       = null;
+    let QUESTIONS    = [];
+    let configLoaded = false;
+
+    let sessionToken   = null;
+    let triedAutoJoin  = false;
+    let playerId       = null;
+    let nickname       = null;
+
+    let currentIndex      = null;
+    let currentQuestionId = null;
+    let questionActive    = false;
+    let reveal            = false;
+
+    let answeredQuestions = {};
+    let shownExplanation  = {};
+    let selectedChoiceIdx = null;
+
+    let timerInterval     = null;
+    let timerRemaining    = 0;
+
+    // DOM
+    const joinCard      = document.getElementById("joinCard");
+    const quizCard      = document.getElementById("quizCard");
+    const nicknameInput = document.getElementById("nicknameInput");
+    const joinBtn       = document.getElementById("joinBtn");
+    const joinFeedback  = document.getElementById("joinFeedback");
+
+    const questionTitleEl = document.getElementById("questionTitle");
+    const questionStemEl  = document.getElementById("questionStem");
+    const optionsListEl   = document.getElementById("optionsList");
+    const timerLabel      = document.getElementById("timerLabel");
+    const answerStatus    = document.getElementById("answerStatus");
+    const myScoreEl       = document.getElementById("myScore");
+
+    const exModal       = document.getElementById("exModal");
+    const exModalTitle  = document.getElementById("exModalTitle");
+    const exModalBody   = document.getElementById("exModalBody");
+    const exModalClose  = document.getElementById("exModalClose");
+
+    function safeQuestion(idx){
+      if(!QUESTIONS.length) return null;
+      if(idx<0) idx=0;
+      if(idx>=QUESTIONS.length) idx=QUESTIONS.length-1;
+      return QUESTIONS[idx];
+    }
+
+    function attachScoreListener(){
+      if(!playerId) return;
+      rootRef.child("players").child(playerId).child("score")
+        .on("value",snap=>{
+          myScoreEl.textContent = snap.val() || 0;
+        });
+    }
+
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+    }
+
+    function startTimerForCurrent(){
+      stopTimer();
+      if(!configLoaded || currentIndex==null){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      const q = safeQuestion(currentIndex);
+      if(!q){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      timerRemaining = q.timeLimitSec || 10;
+      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+      timerInterval = setInterval(()=>{
+        timerRemaining -= 1;
+        if(timerRemaining <= 0){
+          stopTimer();
+          timerLabel.textContent="Süre: 0 sn";
+          return;
+        }
+        timerLabel.textContent="Süre: "+timerRemaining+" sn";
+      },1000);
+    }
+
+    function updateButtonsState(){
+      const canAnswer = configLoaded && currentQuestionId && questionActive && !reveal && playerId;
+      const already   = currentQuestionId && answeredQuestions[currentQuestionId];
+      const disabled  = !canAnswer || already;
+
+      const children = optionsListEl.querySelectorAll(".option-btn");
+      children.forEach(btn=>{
+        if(disabled){
+          btn.classList.add("disabled");
+        }else{
+          btn.classList.remove("disabled");
+        }
+      });
+    }
+
+    function renderQuestion(){
+      if(!configLoaded || currentIndex==null){
+        questionTitleEl.textContent = "Soru bekleniyor";
+        questionStemEl.textContent  = "";
+        optionsListEl.innerHTML     = "";
+        return;
+      }
+      const q = safeQuestion(currentIndex);
+      if(!q){
+        questionTitleEl.textContent = "Soru yok";
+        questionStemEl.textContent  = "";
+        optionsListEl.innerHTML     = "";
+        return;
+      }
+
+      questionTitleEl.textContent = q.title || ("Soru " + (currentIndex+1));
+      questionStemEl.textContent  = q.stem  || "";
+
+      // Yeni soru/oturumda açıklama ve highlight'ları sıfırla
+      exModal.classList.remove("show");
+      optionsListEl.innerHTML = "";
+
+      (q.options || []).forEach((opt,idx)=>{
+        const btn  = document.createElement("button");
+        btn.type   = "button";
+        btn.className = "option-btn";
+        if(reveal && idx === q.correctIndex){
+          btn.classList.add("correct");
+        }
+        if(selectedChoiceIdx === idx){
+          btn.classList.add("selected");
+        }
+
+        const main = document.createElement("div");
+        main.className = "option-main";
+
+        const badge = document.createElement("div");
+        badge.className = "option-badge";
+        badge.textContent = String.fromCharCode(65 + idx);
+
+        const text = document.createElement("div");
+        text.className = "option-text";
+        text.textContent = opt;
+
+        main.appendChild(badge);
+        main.appendChild(text);
+        btn.appendChild(main);
+
+        btn.addEventListener("click",()=>{
+          sendAnswer(idx);
+        });
+
+        optionsListEl.appendChild(btn);
+      });
+
+      if(!currentQuestionId){
+        answerStatus.textContent = "Eğitmen soruyu başlattığında yanıt verebileceksin.";
+        answerStatus.className   = "feedback";
+      }else if(!questionActive && !reveal){
+        answerStatus.textContent = "Bu soru şu anda pasif. Yeni soru için eğitmeni bekle.";
+        answerStatus.className   = "feedback";
+      }else if(questionActive){
+        if(answeredQuestions[currentQuestionId]){
+          answerStatus.textContent = "Bu soruyu yanıtladın. Yeni soru bekle.";
+        }else{
+          answerStatus.textContent = "5–15 sn içinde yanıt ver.";
+        }
+        answerStatus.className   = "feedback";
+      }else if(reveal){
+        answerStatus.textContent = "Doğru yanıt gösterildi.";
+        answerStatus.className   = "feedback";
+      }
+
+      updateButtonsState();
+    }
+
+    function computePoints(orderPosition){
+      if(orderPosition<=0) return 0;
+      if(orderPosition===1) return 20;
+      if(orderPosition===2) return 19;
+      if(orderPosition===3) return 18;
+      if(orderPosition===4) return 17;
+      if(orderPosition===5) return 16;
+      return 15;
+    }
+
+    function openExplanationModal(isCorrect, q){
+      if(!q) return;
+      const key = q.id || (currentQuestionId || "");
+      if(shownExplanation[key]) return;
+      shownExplanation[key] = true;
+
+      exModalTitle.textContent = isCorrect ? "Doğru yanıt" : "Soru açıklaması";
+
+      let body = "";
+      if(typeof q.correctIndex === "number" && q.options && q.options[q.correctIndex]){
+        const letter = String.fromCharCode(65 + q.correctIndex);
+        body += "Doğru yanıt: " + letter + ") " + q.options[q.correctIndex] + "\n\n";
+      }
+      if(q.explanation) body += q.explanation;
+
+      exModalBody.textContent = body;
+      exModal.classList.add("show");
+    }
+
+    function closeExplanationModal(){
+      exModal.classList.remove("show");
+    }
+    exModalClose.addEventListener("click", closeExplanationModal);
+    exModal.addEventListener("click", e=>{
+      if(e.target === exModal) closeExplanationModal();
+    });
+
+    function sendAnswer(choiceIndex){
+      if(!playerId || !configLoaded || currentIndex==null || !currentQuestionId) return;
+      if(!questionActive || reveal) return;
+      if(answeredQuestions[currentQuestionId]) return;
+
+      const q = safeQuestion(currentIndex);
+      if(!q) return;
+
+      const children = optionsListEl.querySelectorAll(".option-btn");
+      children.forEach(btn=>btn.classList.remove("selected"));
+      if(children[choiceIndex]) children[choiceIndex].classList.add("selected");
+      selectedChoiceIdx = choiceIndex;
+
+      answeredQuestions[currentQuestionId] = true;
+      updateButtonsState();
+
+      const isCorrect = (choiceIndex === q.correctIndex);
+      const qIdStr = String(currentQuestionId);
+      const answersRef   = rootRef.child("answers").child(qIdStr);
+      const playerAnsRef = answersRef.child(playerId);
+
+      if(!isCorrect){
+        playerAnsRef.set({
+          nickname: nickname || "Anonim",
+          choiceIndex: choiceIndex,
+          correct: false,
+          points: 0,
+          ts: Date.now()
+        });
+        answerStatus.textContent = "Bu soruda yanıt ERC/rehber ile uyumlu değil.";
+        answerStatus.className   = "feedback bad";
+        openExplanationModal(false, q);
+        return;
+      }
+
+      const orderRef = rootRef.child("answerOrder").child(qIdStr);
+      orderRef.transaction(cur => (cur || 0) + 1, (err, committed, snap)=>{
+        if(!committed || !snap) return;
+        const pos = snap.val();
+        const pts = computePoints(pos);
+
+        playerAnsRef.set({
+          nickname: nickname || "Anonim",
+          choiceIndex: choiceIndex,
+          correct: true,
+          position: pos,
+          points: pts,
+          ts: Date.now()
+        });
+
+        const scoreRef = rootRef.child("players").child(playerId).child("score");
+        scoreRef.transaction(cur => (cur || 0) + pts);
+
+        answerStatus.textContent = "Doğru yanıt. Sıra: " + pos + " • Puan: " + pts;
+        answerStatus.className   = "feedback ok";
+        openExplanationModal(true, q);
+      });
+    }
+
+    function joinSession(){
+      const nick = nicknameInput.value.trim();
+      if(!nick){
+        joinFeedback.textContent = "Nick zorunlu.";
+        return;
+      }
+      nickname = nick;
+      if(!playerId){
+        playerId = "p_" + Math.random().toString(36).substr(2,9);
+      }
+      const playerRef = rootRef.child("players").child(playerId);
+      playerRef.update({ nickname:nickname, score:0 });
+
+      if(sessionToken){
+        localStorage.setItem("defiQuizSessionToken", String(sessionToken));
+      }else{
+        localStorage.removeItem("defiQuizSessionToken");
+      }
+      localStorage.setItem("defiQuizPlayerId", playerId);
+      localStorage.setItem("defiQuizNickname", nickname);
+
+      joinCard.style.display = "none";
+      quizCard.style.display = "block";
+      joinFeedback.textContent = "";
+      answerStatus.textContent = "Eğitmen soruyu başlattığında yanıt verebileceksin.";
+      attachScoreListener();
+      renderQuestion();
+      updateButtonsState();
+    }
+    joinBtn.addEventListener("click", joinSession);
+    nicknameInput.addEventListener("keydown", e=>{ if(e.key==="Enter") joinSession(); });
+
+    function tryAutoJoin(){
+      if(!sessionToken || triedAutoJoin) return;
+      triedAutoJoin = true;
+
+      const storedSession = localStorage.getItem("defiQuizSessionToken");
+      const storedId      = localStorage.getItem("defiQuizPlayerId");
+      const storedNick    = localStorage.getItem("defiQuizNickname");
+
+      if(storedId && storedNick && storedNick.trim() && storedNick!=="Anonim" &&
+         storedSession && String(storedSession)===String(sessionToken)){
+        playerId = storedId;
+        nickname = storedNick;
+        joinCard.style.display = "none";
+        quizCard.style.display = "block";
+        answerStatus.textContent = "Eğitmen soruyu başlattığında yanıt verebileceksin.";
+        attachScoreListener();
+        renderQuestion();
+        updateButtonsState();
+      }else{
+        joinCard.style.display = "block";
+        quizCard.style.display = "none";
+      }
+    }
+
+    function handleSessionTokenChange(newToken){
+      if(!newToken){
+        sessionToken = null;
+        return;
+      }
+      if(sessionToken && sessionToken!==newToken){
+        // Oturum resetlenmiş
+        playerId = null;
+        nickname = null;
+        answeredQuestions = {};
+        shownExplanation  = {};
+        selectedChoiceIdx = null;
+        stopTimer();
+        timerLabel.textContent = "Süre: –";
+        myScoreEl.textContent  = "0";
+
+        localStorage.removeItem("defiQuizPlayerId");
+        localStorage.removeItem("defiQuizNickname");
+        localStorage.removeItem("defiQuizSessionToken");
+
+        joinCard.style.display = "block";
+        quizCard.style.display = "none";
+        joinFeedback.textContent = "Oturum yenilendi, yeniden katıl.";
+      }
+      sessionToken = newToken;
+      tryAutoJoin();
+    }
+
+    function attachDbListeners(){
+      rootRef.child("sessionToken").on("value",snap=>{
+        const val = snap.val();
+        if(val) handleSessionTokenChange(val);
+      });
+
+      rootRef.child("currentQuestionIndex").on("value",snap=>{
+        const idx = snap.val();
+        if(idx === null || idx === undefined) return;
+        currentIndex = idx;
+        renderQuestion();
+      });
+
+      rootRef.child("currentQuestionId").on("value",snap=>{
+        const newId = snap.val();
+        if(newId !== currentQuestionId){
+          currentQuestionId = newId;
+          stopTimer();
+          timerLabel.textContent = currentQuestionId ? "Süre: –" : "Süre: –";
+          selectedChoiceIdx = null;
+          renderQuestion();
+        }
+      });
+
+      rootRef.child("questionActive").on("value",snap=>{
+        questionActive = !!snap.val();
+        if(questionActive){
+          startTimerForCurrent();
+          if(currentQuestionId && !answeredQuestions[currentQuestionId]){
+            answerStatus.textContent = "5–15 sn içinde yanıt ver.";
+            answerStatus.className   = "feedback";
+          }
+        }else{
+          stopTimer();
+          if(currentQuestionId && !answeredQuestions[currentQuestionId]){
+            timerLabel.textContent = "Süre: 0 sn";
+            answerStatus.textContent = "Süre bitti; bu soruyu artık yanıtlayamazsın.";
+            answerStatus.className   = "feedback";
+          }
+        }
+        renderQuestion();
+        updateButtonsState();
+      });
+
+      rootRef.child("reveal").on("value",snap=>{
+        const prev = reveal;
+        reveal = !!snap.val();
+        renderQuestion();
+        updateButtonsState();
+
+        if(reveal && !prev && configLoaded && currentIndex!=null){
+          const q = safeQuestion(currentIndex);
+          if(q) openExplanationModal(false, q);
+        }
+      });
+    }
+
+    async function loadConfig(){
+      try{
+        const res = await fetch(CONFIG_URL,{cache:"no-store"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        CONFIG    = await res.json();
+        QUESTIONS = (CONFIG.questions || []).slice();
+        configLoaded = true;
+        attachDbListeners();
+      }catch(e){
+        console.error(e);
+        questionTitleEl.textContent = "Config yüklenemedi";
+        questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koyduğundan emin ol.";
+      }
+    }
+
+    loadConfig();
+  </script>
+</body>
+</html>

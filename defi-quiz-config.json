@@ -1,0 +1,227 @@
+{
+  "meta": {
+    "title": "Defibrilasyon & Kardiyoversiyon Quiz",
+    "theme": {
+      "bg": "#020617",
+      "card": "#020617",
+      "border": "#1f2937",
+      "accent": "#f97373",
+      "danger": "#ef4444",
+      "text": "#e5e7eb",
+      "muted": "#9ca3af",
+      "heading": "#fef2f2"
+    }
+  },
+  "questions": [
+    {
+      "id": 1,
+      "title": "Şoklanabilir ritim nedir?",
+      "stem": "Aşağıdakilerden hangisi ERC 2025’e göre şoklanabilir ritim grubundadır?",
+      "options": [
+        "Sinüs taşikardi",
+        "PEA",
+        "Pulssuz VT",
+        "Asistoli"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "Pulssuz VT, VF ile birlikte ERC 2025 ALS algoritmasında şoklanabilir ritim grubundadır. Sinüs taşikardi fizyolojik yanıttır, PEA ve asistoli ise şoklanamaz."
+    },
+    {
+      "id": 2,
+      "title": "İlk defibrilasyon enerjisi",
+      "stem": "Erişkinde bifazik defibrilatör ile VF/pVT için önerilen başlangıç enerjisi aşağıdakilerden hangisidir?",
+      "options": [
+        "50–100 J",
+        "120–150 J",
+        "150–200 J",
+        "250–360 J"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "ERC 2025’e göre bifazik defibrilatör ile VF/pVT’de genellikle 150–200 J arası başlangıç enerjisi önerilir. Monofazikte 360 J kullanılır."
+    },
+    {
+      "id": 3,
+      "title": "Defibrilasyon sonrası hemen ne yapılır?",
+      "stem": "Defibrilasyon sonrası monitörde ritim kontrolünde aşağıdakilerden hangisi doğrudur?",
+      "options": [
+        "Her şoktan sonra ritim geri dönmese bile 12 derivasyon EKG çekilir.",
+        "Ritim analizi bittikten hemen sonra KPR’ye devam edilir.",
+        "Her şoktan sonra 1 dakika beklenir, sonra KPR başlatılır.",
+        "Ritim analizi sırasında göğüs kompresyonu kesilmez."
+      ],
+      "correctIndex": 1,
+      "timeLimitSec": 15,
+      "explanation": "Şok sonrası ritim hızlıca değerlendirilir, organizasyon yoksa KPR’ye derhal devam edilir. Gereksiz duraklamalar ROSC şansını azaltır."
+    },
+    {
+      "id": 4,
+      "title": "Şoklanamaz ritimler",
+      "stem": "Aşağıdakilerden hangisi şoklanamaz ritimdir?",
+      "options": [
+        "Pulssuz VT",
+        "VF",
+        "Asistoli",
+        "Torsades de pointes"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "Asistoli ve PEA şoklanamaz; VF ve pVT (torsades dahil) şoklanabilir ritimlerdir."
+    },
+    {
+      "id": 5,
+      "title": "PEA yaklaşımı",
+      "stem": "Nabızsız elektriksel aktivite (PEA) saptandığında ilk odaklanılması gereken yaklaşım hangisidir?",
+      "options": [
+        "Enerjiyi artırarak defibrilasyon",
+        "Senkron kardiyoversiyon",
+        "Yüksek kaliteli KPR ve geri döndürülebilir nedenlerin (4H–4T) araştırılması",
+        "Transkutan pacing"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "PEA’de defibrilasyon endike değildir. Yüksek kaliteli KPR, adrenalin ve geri döndürülebilir nedenlerin (4H–4T) agresif yönetimi esastır."
+    },
+    {
+      "id": 6,
+      "title": "SVT ve hemodinamik instabilite",
+      "stem": "Dar QRS SVT’de ağır hipotansiyon ve bilinç bozukluğu varsa ilk tercih nedir?",
+      "options": [
+        "Vagal manevra",
+        "Adenozin bolus",
+        "Senkron kardiyoversiyon",
+        "Amiodaron infüzyonu"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "Hemodinamik instabil dar QRS SVT’de farmakolojik tedaviyle vakit kaybetmeden senkron kardiyoversiyon endikedir."
+    },
+    {
+      "id": 7,
+      "title": "AF ve şok tablosu",
+      "stem": "Hızlı AF ve şok tablosu olan bir hastada tercih edilmesi gereken yaklaşım hangisidir?",
+      "options": [
+        "Düşük doz beta bloker ile hız kontrolü",
+        "Düşük doz digoksin",
+        "Senkron kardiyoversiyon",
+        "Antikoagülasyon başlatıp 24 saat bekleme"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "Hızlı AF’ye bağlı şok/instabilitede ERC 2025’e göre senkron kardiyoversiyon ilk seçenektir."
+    },
+    {
+      "id": 8,
+      "title": "Torsades de pointes",
+      "stem": "Torsades de pointes gelişmiş, nabızsız ve hipotansif bir hastada ilk yaklaşım hangisidir?",
+      "options": [
+        "Senkron kardiyoversiyon",
+        "Defibrilasyon (VF/pVT algoritması) + magnezyum",
+        "Sadece magnezyum sülfat",
+        "Transkutan pacing"
+      ],
+      "correctIndex": 1,
+      "timeLimitSec": 15,
+      "explanation": "Hemodinamik instabil torsades, VF/pVT algoritmasına göre şoklanabilir ritim kabul edilir. Magnezyum ve QT uzamasına yol açan faktörler mutlaka düzeltilmelidir."
+    },
+    {
+      "id": 9,
+      "title": "Asistoli doğrulama",
+      "stem": "Asistoli saptadığında, defibrilasyona karar vermeden önce aşağıdakilerden hangisi mutlaka yapılmalıdır?",
+      "options": [
+        "En az 3 kez defibrilasyon",
+        "Lead/ek oda kontrolü ve doğru ritim derivasyonunu doğrulama",
+        "Ani senkron kardiyoversiyon",
+        "Atropin uygulaması"
+      ],
+      "correctIndex": 1,
+      "timeLimitSec": 15,
+      "explanation": "Asistoli gerçek bir ritim mi yoksa teknik artefakt mı (lead kopması, düşük gain vs.) mutlaka kontrol edilmelidir. Gerçek asistolide şoklanmaz."
+    },
+    {
+      "id": 10,
+      "title": "Pediatrik defibrilasyon enerjisi",
+      "stem": "Pediyatrik VF/pVT için önerilen ilk defibrilasyon enerjisi aşağıdakilerden hangisidir?",
+      "options": [
+        "1 J/kg",
+        "2–4 J/kg",
+        "5 J/kg sabit",
+        "10 J/kg"
+      ],
+      "correctIndex": 1,
+      "timeLimitSec": 15,
+      "explanation": "Pediatrik hastada VF/pVT için önerilen başlangıç enerjisi 2–4 J/kg’dır. Sonraki şoklarda 4 J/kg’a kadar çıkılabilir."
+    },
+    {
+      "id": 11,
+      "title": "Defibrilatör ped pozisyonu",
+      "stem": "Erişkinde defibrilatör pad yerleşimi açısından aşağıdakilerden hangisi doğru bir seçenek değildir?",
+      "options": [
+        "Sağ parasternal – sol midaksiller (antero-lateral)",
+        "Sternum üstü – sol skapula (antero-posterior)",
+        "İki pad’i doğrudan sternum üzerine yan yana koyma",
+        "ICD/pacer cihazından mümkün olduğunca uzak yerleştirme"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "İki pad’in sternum üzerinde yan yana yerleştirilmesi önerilmez. Antero-lateral veya antero-posterior konfigürasyonlar tercih edilir."
+    },
+    {
+      "id": 12,
+      "title": "ROSC sonrası EKG",
+      "stem": "ROSC sonrası acil EKG değerlendirmesi neden önemlidir?",
+      "options": [
+        "Enerji ayarını belirlemek için",
+        "Yeni bir ritim bozukluğunu tetiklemek için",
+        "ST elevasyonlu MI veya ciddi iskemiyi saptamak için",
+        "Sadece AF’yi dışlamak için"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "ROSC sonrası erken 12 derivasyon EKG, özellikle STEMI/akut koroner sendromun belirlenmesi ve acil revaskülarizasyon kararı için kritik önemdedir."
+    },
+    {
+      "id": 13,
+      "title": "KPR sırasında ritim kontrolü",
+      "stem": "KPR sırasında ritim analiz aralıkları için önerilen süre aşağıdakilerden hangisidir?",
+      "options": [
+        "Her 30 sn’de bir",
+        "Her 1 dakikada bir",
+        "Her 2 dakikada bir",
+        "Her 10 dakikada bir"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "ERC 2025’e göre ritim analizi ve müdahale döngüleri tipik olarak her 2 dakikada bir planlanır; KPR’de gereksiz duraklamalardan kaçınılmalıdır."
+    },
+    {
+      "id": 14,
+      "title": "Otomatik eksternal defibrilatör (AED)",
+      "stem": "AED kullanımında aşağıdakilerden hangisi doğrudur?",
+      "options": [
+        "AED sadece hastane içinde kullanılabilir.",
+        "AED yalnızca sağlık profesyonelleri için uygundur.",
+        "AED, VF/pVT benzeri şoklanabilir ritimleri otomatik tanıyıp şok önerir.",
+        "AED kullanılırken KPR tamamen bırakılmalıdır."
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "AED, toplumda VF/pVT tanıyarak şok öneren basit cihazdır; eğitim almış her kişi, uygun güvenlik önlemleri ile kullanabilir."
+    },
+    {
+      "id": 15,
+      "title": "Defibrilasyon güvenliği",
+      "stem": "Defibrilasyon uygulanırken aşağıdakilerden hangisi temel güvenlik önlemi değildir?",
+      "options": [
+        "Çevredeki kişilerin hastadan ayrıldığından emin olmak",
+        "Oksijen kaynağını mümkünse uzaklaştırmak veya maskeyi kaldırmak",
+        "Şok verirken göğüs kompresyonuna devam etmek",
+        "Islak ortamda mümkünse hastayı kuru yüzeye almak"
+      ],
+      "correctIndex": 2,
+      "timeLimitSec": 15,
+      "explanation": "Şok anında herkesin hastadan ayrılması ve yangın riskine karşı oksijen kaynağına dikkat edilmesi gerekir. Şok sırasında kompresyon devamı önerilmez."
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "meta": {
+    "title": "Defi ALS Sim",
+    "theme": {
+      "bg": "#020617",
+      "card": "#020617",
+      "border": "#1f2937",
+      "accent": "#f97373",
+      "danger": "#ef4444",
+      "text": "#e5e7eb",
+      "muted": "#9ca3af",
+      "heading": "#fef2f2"
+    }
+  },
+  "cases": [
+    {
+      "id": 1,
+      "title": "Olgu 1 – Klasik VF arrest (mekanik travma yok)",
+      "narrative": "68 yaş, erkek, acil triajda ani kollaps. EMS ekibi tanık, monitör VF gösteriyor.\nBLS + AED başlatılıyor, sen ALS ekibisin, monitör/defi sende.\n\nRitim: Kaotik, izoelektrik çizgiden sapmış, belirgin QRS yok.\n\nHemodinami: Nabız yok, apneik, CPR sürüyor.",
+      "tags": [
+        "VF",
+        "şoklanabilir",
+        "erişkin"
+      ],
+      "rhythmKey": "vf",
+      "timeLimitSec": 8,
+      "type": "ALS ritim kararı",
+      "correctAction": "shock",
+      "explanation": "Bu klasik VF ritmidir, şoklanabilir. ERC 2025’e göre yüksek kaliteli KPR ile birlikte\nbifazik defibrilasyon (150–200 J başlangıç) önerilir. Travma veya hipoksiye bağlı spesifik bir kontrendikasyon yok."
+    },
+    {
+      "id": 2,
+      "title": "Olgu 2 – Pulssuz VT",
+      "narrative": "55 yaş, erkek, göğüs ağrısı sonrası senkop. Ambulans ekibi geldiğinde monitörde geniş QRS, düzenli,\ndakikada ~180/dk; ancak nabız palpe edilemiyor.\n\nRitim: Geniş, monomorfik, çok düzenli ventrikül aktivitesi.\n\nHemodinami: Nabız yok, hipotansif, CPR başlatılmış.",
+      "tags": [
+        "pulssuz VT",
+        "şoklanabilir"
+      ],
+      "rhythmKey": "vt",
+      "timeLimitSec": 8,
+      "type": "ALS ritim kararı",
+      "correctAction": "shock",
+      "explanation": "Pulssuz VT, VF ile birlikte ‘şoklanabilir ritim’ grubundadır.\nERC/ALS algoritmasına göre defibrilasyon yapılmalıdır. Nabızın olmaması defibrilasyon kararı için kritik."
+    },
+    {
+      "id": 3,
+      "title": "Olgu 3 – Asistoli",
+      "narrative": "82 yaş, kadın, evde kollaps. EMS ekibi geldiğinde monitörde düz çizgiye çok yakın düşük amplitüdlü aktivite.\nLead bağlantıları kontrol edilmiş.\n\nRitim: İzolinde düz çizgi (asistoli).\n\nHemodinami: Nabız yok, apneik, CPR devam ediyor.",
+      "tags": [
+        "asistoli",
+        "şoklanamaz"
+      ],
+      "rhythmKey": "asystole",
+      "timeLimitSec": 8,
+      "type": "ALS ritim kararı",
+      "correctAction": "noShock",
+      "explanation": "Asistoli şoklanamaz ritimdir. Defibrilasyon önerilmez; yüksek kaliteli KPR, adrenalin ve geri döndürülebilir\nnedenlere (4H–4T) odaklanmak gerekir."
+    },
+    {
+      "id": 4,
+      "title": "Olgu 4 – PEA (nabızsız elektriksel aktivite)",
+      "narrative": "64 yaş, erkek, septik şok öyküsü, yoğun bakımda ani hipotansiyon ve kollaps.\nMonitörde düzenli dar QRS ritim, ~70/dk.\nHemodinamik: Nabız palpe edilemiyor, monitor normal sinüs ritim gibi.\n\nRitim: Sinüs benzeri elektriksel aktivite var, mekanik yanıt yok.",
+      "tags": [
+        "PEA",
+        "şoklanamaz"
+      ],
+      "rhythmKey": "pea",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "noShock",
+      "explanation": "PEA’de (nabızsız elektriksel aktivite) defibrilasyon endike değildir. Elektriksel aktivite olmasına rağmen\nmekanik yanıt yoktur; KPR, adrenalin ve altta yatan nedenlerin (özellikle hipovolemi, hipoksi, tamponad, TEP vb.)\nagresif yönetimi esastır."
+    },
+    {
+      "id": 5,
+      "title": "Olgu 5 – Hemodinamik instabil SVT",
+      "narrative": "27 yaş, kadın, palpitasyon, baş dönmesi ve soğuk terleme ile geliyor.\nEKG: Dar QRS, düzenli taşikardi ~190/dk, tipik PSVT görünümü.\nHemodinami: Hipotansif, bilinç bulanık, göğüs ağrısı var.\n\nFarmakolojik tedavi için zaman kaybetmek istemiyorsun.",
+      "tags": [
+        "SVT",
+        "senkron KV"
+      ],
+      "rhythmKey": "svt",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "cardioversion",
+      "explanation": "Hemodinamik instabil SVT’de vagal manevra veya adenozin beklenmez; ERC 2025’e göre senkron kardiyoversiyon\nendikedir. ‘Şokla’ dersen asenkron defibrilasyon anlamına gelir, bu durumda hedef senkron KV olmalı."
+    },
+    {
+      "id": 6,
+      "title": "Olgu 6 – Hızlı AF, instabil",
+      "narrative": "74 yaş, kadın, bilinen AF öyküsü yok. Dispne, göğüs ağrısı, hipotansiyon ile acile getiriliyor.\nMonitor: Düzensiz, dar QRS taşikardi, belirgin P dalgaları seçilemiyor (AF ile uyumlu).\nHemodinami: TA 70/40 mmHg, soğuk, terli, bilinç bulanık.\n\nRitim: Hızlı ventrikül yanıtlı AF.",
+      "tags": [
+        "AF",
+        "senkron KV"
+      ],
+      "rhythmKey": "af",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "cardioversion",
+      "explanation": "Hemodinamik instabil AF’de (şok tablosu) senkron kardiyoversiyon ilk seçenektir.\nİlaçla hız kontrolü için zaman kaybedilmez. Enerji genelde 100–200 J bifazik ile başlanır."
+    },
+    {
+      "id": 7,
+      "title": "Olgu 7 – Torsades de pointes (polimorfik VT)",
+      "narrative": "45 yaş, kadın, QT uzatan ilaç kullanımı öyküsü var (örn. amiodaron + bazı antidepresanlar).\nAni senkop sonrası monitörde karakteristik QT uzaması sonrası salvolar ve polimorfik VT izleniyor.\nHemodinami: Nabız yok, hipotansif, CPR başlatılmış.\n\nRitim: Torsades de pointes görünümü (eksen değişen polimorfik VT).",
+      "tags": [
+        "torsades",
+        "VF/pVT algoritması"
+      ],
+      "rhythmKey": "torsades",
+      "timeLimitSec": 8,
+      "type": "ALS ritim kararı",
+      "correctAction": "shock",
+      "explanation": "Hemodinamik instabil torsades de pointes, VF/pVT algoritmasına göre şoklanabilir ritim olarak ele alınır.\nAyrıca magnezyum ve QT uzaması yapan ilaç/elektrolit bozuklukları mutlaka düzeltilmelidir."
+    },
+    {
+      "id": 8,
+      "title": "Olgu 8 – Monomorfik VT, nabız var, instabil",
+      "narrative": "60 yaş, erkek, iskemik kalp hastalığı öyküsü. Ani çarpıntı, baş dönmesi ve göğüs ağrısı ile geliyor.\nEKG: Geniş QRS, düzenli taşikardi ~160/dk (monomorfik VT ile uyumlu).\nHemodinami: TA 70/40 mmHg, bilinç bulanık, nabız palpe edilebiliyor.",
+      "tags": [
+        "VT",
+        "senkron KV"
+      ],
+      "rhythmKey": "vt",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "cardioversion",
+      "explanation": "Geniş QRS VT’de nabız varsa ve hasta hemodinamik olarak instabil ise ERC 2025’e göre senkron kardiyoversiyon\nendikedir. Pulssuz hale geçtiğinde ise defibrilasyon (asenkron) algoritmasına geçilir."
+    },
+    {
+      "id": 9,
+      "title": "Olgu 9 – Sinüs taşikardi",
+      "narrative": "32 yaş, erkek, fazla kafein alımı sonrası çarpıntı, hafif anksiyete.\nEKG: Sinüs ritmi, dakikada 120/dk, dar QRS.\nHemodinami: Normotansif, organ perfüzyonu iyi, göğüs ağrısı yok.",
+      "tags": [
+        "sinüs taşikardi",
+        "şoklanamaz"
+      ],
+      "rhythmKey": "sinus",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "noShock",
+      "explanation": "Sinüs taşikardi fizyolojik veya sekonder bir yanıttır (ateş, hipovolemi, anksiyete vb.).\nŞok veya senkron KV endike değildir; altta yatan nedenin tedavisi esastır."
+    },
+    {
+      "id": 10,
+      "title": "Olgu 10 – İleri hipotermi VF",
+      "narrative": "28 yaş, erkek, dağda göl içine düşme sonrası yaklaşık 30 dk soğuk suda kalmış.\nMerkezine getirildiğinde çekirdek ısısı 27 °C, monitörde VF görülüyor.\nHemodinami: Nabız yok, CPR başlatılmış.",
+      "tags": [
+        "hipotermi",
+        "VF"
+      ],
+      "rhythmKey": "vf",
+      "timeLimitSec": 10,
+      "type": "ALS ritim kararı",
+      "correctAction": "shock",
+      "explanation": "İleri hipotermide VF görülebilir ve şoklanabilir. Bazı rehberler birkaç şok sonrası\nısıtma önceliğini vurgular; ancak temel prensip VF’nin şoklanabilir olduğudur. Burada doğru karar yine ‘şokla’dır,\neş zamanlı aktif rewarming yapılmalıdır."
+    }
+  ]
+}

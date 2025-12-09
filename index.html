@@ -2,1797 +2,199 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defibrilasyon & Kardiyoversiyon Quiz</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
+  <title>Defi Workshop – Ana Ekran</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
       --bg: #020617;
-      --bg-soft: #020617;
-      --card: #0b1120;
-      --card-soft: #020617;
-      --border: #1e293b;
-      --accent: #22c55e;
-      --accent-soft: rgba(34, 197, 94, 0.12);
-      --accent-strong: #4ade80;
-      --danger: #f97373;
+      --card: #020617;
+      --border: #1f2937;
+      --accent: #f97373;
+      --danger: #ef4444;
       --text: #e5e7eb;
-      --muted: #94a3b8;
-      --heading: #f9fafb;
-      --radius-lg: 20px;
+      --muted: #9ca3af;
+      --heading: #fef2f2;
+      --radius-lg: 22px;
       --radius-pill: 999px;
     }
-
     * { box-sizing: border-box; }
-
     body {
       margin: 0;
-      padding: 16px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+      padding: 18px 10px 24px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #7f1d1d 0, #020617 40%, #000 100%);
       color: var(--text);
-      font-size: 16px;
+      font-size: 15px;
     }
-
-    .app-shell {
+    .app {
       max-width: 960px;
       margin: 0 auto;
     }
-
-    #connectionBanner {
-      background: #7f1d1d;
-      color: #fee2e2;
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-size: 0.8rem;
-      text-align: center;
-      margin-bottom: 8px;
-      box-shadow: 0 0 0 1px rgba(248,113,113,0.6);
+    .hero {
+      border-radius: 28px;
+      border: 1px solid #27272f;
+      padding: 14px 16px 16px;
+      background:
+        radial-gradient(circle at top left, rgba(248,113,113,0.17),transparent 55%),
+        radial-gradient(circle at bottom right, rgba(15,23,42,0.95), #020617 70%);
+      box-shadow: 0 22px 50px rgba(15,23,42,0.9);
+      margin-bottom: 14px;
     }
-    .hidden { display: none; }
-
-    #modeInfo {
-      font-size: 0.85rem;
+    .hero-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: .05em;
       text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    #modeInfo::before {
-      content: "";
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: radial-gradient(circle, var(--accent-strong), var(--accent));
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.9);
-    }
-
-    h1 {
-      margin: 4px 0 12px;
-      font-size: 1.4rem;
       color: var(--heading);
+      margin-bottom: 4px;
     }
-    h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-      color: var(--heading);
-    }
-    p {
-      margin: 4px 0;
-      color: var(--muted);
+    .hero-sub {
       font-size: 0.9rem;
-    }
-
-    .card {
-      background: linear-gradient(135deg, var(--card) 0%, #020617 100%);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 14px 16px;
-      margin-top: 12px;
-      box-shadow: 0 20px 35px rgba(15, 23, 42, 0.8);
-    }
-
-    .card-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-
-    .card-shock {
-      border-color: #f97316;
-      box-shadow:
-        0 0 0 1px rgba(249,115,22,0.25),
-        0 20px 38px rgba(15,23,42,0.9);
-      background: radial-gradient(circle at top left, rgba(249,115,22,0.16), #020617 55%);
-    }
-
-    .badge {
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      font-size: 0.75rem;
-      border: 1px solid var(--border);
       color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: #020617;
+      max-width: 640px;
     }
-    .badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 999px;
-      background: var(--accent);
-    }
-    .badge-shock {
-      border-color: #f97316;
-      color: #fed7aa;
-      background: rgba(251,146,60,0.08);
-    }
-
-    .btn {
-      border: none;
-      border-radius: var(--radius-pill);
-      padding: 10px 16px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease-out;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      outline: none;
-    }
-    .btn-primary {
-      width: 100%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-      color: #022c22;
-      box-shadow: 0 12px 25px rgba(34, 197, 94, 0.35);
-    }
-    .btn-primary:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 6px 15px rgba(34, 197, 94, 0.3);
-    }
-    .btn-secondary {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-    .btn-secondary:active { transform: translateY(1px); }
-    .btn-sm { padding: 6px 10px; font-size: 0.8rem; }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 10px 12px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.95);
-      color: var(--text);
-      font-size: 0.95rem;
-      outline: none;
-    }
-    input[type="text"]::placeholder { color: #64748b; }
-    input[type="text"]:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
-    }
-
-    .status-text {
-      font-size: 0.8rem;
-      margin-top: 4px;
-    }
-    .status-text.error { color: var(--danger); }
-    .status-text.success { color: var(--accent-strong); }
-    .status-text.info { color: var(--muted); }
-
-    #qrcode {
+    .hero-badges {
       margin-top: 8px;
       display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #playerLink {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 0.8rem;
-      word-break: break-all;
-      color: var(--accent-strong);
-    }
-
-    .question-meta {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 4px;
-      gap: 6px;
       flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.76rem;
+    }
+    .badge {
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      background: rgba(15,23,42,0.9);
+      color: var(--muted);
     }
 
-    .question-text {
-      font-size: 0.95rem;
-      color: var(--heading);
-      margin-bottom: 6px;
-      line-height: 1.4;
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0,1fr);
+      gap: 12px;
+      margin-top: 10px;
     }
-
-    .question-image {
-      margin-top: 4px;
-      max-width: 100%;
-      border-radius: 12px;
+    @media (min-width: 820px) {
+      .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    }
+    .card {
+      border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      display: block;
-    }
-
-    .options-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .option-label {
-      display: block;
+      background: var(--card);
+      box-shadow: 0 16px 32px rgba(15,23,42,0.9);
+      padding: 12px;
       position: relative;
-      cursor: pointer;
+      overflow: hidden;
     }
-    .option-label input[type="radio"] {
+    .card::before {
+      content: "";
       position: absolute;
-      opacity: 0;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(248,113,113,0.14), transparent 55%);
       pointer-events: none;
     }
+    .card-inner { position: relative; z-index: 1; }
 
-    .option-card {
-      border-radius: 16px;
-      border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.9);
-      padding: 10px 12px;
-      display: flex;
+    .card-title {
+      font-size: 0.98rem;
+      font-weight: 600;
+      color: var(--heading);
+      margin-bottom: 3px;
+    }
+    .card-sub {
+      font-size: 0.86rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+      min-height: 40px;
+    }
+    .btn {
+      display: inline-flex;
       align-items: center;
-      gap: 10px;
+      justify-content: center;
+      gap: 6px;
+      border-radius: var(--radius-pill);
+      padding: 8px 12px;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border: 1px solid #374151;
+      background: rgba(15,23,42,0.98);
+      color: var(--text);
+      cursor: pointer;
+      text-decoration: none;
       transition: all 0.15s ease-out;
     }
-    .option-card[data-letter] { position: relative; }
-
-    .option-letter {
-      width: 26px;
-      height: 26px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.9rem;
-      color: var(--muted);
-      background: radial-gradient(circle at top, #020617 0, #000 100%);
-      flex-shrink: 0;
-    }
-
-    .option-text {
-      font-size: 0.9rem;
-      color: var(--text);
-    }
-
-    .option-label input[type="radio"]:focus + .option-card,
-    .option-label input[type="radio"]:checked + .option-card {
+    .btn:hover {
       border-color: var(--accent);
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.3);
-      background: linear-gradient(135deg, rgba(22, 163, 74, 0.12), rgba(15, 23, 42, 0.95));
+      color: var(--accent);
     }
-    .option-label input[type="radio"]:checked + .option-card .option-letter {
-      border-color: var(--accent-strong);
-      color: var(--accent-strong);
-      box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
-    }
-
-    .option-card-correct {
-      border-color: var(--accent-strong) !important;
-      box-shadow: 0 0 0 1px rgba(34, 197, 94, 0.4);
-    }
-    .option-card-dim {
-      opacity: 0.55;
+    .btn-main {
+      background: radial-gradient(circle at top left, #f97373, #b91c1c);
+      border: none;
+      color: #fef2f2;
+      box-shadow: 0 12px 26px rgba(239,68,68,0.7);
     }
 
-    .timer-text {
-      font-size: 0.9rem;
-      margin-top: 4px;
-      color: var(--muted);
-    }
-    .timer-hot {
-      color: var(--accent-strong);
-      font-weight: 600;
-    }
-    .timer-critical {
-      color: var(--danger);
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    .table-wrapper {
-      margin-top: 6px;
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: rgba(15, 23, 42, 0.9);
-      max-height: 260px;
-      overflow-y: auto;
-    }
-
-    table {
-      border-collapse: collapse;
-      width: 100%;
-      font-size: 0.85rem;
-    }
-    thead {
-      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.13), rgba(15, 23, 42, 0.96));
-    }
-    th, td {
-      padding: 6px 8px;
-      text-align: left;
-      border-bottom: 1px solid rgba(30, 41, 59, 0.8);
-    }
-    th {
-      color: var(--muted);
-      font-weight: 500;
-      position: sticky;
-      top: 0;
-      backdrop-filter: blur(10px);
-      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.13), rgba(15, 23, 42, 0.96));
-    }
-    tbody tr:nth-child(even) {
-      background: rgba(15, 23, 42, 0.85);
-    }
-    tbody tr:nth-child(odd) {
-      background: rgba(15, 23, 42, 0.95);
-    }
-
-    /* Host skor tablosu – renkli, progress barlı */
-    .score-row {
-      transition: background 0.15s ease-out, transform 0.1s ease-out;
-    }
-    .score-row.rank-1 {
-      background: radial-gradient(circle at left, rgba(250,204,21,0.22), rgba(15,23,42,0.96));
-    }
-    .score-row.rank-2 {
-      background: radial-gradient(circle at left, rgba(148,163,184,0.22), rgba(15,23,42,0.96));
-    }
-    .score-row.rank-3 {
-      background: radial-gradient(circle at left, rgba(248,113,113,0.18), rgba(15,23,42,0.96));
-    }
-    .score-rank-cell {
-      width: 32px;
-      text-align: center;
-    }
-    .score-rank-medal {
-      font-size: 1.05rem;
-    }
-    .score-name-cell {
-      max-width: 140px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-    .score-cell {
-      min-width: 120px;
-    }
-    .score-points {
-      font-size: 0.8rem;
-      margin-bottom: 2px;
-      text-align: right;
-    }
-    .score-bar {
-      width: 100%;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(30, 64, 175, 0.7);
-      overflow: hidden;
-    }
-    .score-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-      transform-origin: left;
-    }
-
-    /* Explanation (debrief) kartı + istatistikler */
-    .explanation-card {
+    .links {
       margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(34, 197, 94, 0.35);
-      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), rgba(15, 23, 42, 0.96));
-    }
-    .explanation-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      margin-bottom: 6px;
       font-size: 0.8rem;
       color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
     }
-    .explanation-title {
-      color: var(--accent-strong);
-      font-weight: 600;
+    .links a {
+      color: #f97373;
+      text-decoration: none;
     }
-    .explanation-tag {
-      font-size: 0.7rem;
-      border-radius: 999px;
-      padding: 2px 7px;
-      border: 1px solid rgba(34, 197, 94, 0.4);
-      color: var(--muted);
-    }
-    .explanation-key {
-      font-size: 0.9rem;
-      font-weight: 600;
-      color: var(--heading);
-      margin-bottom: 4px;
-    }
-    .explanation-body {
-      font-size: 0.85rem;
-      color: var(--text);
-      margin-bottom: 6px;
-    }
-    .explanation-stats {
-      margin-top: 4px;
-      border-top: 1px solid rgba(148, 163, 184, 0.3);
-      padding-top: 4px;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-    .stat-heading {
-      font-size: 0.78rem;
-      margin-bottom: 2px;
-      color: var(--muted);
-    }
-    .stat-row {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      margin-top: 2px;
-    }
-    .stat-label {
-      width: 18px;
-      font-weight: 600;
-      color: var(--muted);
-    }
-    .stat-bar {
-      flex: 1;
-      height: 6px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid rgba(30, 64, 175, 0.8);
-      overflow: hidden;
-    }
-    .stat-bar-fill {
-      height: 100%;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--accent), var(--accent-strong));
-      transform-origin: left;
-    }
-    .stat-bar-fill-wrong {
-      background: linear-gradient(90deg, rgba(248,113,113,0.6), rgba(239,68,68,0.95));
-    }
-    .stat-count {
-      min-width: 60px;
-      text-align: right;
-    }
-
-    @media (min-width: 768px) {
-      body { padding: 24px; }
-      .card { padding: 16px 18px; }
-      h1 { font-size: 1.6rem; }
-      .host-layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
-        gap: 12px;
-      }
-    }
-
-    /* QR overlay (büyütülmüş) */
-    .qr-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(15, 23, 42, 0.9);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .qr-overlay-inner {
-      background: linear-gradient(135deg, #020617, #020617);
-      border-radius: 24px;
-      border: 1px solid var(--border);
-      padding: 16px 18px;
-      max-width: 420px;
-      width: 90%;
-      text-align: center;
-      box-shadow: 0 24px 40px rgba(0,0,0,0.8);
-    }
-    .qr-overlay-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-      font-size: 0.9rem;
-      color: var(--heading);
-    }
-
-    /* Beyaz zeminli büyük QR */
-    #qrBig {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      background: #ffffff;
-      border-radius: 16px;
-    }
-    #qrBig canvas,
-    #qrBig img {
-      width: 320px;
-      height: 320px;
-    }
-
-    /* Projeksiyon modu – daha büyük fontlar */
-    body.projection-mode {
-      font-size: 18px;
-    }
-    body.projection-mode .app-shell {
-      max-width: 1180px;
-    }
-    body.projection-mode h1 {
-      font-size: 2rem;
-    }
-    body.projection-mode h2 {
-      font-size: 1.35rem;
-    }
-    body.projection-mode .question-text {
-      font-size: 1.15rem;
-    }
-    body.projection-mode .option-text {
-      font-size: 1rem;
-    }
-    body.projection-mode .option-letter {
-      width: 30px;
-      height: 30px;
-      font-size: 0.95rem;
-    }
-    body.projection-mode .timer-text {
-      font-size: 1rem;
-    }
-    body.projection-mode .score-name-cell,
-    body.projection-mode .score-points {
-      font-size: 0.95rem;
-    }
-
-    /* Katılım adresini büyüt */
-    #playerLinkBig {
-      font-size: 1.05rem;
-      font-weight: 600;
-      color: #e5e7eb;
-      word-break: break-all;
-    }
+    .links a:hover { text-decoration: underline; }
   </style>
-
-  <!-- QR code -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-
-  <!-- Firebase v8 (app + realtime db) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-  <div class="app-shell">
-    <div id="connectionBanner" class="hidden">
-      Bağlantı yok, tekrar bağlanmaya çalışılıyor...
-    </div>
-
-    <div id="modeInfo"></div>
-
-    <!-- QR OVERLAY (BÜYÜTÜLMÜŞ) -->
-    <div id="qrOverlay" class="qr-overlay hidden">
-      <div class="qr-overlay-inner">
-        <div class="qr-overlay-header">
-          <span>Katılım QR Kodu</span>
-          <button
-            id="qrOverlayClose"
-            class="btn btn-secondary btn-sm"
-            onclick="document.getElementById('qrOverlay').classList.add('hidden');"
-          >
-            Kapat
-          </button>
-        </div>
-        <div id="qrBig"></div>
-        <p class="status-text info" style="margin-top:8px; text-align:center;">
-          Katılmak için bu QR kodu telefonunuzla tarayın.
-        </p>
+  <div class="app">
+    <section class="hero">
+      <div class="hero-title">Defibrilasyon & Kardiyoversiyon Workshop</div>
+      <p class="hero-sub">
+        Bu sayfa, projeksiyona yansıtacağın <strong>eğitmen ekranlarını</strong> açman için.
+        Katılımcılar kendi telefonlarından QR kodu okutarak quiz ve ALS ritim simülasyonuna bağlanacak.
+      </p>
+      <div class="hero-badges">
+        <span class="badge">ERC 2025 ALS odaklı</span>
+        <span class="badge">Canlı skor tablosu</span>
+        <span class="badge">Şok / şoklama / senkron KV karar pratiği</span>
       </div>
-    </div>
+    </section>
 
-    <!-- EĞİTMEN ALANI -->
-    <div id="hostArea" class="hidden">
-      <h1>Defibrilasyon & Kardiyoversiyon Quiz</h1>
-
-      <div class="host-layout">
-        <div>
-          <div class="card">
-            <div class="card-header">
-              <h2>Oturum Durumu</h2>
-              <span class="badge">
-                <span class="badge-dot"></span>
-                Eğitmen
-              </span>
-            </div>
-            <p id="hostStatus" class="status-text info">Hazır.</p>
-            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:4px;">
-              <button id="resetBtn" class="btn btn-secondary btn-sm">
-                Oturumu Sıfırla (R)
-              </button>
-              <button id="projectionToggleBtn" class="btn btn-secondary btn-sm">
-                Projeksiyon modu (P)
-              </button>
-              <button id="hostViewToggleBtn" class="btn btn-secondary btn-sm">
-                Katılım ekranı
-              </button>
-            </div>
+    <section class="grid">
+      <article class="card">
+        <div class="card-inner">
+          <div class="card-title">1. ERC 2025 Defi Bilgi Quiz – Host</div>
+          <div class="card-sub">
+            15 soruluk, zaman baskılı bilgi testi.
+            İlk doğru cevap 20 puan, sonra 19–18… en az 15 puan.
           </div>
+          <a href="defi-quiz-host.html" class="btn btn-main">Quiz Eğitmen Ekranını Aç</a>
+        </div>
+      </article>
 
-          <div id="hostQuestionCard" class="card">
-            <div class="card-header">
-              <h2>Aktif Olgu</h2>
-              <span id="hostQuestionBadge" class="badge">
-                Süreli soru
-              </span>
-            </div>
-            <div class="question-meta">
-              <span id="hostQuestionMeta">Henüz soru başlatılmadı.</span>
-              <span id="hostTimer" class="timer-text"></span>
-            </div>
-            <div class="question-text" id="hostQuestionTitle">
-              Henüz soru başlatılmadı.
-            </div>
-            <img id="hostQuestionImage" class="question-image hidden" alt="Olgu görseli" />
-            <div class="options-grid" id="hostOptionsList"></div>
-
-            <div id="hostExplanationCard" class="explanation-card hidden">
-              <div class="explanation-header">
-                <span class="explanation-title">Bu olgudan öğrenilecekler</span>
-                <span id="hostExplanationTag" class="explanation-tag"></span>
-              </div>
-              <div id="hostKeyPoint" class="explanation-key"></div>
-              <div id="hostExplanation" class="explanation-body"></div>
-              <div id="hostStats" class="explanation-stats"></div>
-            </div>
-
-            <button id="nextQuestionBtn" class="btn btn-primary" style="margin-top:10px;">
-              Sonraki olguyu başlat (N)
-            </button>
+      <article class="card">
+        <div class="card-inner">
+          <div class="card-title">2. Defi ALS Ritim Sim – Host</div>
+          <div class="card-sub">
+            VF/pVT, torsades, PEA, asistoli, SVT ve AF olguları ile
+            “şok / şoklama / senkron KV” kararı üzerinde interaktif ALS pratiği.
           </div>
+          <a href="defi-sim-host.html" class="btn btn-main">ALS Sim Eğitmen Ekranını Aç</a>
         </div>
+      </article>
+    </section>
 
-        <div>
-          <div id="hostQrCard" class="card">
-            <div class="card-header">
-              <h2>Katılım QR Kodu</h2>
-            </div>
-            <p class="status-text info">
-              Katılımcılar telefonlarından QR'ı okutarak veya adresi yazarak katılabilir.
-            </p>
-            <div id="qrcode"></div>
-            <div style="display:flex; justify-content:flex-end; margin-top:6px;">
-              <button id="qrEnlargeBtn" class="btn btn-secondary btn-sm">Büyüt (Q)</button>
-            </div>
-            <p style="margin-top:10px;">Kısa adres:</p>
-            <p id="playerLinkBig"></p>
-            <p id="playerLink"></p>
-            <p id="sessionCodeLabel" class="status-text info"></p>
-          </div>
-
-          <div class="card">
-            <div class="card-header">
-              <h2>Liderlik Tablosu</h2>
-            </div>
-            <div class="table-wrapper">
-              <table>
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Nick</th>
-                    <th>Puan</th>
-                  </tr>
-                </thead>
-                <tbody id="hostScoreBody"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- KATILIMCI ALANI -->
-    <div id="playerArea" class="hidden">
-      <h1>Quiz Katılım Ekranı</h1>
-
-      <div id="joinStep" class="card">
-        <div class="card-header">
-          <h2>Katıl</h2>
-          <span class="badge">
-            <span class="badge-dot"></span>
-            Mobil katılımcı
-          </span>
-        </div>
-        <p class="status-text info">
-          Nick seç, "Katıl" butonuna bas. Aynı cihazdan tekrar girersen kaldığın skorla devam edersin (reset sonrası tekrar katılman gerekir).
-        </p>
-        <label style="margin-top:8px; font-size:0.9rem;">
-          Nick:
-          <input type="text" id="nickInput" placeholder="Örn. VF_master, ALS_pro, HomerED" />
-        </label>
-        <button id="joinBtn" class="btn btn-primary" style="margin-top:10px;">
-          Katıl
-        </button>
-        <p id="joinMsg" class="status-text"></p>
-      </div>
-
-      <div id="playStep" class="card hidden">
-        <div class="card-header">
-          <h2>Aktif Olgu</h2>
-          <span class="badge" id="playerQuestionBadge">Soru bekleniyor</span>
-        </div>
-        <p id="helloPlayer" class="status-text info"></p>
-
-        <div class="question-meta">
-          <span id="playerQuestionMeta"></span>
-          <span id="playerTimer" class="timer-text"></span>
-        </div>
-        <div id="playerQuestionTitle" class="question-text">
-          Soru bekleniyor...
-        </div>
-        <img id="playerQuestionImage" class="question-image hidden" alt="Olgu görseli" />
-
-        <div id="playerOptions" class="options-grid"></div>
-
-        <button id="answerBtn" class="btn btn-primary" style="margin-top:12px;" disabled>
-          Cevapla
-        </button>
-        <p id="answerMsg" class="status-text" style="margin-top:6px;"></p>
-        <p id="playerExplanation" class="status-text" style="margin-top:4px;"></p>
-      </div>
-
-      <div class="card">
-        <div class="card-header">
-          <h2>Liderlik (ilk 10)</h2>
-        </div>
-        <div class="table-wrapper">
-          <table>
-            <thead>
-              <tr>
-                <th>#</th>
-                <th>Nick</th>
-                <th>Puan</th>
-              </tr>
-            </thead>
-            <tbody id="playerScoreBody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <div id="finishedStep" class="card hidden">
-        <h2>Quiz Tamamlandı</h2>
-        <p class="status-text success">
-          Katıldığın için teşekkürler. Nihai skorlar aşağıda.
-        </p>
-        <p id="summaryScore" class="status-text"></p>
-        <p id="summaryDetail" class="status-text"></p>
-      </div>
-    </div>
+    <section class="links">
+      <p>
+        Katılımcı URL’leri eğitmen ekranındaki QR kodu ile otomatik gösterilir.
+        Gerekirse elle de paylaşabilirsin:
+      </p>
+      <p>
+        • Quiz katılımcı: <code>…/defi-quiz-player.html</code><br/>
+        • ALS sim katılımcı: <code>…/defi-sim-player.html</code>
+      </p>
+    </section>
   </div>
-
-  <script>
-    /*************** 1) AYARLAR ***************/
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
-      authDomain: "defi-quiz.firebaseapp.com",
-      databaseURL: "https://defi-quiz-default-rtdb.europe-west1.firebasedatabase.app",
-      projectId: "defi-quiz",
-      storageBucket: "defi-quiz.firebasestorage.app",
-      messagingSenderId: "642741899462",
-      appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
-      measurementId: "G-SY348RPCVZ"
-    };
-
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-
-    const params = new URLSearchParams(window.location.search);
-    const sessionParam = params.get("session") || "erc-quiz-als-2025";
-    const SESSION_ID = sessionParam;
-
-    const DEFAULT_TIME_LIMIT_MS = 10000;
-
-    const DEFAULT_QUESTIONS = [
-      {
-        text: "Olgu 1: 65 yaş, tanıklı VF arrest; 2. şok sonrası ritim hala VF. Ne yaparsın?",
-        options: [
-          "Hemen üçüncü şoku uygularım",
-          "2 dk KPR, sonra ritim kontrolü ve uygun ise tekrar şok",
-          "Lidokain 1 mg/kg iv bolus, şok yok",
-          "Atropin 1 mg iv veririm"
-        ],
-        correct: "B",
-        timeLimitMs: 8000,
-        explanation: "2025 ERC ALS: Şoklanabilir ritimde her şoktan sonra 2 dk yüksek kaliteli KPR, aralarda ritim/anlam kontrolü; 3'lü şok yok.",
-        isDemo: true
-      },
-      {
-        text: "Olgu 2: Stabil düzenli SVT, dar QRS, semptomlu. İlk yaklaşım?",
-        options: [
-          "Amiodaron yükleme",
-          "Senkronize kardiyoversiyon",
-          "Vagal manevra, başarısızsa adenozin",
-          "Magnezyum sülfat"
-        ],
-        correct: "C",
-        timeLimitMs: 12000,
-        explanation: "Hemodinamik olarak stabil, dar QRS SVT'de ilk basamak vagal manevralar; başarısız olursa adenozin."
-      },
-      {
-        text: "Olgu 3: Bilinci kapalı, monitörde kaba VF. İlk yapılacak?",
-        options: [
-          "1 dk ritim analizi",
-          "Senkronize kardiyoversiyon",
-          "Hemen defibrilasyon + KPR",
-          "1 mg adrenalin iv"
-        ],
-        correct: "C",
-        timeLimitMs: 10000,
-        explanation: "Tanıklı VF/pulssuz VT'de mümkün olan en kısa sürede defibrilasyon, ardından KPR."
-      },
-      {
-        type: "info",
-        text: "3'lü şok yok!\nHer şoktan sonra 2 dk KPR, sonra ritim değerlendirmesi.",
-        explanation: "ERC 2025 ALS algoritmasında ardışık 3'lü şok yerine; her defibrilasyondan sonra 2 dk yüksek kaliteli KPR, arada ritim ve nabız kontrolü önerilir.",
-        tag: "reminder"
-      }
-    ];
-
-    let QUESTIONS = DEFAULT_QUESTIONS;
-
-    function sessionRef(path) {
-      return db.ref("sessions/" + SESSION_ID + (path ? "/" + path : ""));
-    }
-
-    function escapeHtml(str) {
-      if (!str) return "";
-      return String(str)
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    /*************** 2) SORULARI JSON'DAN YÜKLEME ***************/
-    function loadQuestions() {
-      return fetch("questions.json", { cache: "no-store" })
-        .then(resp => {
-          if (!resp.ok) throw new Error("HTTP " + resp.status);
-          return resp.json();
-        })
-        .then(data => {
-          if (Array.isArray(data)) {
-            QUESTIONS = data;
-          } else if (data && Array.isArray(data.questions)) {
-            QUESTIONS = data.questions;
-          } else {
-            console.warn("questions.json formatı beklenenden farklı, varsayılan sorular kullanılacak.");
-            QUESTIONS = DEFAULT_QUESTIONS;
-          }
-        })
-        .catch(err => {
-          console.warn("questions.json yüklenemedi, varsayılan sorular kullanılacak:", err);
-          QUESTIONS = DEFAULT_QUESTIONS;
-        });
-    }
-
-    /*************** 3) BAĞLANTI DURUMU ***************/
-    function initConnectionMonitor() {
-      const connectionBanner = document.getElementById("connectionBanner");
-      db.ref(".info/connected").on("value", snap => {
-        const val = snap.val();
-        if (val === true) {
-          connectionBanner.classList.add("hidden");
-        } else {
-          connectionBanner.classList.remove("hidden");
-        }
-      });
-    }
-
-    /*************** 4) GENEL DEĞİŞKENLER ***************/
-    const IS_HOST = params.get("host") === "1";
-
-    const modeInfo = document.getElementById("modeInfo");
-    const hostArea = document.getElementById("hostArea");
-    const playerArea = document.getElementById("playerArea");
-
-    /*************** 5) EĞİTMEN TARAFI ***************/
-    let currentQuestionIndex = -1;
-    let hostCountdownInterval = null;
-    let gradeTimeout = null;
-    let hostCurrentQId = null;
-
-    function initHost() {
-      hostArea.classList.remove("hidden");
-      modeInfo.textContent = "Mod: Eğitmen (projeksiyona bu ekranı ver)";
-
-      const hostStatus = document.getElementById("hostStatus");
-      const resetBtn = document.getElementById("resetBtn");
-      const projectionToggleBtn = document.getElementById("projectionToggleBtn");
-      const hostViewToggleBtn = document.getElementById("hostViewToggleBtn");
-      const qrcodeDiv = document.getElementById("qrcode");
-      const qrEnlargeBtn = document.getElementById("qrEnlargeBtn");
-      const qrOverlay = document.getElementById("qrOverlay");
-      const qrBigDiv = document.getElementById("qrBig");
-      const playerLinkSpan = document.getElementById("playerLink");
-      const playerLinkBig = document.getElementById("playerLinkBig");
-      const sessionCodeLabel = document.getElementById("sessionCodeLabel");
-      const nextQuestionBtn = document.getElementById("nextQuestionBtn");
-      const hostQuestionCard = document.getElementById("hostQuestionCard");
-      const hostQrCard = document.getElementById("hostQrCard");
-      const hostQuestionBadge = document.getElementById("hostQuestionBadge");
-      const hostQuestionTitle = document.getElementById("hostQuestionTitle");
-      const hostOptionsList = document.getElementById("hostOptionsList");
-      const hostTimer = document.getElementById("hostTimer");
-      const hostScoreBody = document.getElementById("hostScoreBody");
-      const hostQuestionMeta = document.getElementById("hostQuestionMeta");
-      const hostExplanationCard = document.getElementById("hostExplanationCard");
-      const hostExplanationTag = document.getElementById("hostExplanationTag");
-      const hostKeyPoint = document.getElementById("hostKeyPoint");
-      const hostExplanation = document.getElementById("hostExplanation");
-      const hostStats = document.getElementById("hostStats");
-      const hostQuestionImage = document.getElementById("hostQuestionImage");
-
-      const baseUrl = window.location.origin + window.location.pathname;
-      const displayUrl = baseUrl.replace(/^https?:\/\//, "");
-      playerLinkSpan.textContent = baseUrl;
-      playerLinkBig.textContent = displayUrl;
-      sessionCodeLabel.textContent = "Teknik oturum kimliği: " + SESSION_ID;
-
-      new QRCode(qrcodeDiv, {
-        text: baseUrl,
-        width: 180,
-        height: 180
-      });
-
-      new QRCode(qrBigDiv, {
-        text: baseUrl,
-        width: 320,
-        height: 320
-      });
-
-      qrEnlargeBtn.onclick = () => {
-        qrOverlay.classList.remove("hidden");
-      };
-      // Kapama butonu inline onclick ile de bağlı (HTML tarafında)
-
-      qrOverlay.addEventListener("click", (e) => {
-        if (e.target === qrOverlay) {
-          qrOverlay.classList.add("hidden");
-        }
-      });
-
-      let projectionOn = false;
-      projectionToggleBtn.onclick = () => {
-        projectionOn = !projectionOn;
-        document.body.classList.toggle("projection-mode", projectionOn);
-        projectionToggleBtn.textContent = projectionOn ? "Projeksiyon modunu kapat (P)" : "Projeksiyon modu (P)";
-      };
-
-      let hostViewMode = "quiz";
-      function updateHostViewMode() {
-        if (hostViewMode === "join") {
-          hostQuestionCard.classList.add("hidden");
-          hostQrCard.classList.remove("hidden");
-          hostViewToggleBtn.textContent = "Quiz ekranı";
-        } else {
-          hostQuestionCard.classList.remove("hidden");
-          hostQrCard.classList.remove("hidden");
-          hostViewToggleBtn.textContent = "Katılım ekranı";
-        }
-      }
-      hostViewToggleBtn.onclick = () => {
-        hostViewMode = hostViewMode === "quiz" ? "join" : "quiz";
-        updateHostViewMode();
-      };
-      updateHostViewMode();
-
-      sessionRef("players").on("value", (snap) => {
-        const list = [];
-        snap.forEach((child) => {
-          const v = child.val() || {};
-          list.push({
-            nickname: v.nickname || "???",
-            score: v.score || 0
-          });
-        });
-        list.sort((a, b) => b.score - a.score);
-
-        hostScoreBody.innerHTML = "";
-        const maxScore = list.length ? Math.max(...list.map(p => p.score || 0)) : 0;
-
-        list.forEach((p, idx) => {
-          const tr = document.createElement("tr");
-          tr.className = "score-row rank-" + (idx + 1);
-          const score = p.score || 0;
-          const ratio = maxScore > 0 ? (score / maxScore) : 0;
-          const width = maxScore > 0 && score > 0 ? Math.max(4, Math.round(ratio * 100)) : 0;
-
-          let rankContent = idx + 1;
-          let medalClass = "";
-          if (idx === 0) { rankContent = "🥇"; medalClass = "score-rank-medal"; }
-          else if (idx === 1) { rankContent = "🥈"; medalClass = "score-rank-medal"; }
-          else if (idx === 2) { rankContent = "🥉"; medalClass = "score-rank-medal"; }
-
-          tr.innerHTML = `
-            <td class="score-rank-cell"><span class="${medalClass}">${rankContent}</span></td>
-            <td class="score-name-cell">${escapeHtml(p.nickname)}</td>
-            <td class="score-cell">
-              <div class="score-points">${score}</div>
-              <div class="score-bar">
-                <div class="score-bar-fill" style="width:${width}%;"></div>
-              </div>
-            </td>
-          `;
-          hostScoreBody.appendChild(tr);
-        });
-      });
-
-      sessionRef("state").on("value", (snap) => {
-        const st = snap.val();
-        if (!st) return;
-        if (st.status === "ended") {
-          hostStatus.textContent = "Quiz bitti. Nihai skorlar tabloda.";
-          hostStatus.className = "status-text success";
-          if (hostCountdownInterval) clearInterval(hostCountdownInterval);
-          if (gradeTimeout) clearTimeout(gradeTimeout);
-          hostTimer.textContent = "";
-        } else if (st.status === "waiting") {
-          hostStatus.textContent = "Oturum hazır. Katılımcılar tekrar katılabilir.";
-          hostStatus.className = "status-text info";
-        } else if (st.status === "info") {
-          hostStatus.textContent = "Bilgi slaytı gösteriliyor (puan yok).";
-          hostStatus.className = "status-text info";
-        }
-      });
-
-      sessionRef("currentExplanation").on("value", (snap) => {
-        const ex = snap.val();
-        if (!ex || !hostCurrentQId || ex.qId !== hostCurrentQId) {
-          hostExplanationCard.classList.add("hidden");
-          hostKeyPoint.textContent = "";
-          hostExplanation.textContent = "";
-          hostStats.innerHTML = "";
-          hostExplanationTag.textContent = "";
-          hostOptionsList.querySelectorAll(".option-card").forEach(card => {
-            card.classList.remove("option-card-correct", "option-card-dim");
-          });
-          return;
-        }
-
-        hostOptionsList.querySelectorAll(".option-card").forEach(card => {
-          const letter = card.dataset.letter;
-          if (letter === ex.correct) {
-            card.classList.add("option-card-correct");
-            card.classList.remove("option-card-dim");
-          } else {
-            card.classList.add("option-card-dim");
-            card.classList.remove("option-card-correct");
-          }
-        });
-
-        const correctTextPart = ex.correctText ? " – " + ex.correctText : "";
-        hostKeyPoint.textContent = "Doğru cevap: " + ex.correct + correctTextPart;
-
-        hostExplanation.textContent = ex.explanation || "";
-
-        if (ex.isDemo) {
-          hostExplanationTag.textContent = "DEMO – Puan yok";
-          hostExplanationTag.style.display = "inline-flex";
-        } else {
-          hostExplanationTag.textContent = "";
-          hostExplanationTag.style.display = "none";
-        }
-
-        if (ex.stats && ex.stats.total > 0) {
-          const stats = ex.stats;
-          const qIndex = (typeof ex.index === "number" ? ex.index - 1 : null);
-          let optionCount = 4;
-          if (qIndex !== null && QUESTIONS[qIndex] && Array.isArray(QUESTIONS[qIndex].options)) {
-            optionCount = QUESTIONS[qIndex].options.length;
-          }
-          const letters = ["A", "B", "C", "D"].slice(0, optionCount);
-          const total = stats.total;
-          let html = '<div class="stat-heading">Cevap dağılımı (' + total + ' cevap)</div>';
-          letters.forEach(letter => {
-            const count = (stats.counts && typeof stats.counts[letter] === "number") ? stats.counts[letter] : 0;
-            const pct = total > 0 ? Math.round((count / total) * 100) : 0;
-            const barWidth = total > 0 && count > 0 ? Math.max(5, pct) : 0;
-            const isCorrect = letter === ex.correct;
-            html += `
-              <div class="stat-row">
-                <div class="stat-label">${letter}</div>
-                <div class="stat-bar">
-                  <div class="stat-bar-fill ${isCorrect ? "" : "stat-bar-fill-wrong"}" style="width:${barWidth}%;"></div>
-                </div>
-                <div class="stat-count">${count} (${pct}%)</div>
-              </div>
-            `;
-          });
-          hostStats.innerHTML = html;
-        } else {
-          hostStats.innerHTML = "";
-        }
-
-        hostExplanationCard.classList.remove("hidden");
-      });
-
-      resetBtn.onclick = () => {
-        const payload = {
-          state: {
-            status: "waiting",
-            resetAt: Date.now()
-          }
-        };
-        sessionRef("").set(payload).then(() => {
-          currentQuestionIndex = -1;
-          hostCurrentQId = null;
-          hostQuestionTitle.textContent = "Henüz soru başlatılmadı.";
-          hostQuestionMeta.textContent = "Henüz soru yok";
-          hostOptionsList.innerHTML = "";
-          hostTimer.textContent = "";
-          hostExplanationCard.classList.add("hidden");
-          hostKeyPoint.textContent = "";
-          hostExplanation.textContent = "";
-          hostStats.innerHTML = "";
-          hostExplanationTag.textContent = "";
-          hostQuestionImage.src = "";
-          hostQuestionImage.classList.add("hidden");
-          hostQuestionCard.classList.remove("card-shock");
-          hostQuestionBadge.classList.remove("badge-shock");
-          hostQuestionBadge.textContent = "Süreli soru";
-        }).catch(err => {
-          hostStatus.textContent = "Sıfırlama hatası: " + err.message;
-          hostStatus.className = "status-text error";
-        });
-      };
-
-      nextQuestionBtn.onclick = () => {
-        startNextQuestion(
-          hostStatus,
-          hostQuestionTitle,
-          hostOptionsList,
-          hostTimer,
-          hostQuestionMeta,
-          hostExplanationCard,
-          hostQuestionImage,
-          hostQuestionBadge,
-          hostQuestionCard,
-          hostKeyPoint,
-          hostExplanation,
-          hostStats,
-          hostExplanationTag
-        );
-      };
-
-      // Klavye kısayolları
-      document.addEventListener("keydown", (e) => {
-        if (!IS_HOST) return;
-        if (e.altKey || e.ctrlKey || e.metaKey) return;
-        const tag = (e.target && e.target.tagName) || "";
-        if (tag === "INPUT" || tag === "TEXTAREA") return;
-
-        if (e.key === "n" || e.key === "N") {
-          e.preventDefault();
-          nextQuestionBtn.click();
-        } else if (e.key === "q" || e.key === "Q") {
-          e.preventDefault();
-          qrOverlay.classList.toggle("hidden");
-        } else if (e.key === "p" || e.key === "P") {
-          e.preventDefault();
-          projectionToggleBtn.click();
-        } else if (e.key === "r" || e.key === "R") {
-          e.preventDefault();
-          if (confirm("Oturumu gerçekten sıfırlamak istiyor musun?")) {
-            resetBtn.click();
-          }
-        }
-      });
-    }
-
-    function startNextQuestion(
-      hostStatus,
-      hostQuestionTitle,
-      hostOptionsList,
-      hostTimer,
-      hostQuestionMeta,
-      hostExplanationCard,
-      hostQuestionImage,
-      hostQuestionBadge,
-      hostQuestionCard,
-      hostKeyPoint,
-      hostExplanation,
-      hostStats,
-      hostExplanationTag
-    ) {
-      currentQuestionIndex++;
-      if (currentQuestionIndex >= QUESTIONS.length) {
-        hostStatus.textContent = "Tüm olgular bitti. Yeni soru yok.";
-        hostStatus.className = "status-text info";
-        sessionRef("state").set({ status: "ended", index: currentQuestionIndex, finishedAt: Date.now() });
-        return;
-      }
-
-      const q = QUESTIONS[currentQuestionIndex] || {};
-      const qId = "q" + currentQuestionIndex;
-      const isInfo = q.type === "info";
-      const timeLimit = q.timeLimitMs || DEFAULT_TIME_LIMIT_MS;
-      const startTime = Date.now();
-      hostCurrentQId = qId;
-
-      if (hostCountdownInterval) clearInterval(hostCountdownInterval);
-      if (gradeTimeout) clearTimeout(gradeTimeout);
-
-      sessionRef("answers/" + qId).set(null);
-
-      const qObj = {
-        index: currentQuestionIndex + 1,
-        total: QUESTIONS.length,
-        text: q.text,
-        options: q.options || [],
-        correct: q.correct || null,
-        qId: qId,
-        startTime: startTime,
-        timeLimitMs: isInfo ? 0 : timeLimit,
-        imageUrl: q.imageUrl || null,
-        tag: q.tag || null,
-        type: q.type || "question"
-      };
-
-      sessionRef("currentQuestion").set(qObj);
-      sessionRef("state").set({ status: isInfo ? "info" : "running", index: currentQuestionIndex });
-
-      hostQuestionTitle.textContent = q.text || "";
-      hostOptionsList.innerHTML = "";
-      hostExplanationCard.classList.add("hidden");
-      hostKeyPoint.textContent = "";
-      hostExplanation.textContent = "";
-      hostStats.innerHTML = "";
-      hostExplanationTag.textContent = "";
-
-      if (q.tag === "shock" && !isInfo) {
-        hostQuestionBadge.textContent = "Şok / Şok yok turu";
-        hostQuestionBadge.classList.add("badge-shock");
-        hostQuestionCard.classList.add("card-shock");
-      } else if (isInfo) {
-        hostQuestionBadge.textContent = "Bilgi slaytı";
-        hostQuestionBadge.classList.remove("badge-shock");
-        hostQuestionCard.classList.remove("card-shock");
-      } else {
-        hostQuestionBadge.textContent = "Süreli soru";
-        hostQuestionBadge.classList.remove("badge-shock");
-        hostQuestionCard.classList.remove("card-shock");
-      }
-
-      if (q.imageUrl) {
-        hostQuestionImage.src = q.imageUrl;
-        hostQuestionImage.classList.remove("hidden");
-      } else {
-        hostQuestionImage.src = "";
-        hostQuestionImage.classList.add("hidden");
-      }
-
-      if (isInfo) {
-        hostStatus.textContent = "Bilgi slaytı gösteriliyor (puan yok).";
-        hostStatus.className = "status-text info";
-        hostQuestionMeta.textContent = "Bilgi slaytı – Olgu " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length;
-        hostTimer.textContent = "";
-        hostTimer.className = "timer-text";
-        // İstersen info slaytında q.explanation'ı hemen oyunculara da göstermek için currentQuestion.explanation alanını kullandık;
-        // oyuncu tarafında q.explanation doğrudan gösteriliyor.
-        return;
-      }
-
-      hostStatus.textContent = "Soru " + (currentQuestionIndex + 1) + "/" + QUESTIONS.length + " başlatıldı.";
-      hostStatus.className = "status-text success";
-
-      const seconds = Math.round(timeLimit / 1000);
-      hostQuestionMeta.textContent = "Soru " + (currentQuestionIndex + 1) + " / " + QUESTIONS.length + " • Süre: " + seconds + " sn";
-
-      (q.options || []).forEach((opt, idx) => {
-        const letter = String.fromCharCode(65 + idx);
-        const div = document.createElement("div");
-        div.className = "option-card";
-        div.dataset.letter = letter;
-        div.innerHTML = `
-          <div class="option-letter">${letter}</div>
-          <div class="option-text">${opt}</div>
-        `;
-        hostOptionsList.appendChild(div);
-      });
-
-      const endTime = startTime + timeLimit;
-      function hostTick() {
-        const now = Date.now();
-        const remaining = endTime - now;
-        if (remaining <= 0) {
-          hostTimer.textContent = "Süre doldu. Puanlama yapılıyor...";
-          hostTimer.className = "timer-text";
-          clearInterval(hostCountdownInterval);
-        } else {
-          const sec = Math.ceil(remaining / 1000);
-          hostTimer.textContent = "Kalan süre: " + sec + " sn";
-          hostTimer.className = "timer-text " + (sec <= 3 ? "timer-critical" : "timer-hot");
-        }
-      }
-      hostTick();
-      hostCountdownInterval = setInterval(hostTick, 200);
-
-      gradeTimeout = setTimeout(() => {
-        gradeQuestion(qId, q.correct, timeLimit);
-      }, timeLimit + 500);
-    }
-
-    function gradeQuestion(qId, correctLetter, timeLimit) {
-      const answersPath = "answers/" + qId;
-      const idx = parseInt(qId.slice(1), 10);
-      const q = QUESTIONS[idx] || {};
-      const isDemo = !!q.isDemo;
-
-      sessionRef(answersPath).once("value").then((snap) => {
-        const answers = [];
-        snap.forEach((child) => {
-          const v = child.val() || {};
-          answers.push({
-            playerId: child.key,
-            answer: v.answer,
-            ts: v.ts || 0
-          });
-        });
-
-        const correctArr = answers
-          .filter((a) => a.answer === correctLetter)
-          .sort((a, b) => a.ts - b.ts);
-
-        const counts = { A: 0, B: 0, C: 0, D: 0 };
-        answers.forEach(a => {
-          if (a.answer && Object.prototype.hasOwnProperty.call(counts, a.answer)) {
-            counts[a.answer] = (counts[a.answer] || 0) + 1;
-          }
-        });
-        const totalAnswers = answers.length;
-
-        if (!isDemo) {
-          answers.forEach(a => {
-            sessionRef("players/" + a.playerId + "/totalAnswered").transaction(cur => (cur || 0) + 1);
-          });
-
-          correctArr.forEach((a, idxPos) => {
-            const points = Math.max(20 - idxPos, 1);
-            const baseRef = sessionRef("players/" + a.playerId);
-            baseRef.child("score").transaction((current) => (current || 0) + points);
-            baseRef.child("totalCorrect").transaction((current) => (current || 0) + 1);
-          });
-        }
-
-        let correctText = "";
-        if (q.options && Array.isArray(q.options)) {
-          const idxLetter = correctLetter ? (correctLetter.charCodeAt(0) - 65) : -1;
-          if (idxLetter >= 0 && idxLetter < q.options.length) {
-            correctText = q.options[idxLetter];
-          }
-        }
-
-        sessionRef("currentExplanation").set({
-          qId: qId,
-          index: idx + 1,
-          correct: correctLetter,
-          correctText: correctText,
-          explanation: q.explanation || "",
-          isDemo: isDemo,
-          stats: {
-            counts: counts,
-            total: totalAnswers
-          },
-          ts: Date.now()
-        });
-
-        if (currentQuestionIndex === QUESTIONS.length - 1) {
-          sessionRef("state").set({ status: "ended", index: currentQuestionIndex, finishedAt: Date.now() });
-        }
-      }).catch(err => {
-        console.error("Puanlama hatası:", err);
-      });
-    }
-
-    /*************** 6) KATILIMCI TARAFI ***************/
-    let playerKey = null;
-    let myNickname = "";
-    let currentQuestion = null;
-    let playerCountdownInterval = null;
-    let playerQuestionEndTime = null;
-    let hasAnsweredThisQuestion = false;
-    let lastAnswerForQuestion = null;
-
-    function initPlayer() {
-      playerArea.classList.remove("hidden");
-      modeInfo.textContent = "Mod: Katılımcı (telefon ekranı)";
-
-      const joinStep = document.getElementById("joinStep");
-      const playStep = document.getElementById("playStep");
-      const finishedStep = document.getElementById("finishedStep");
-
-      const nickInput = document.getElementById("nickInput");
-      const joinBtn = document.getElementById("joinBtn");
-      const joinMsg = document.getElementById("joinMsg");
-      const helloPlayer = document.getElementById("helloPlayer");
-      const playerQuestionTitle = document.getElementById("playerQuestionTitle");
-      const playerOptions = document.getElementById("playerOptions");
-      const playerTimer = document.getElementById("playerTimer");
-      const answerBtn = document.getElementById("answerBtn");
-      const answerMsg = document.getElementById("answerMsg");
-      const playerScoreBody = document.getElementById("playerScoreBody");
-      const playerQuestionMeta = document.getElementById("playerQuestionMeta");
-      const playerQuestionBadge = document.getElementById("playerQuestionBadge");
-      const playerExplanation = document.getElementById("playerExplanation");
-      const playerQuestionImage = document.getElementById("playerQuestionImage");
-      const summaryScore = document.getElementById("summaryScore");
-      const summaryDetail = document.getElementById("summaryDetail");
-
-      function handleResetOnPlayerSide() {
-        localStorage.removeItem("ercQuizPlayerKey");
-        playerKey = null;
-        myNickname = "";
-        currentQuestion = null;
-        hasAnsweredThisQuestion = false;
-        lastAnswerForQuestion = null;
-        if (playerCountdownInterval) clearInterval(playerCountdownInterval);
-        playerTimer.textContent = "";
-        playerTimer.className = "timer-text";
-        answerBtn.disabled = true;
-        playerOptions.innerHTML = "";
-        playerQuestionTitle.textContent = "Soru bekleniyor...";
-        playerQuestionMeta.textContent = "";
-        playerQuestionBadge.textContent = "Soru bekleniyor";
-        playerQuestionBadge.classList.remove("badge-shock");
-        helloPlayer.textContent = "";
-        playerExplanation.textContent = "";
-        playerQuestionImage.src = "";
-        playerQuestionImage.classList.add("hidden");
-
-        playStep.classList.add("hidden");
-        finishedStep.classList.add("hidden");
-        joinStep.classList.remove("hidden");
-
-        joinMsg.textContent = "Oturum sıfırlandı. Yeni oturuma tekrar katılabilirsin.";
-        joinMsg.className = "status-text info";
-        nickInput.value = "";
-      }
-
-      sessionRef("players").on("value", (snap) => {
-        const list = [];
-        snap.forEach((child) => {
-          const v = child.val() || {};
-          list.push({
-            nickname: v.nickname || "???",
-            score: v.score || 0
-          });
-        });
-        list.sort((a, b) => b.score - a.score);
-
-        playerScoreBody.innerHTML = "";
-        list.slice(0, 10).forEach((p, idx) => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td>${idx + 1}</td><td>${escapeHtml(p.nickname)}</td><td>${p.score}</td>`;
-          playerScoreBody.appendChild(tr);
-        });
-      });
-
-      sessionRef("state").on("value", (snap) => {
-        const st = snap.val();
-        if (!st) return;
-        if (st.status === "ended") {
-          finishedStep.classList.remove("hidden");
-          playerTimer.textContent = "";
-          playerTimer.className = "timer-text";
-          answerBtn.disabled = true;
-
-          if (playerKey) {
-            sessionRef("players/" + playerKey).once("value").then(s => {
-              const v = s.val() || {};
-              const score = v.score || 0;
-              const totalCorrect = v.totalCorrect || 0;
-              const totalAnswered = v.totalAnswered || 0;
-              summaryScore.textContent = "Toplam puanın: " + score;
-              if (totalAnswered > 0) {
-                summaryDetail.textContent = "Doğru sayın: " + totalCorrect + " / " + totalAnswered + " (demo sorular hariç).";
-              } else {
-                summaryDetail.textContent = "Bu oturumda puanlanan soru cevaplamadın veya demo sorulardaydın.";
-              }
-            }).catch(() => {
-              summaryScore.textContent = "";
-              summaryDetail.textContent = "";
-            });
-          }
-        } else if (st.status === "waiting") {
-          handleResetOnPlayerSide();
-        }
-      });
-
-      joinBtn.onclick = () => {
-        const nick = (nickInput.value || "").trim();
-        if (!nick) {
-          joinMsg.textContent = "Lütfen bir nick gir.";
-          joinMsg.className = "status-text error";
-          return;
-        }
-        myNickname = nick;
-        joinMsg.textContent = "Katılınıyor...";
-        joinMsg.className = "status-text info";
-
-        const storedKey = localStorage.getItem("ercQuizPlayerKey");
-        if (storedKey) {
-          playerKey = storedKey;
-        } else {
-          const newRef = sessionRef("players").push();
-          playerKey = newRef.key;
-          localStorage.setItem("ercQuizPlayerKey", playerKey);
-        }
-
-        sessionRef("players/" + playerKey).update({
-          nickname: myNickname,
-          score: 0,
-          totalCorrect: 0,
-          totalAnswered: 0
-        }).then(() => {
-          joinStep.classList.add("hidden");
-          playStep.classList.remove("hidden");
-          helloPlayer.textContent = "Hoş geldin, " + myNickname + ". Soru başlatıldığında süre işlemeye başlayacak.";
-          helloPlayer.className = "status-text success";
-        }).catch(err => {
-          joinMsg.textContent = "Katılırken bir hata oluştu: " + err.message;
-          joinMsg.className = "status-text error";
-        });
-      };
-
-      sessionRef("currentQuestion").on("value", (snap) => {
-        const q = snap.val();
-        if (!q) {
-          currentQuestion = null;
-          playerQuestionTitle.textContent = "Soru bekleniyor...";
-          playerOptions.innerHTML = "";
-          playerTimer.textContent = "";
-          playerTimer.className = "timer-text";
-          playerQuestionMeta.textContent = "";
-          playerQuestionBadge.textContent = "Soru bekleniyor";
-          playerQuestionBadge.classList.remove("badge-shock");
-          playerExplanation.textContent = "";
-          answerBtn.disabled = true;
-          playerQuestionImage.src = "";
-          playerQuestionImage.classList.add("hidden");
-          return;
-        }
-
-        currentQuestion = q;
-        hasAnsweredThisQuestion = false;
-        lastAnswerForQuestion = null;
-        answerMsg.textContent = "";
-        answerMsg.className = "status-text";
-        playerExplanation.textContent = "";
-
-        const isInfo = q.type === "info";
-
-        if (q.imageUrl) {
-          playerQuestionImage.src = q.imageUrl;
-          playerQuestionImage.classList.remove("hidden");
-        } else {
-          playerQuestionImage.src = "";
-          playerQuestionImage.classList.add("hidden");
-        }
-
-        if (isInfo) {
-          playerQuestionMeta.textContent = "Bilgi slaytı – Eğitmenin açıklamasını dinleyin (puan yok).";
-          playerQuestionBadge.textContent = "Bilgi slaytı";
-          playerQuestionBadge.classList.remove("badge-shock");
-          playerQuestionTitle.textContent = q.text || "";
-          playerOptions.innerHTML = "";
-          playerTimer.textContent = "";
-          playerTimer.className = "timer-text";
-          answerBtn.disabled = true;
-
-          if (q.explanation) {
-            playerExplanation.textContent = q.explanation;
-          } else {
-            playerExplanation.textContent = "";
-          }
-
-          if (playerCountdownInterval) clearInterval(playerCountdownInterval);
-          return;
-        }
-
-        const seconds = Math.round((q.timeLimitMs || DEFAULT_TIME_LIMIT_MS) / 1000);
-        playerQuestionMeta.textContent = "Soru " + q.index + " / " + q.total + " • Süre: " + seconds + " sn";
-
-        if (q.tag === "shock") {
-          playerQuestionBadge.textContent = "Şok / Şok yok turu";
-          playerQuestionBadge.classList.add("badge-shock");
-        } else {
-          playerQuestionBadge.textContent = "Aktif";
-          playerQuestionBadge.classList.remove("badge-shock");
-        }
-
-        playerQuestionTitle.textContent = q.text || "";
-        playerOptions.innerHTML = "";
-
-        (q.options || []).forEach((opt, idx) => {
-          const letter = String.fromCharCode(65 + idx);
-          const id = "opt" + idx;
-          const label = document.createElement("label");
-          label.className = "option-label";
-          label.htmlFor = id;
-          label.innerHTML = `
-            <input type="radio" name="answer" id="${id}" value="${letter}">
-            <div class="option-card">
-              <div class="option-letter">${letter}</div>
-              <div class="option-text">${opt}</div>
-            </div>
-          `;
-          playerOptions.appendChild(label);
-        });
-
-        if (playerCountdownInterval) clearInterval(playerCountdownInterval);
-        const endTime = q.startTime + (q.timeLimitMs || DEFAULT_TIME_LIMIT_MS);
-        playerQuestionEndTime = endTime;
-
-        function playerTick() {
-          const now = Date.now();
-          const remaining = endTime - now;
-          if (remaining <= 0) {
-            playerTimer.textContent = "Süre doldu. Eğitmenin yeni olguyu başlatmasını bekle.";
-            playerTimer.className = "timer-text";
-            answerBtn.disabled = true;
-            clearInterval(playerCountdownInterval);
-          } else {
-            const sec = Math.ceil(remaining / 1000);
-            playerTimer.textContent = "Kalan süre: " + sec + " sn";
-            playerTimer.className = "timer-text " + (sec <= 3 ? "timer-critical" : "timer-hot");
-            if (!hasAnsweredThisQuestion) {
-              answerBtn.disabled = false;
-            }
-          }
-        }
-        playerTick();
-        playerCountdownInterval = setInterval(playerTick, 200);
-      });
-
-      sessionRef("currentExplanation").on("value", (snap) => {
-        const ex = snap.val();
-        if (!ex || !currentQuestion || ex.qId !== currentQuestion.qId) {
-          return;
-        }
-
-        answerBtn.disabled = true;
-
-        const correctLetter = ex.correct;
-        let correctText = ex.correctText || "";
-        if (!correctText && currentQuestion.options && currentQuestion.options.length) {
-          const idx = correctLetter ? (correctLetter.charCodeAt(0) - 65) : -1;
-          if (idx >= 0 && idx < currentQuestion.options.length) {
-            correctText = currentQuestion.options[idx];
-          }
-        }
-
-        let baseText = "";
-        if (lastAnswerForQuestion && lastAnswerForQuestion.qId === ex.qId) {
-          if (lastAnswerForQuestion.value === correctLetter) {
-            baseText = "Bu soruya zamanında cevap verdin: " + correctLetter + (correctText ? " – " + correctText : "") + ". Doğru!";
-          } else {
-            baseText = "Bu soruya cevap verdin ama yanlış: " + lastAnswerForQuestion.value +
-              ". Doğru cevap: " + correctLetter + (correctText ? " – " + correctText : "") + ".";
-          }
-        } else {
-          baseText = "Bu soruya zamanında cevap veremedin. Doğru cevap: " + correctLetter +
-            (correctText ? " – " + correctText : "") + ".";
-        }
-
-        let fullText = "";
-        if (ex.isDemo) {
-          fullText += "[DEMO soru – puan yok] ";
-        }
-        fullText += baseText;
-        if (ex.explanation) {
-          fullText += " " + ex.explanation;
-        }
-
-        if (ex.stats && ex.stats.total > 0) {
-          const s = ex.stats;
-          const total = s.total;
-          const correctCount = (s.counts && typeof s.counts[correctLetter] === "number") ? s.counts[correctLetter] : 0;
-          const pct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-          fullText += " Bu soruda " + total + " cevap vardı; " + correctCount + " kişi (" + pct + "%) doğru cevabı seçti.";
-        }
-
-        playerExplanation.textContent = fullText;
-      });
-
-      answerBtn.onclick = () => {
-        if (!currentQuestion) return;
-        if (hasAnsweredThisQuestion) return;
-        if (!playerKey) {
-          answerMsg.textContent = "Önce katılman gerekiyor.";
-          answerMsg.className = "status-text error";
-          return;
-        }
-
-        const now = Date.now();
-        if (playerQuestionEndTime && now > playerQuestionEndTime) {
-          answerMsg.textContent = "Süre doldu, cevap gönderilemedi. Bir sonraki olguyu bekle.";
-          answerMsg.className = "status-text error";
-          answerBtn.disabled = true;
-          return;
-        }
-
-        const selected = document.querySelector('#playerOptions input[name="answer"]:checked');
-        if (!selected) {
-          answerMsg.textContent = "Lütfen bir seçenek seç.";
-          answerMsg.className = "status-text error";
-          return;
-        }
-
-        hasAnsweredThisQuestion = true;
-        answerBtn.disabled = true;
-        const answer = selected.value;
-        const qId = currentQuestion.qId;
-        lastAnswerForQuestion = { qId, value: answer };
-
-        sessionRef("answers/" + qId + "/" + playerKey).set({
-          answer: answer,
-          ts: now
-        }).then(() => {
-          answerMsg.textContent = "Cevabın kaydedildi. Puanlama süre sonunda yapılacak.";
-          answerMsg.className = "status-text success";
-        }).catch(err => {
-          answerMsg.textContent = "Cevap gönderilemedi: " + err.message;
-          answerMsg.className = "status-text error";
-        });
-      };
-    }
-
-    /*************** 7) BAŞLAT ***************/
-    function startApp() {
-      loadQuestions().then(() => {
-        initConnectionMonitor();
-        if (IS_HOST) {
-          hostArea.classList.remove("hidden");
-          playerArea.classList.add("hidden");
-          initHost();
-        } else {
-          playerArea.classList.remove("hidden");
-          hostArea.classList.add("hidden");
-          initPlayer();
-        }
-      });
-    }
-
-    startApp();
-  </script>
 </body>
 </html>

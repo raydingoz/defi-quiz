@@ -2,264 +2,417 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defi Simülatörü – Katılımcı</title>
+  <title>Defi ALS Sim – Katılımcı</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
+  <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 
   <style>
-    :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --accent: #22c55e;
-      --danger: #f97373;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --heading: #f9fafb;
-      --radius-lg: 18px;
-      --radius-pill: 999px;
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --border:#1f2937;
+      --accent:#f97373;
+      --danger:#ef4444;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --heading:#fef2f2;
+      --radius-lg:18px;
+      --radius-pill:999px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      padding:8px;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      color:var(--text);
+      font-size:15px;
+    }
+    .app{max-width:480px;margin:0 auto;}
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .brand{
+      font-size:1.02rem;
+      font-weight:800;
+      letter-spacing:.05em;
+      text-transform:uppercase;
+      color:var(--heading);
+    }
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      padding:3px 9px;
+      font-size:0.78rem;
+      color:var(--muted);
+      background:rgba(15,23,42,0.97);
+    }
+    .pill-dot{
+      width:7px;height:7px;border-radius:999px;background:var(--danger);
+      box-shadow:0 0 10px rgba(239,68,68,0.95);
     }
 
-    * { box-sizing: border-box; }
+    .card{
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border);
+      background:var(--card);
+      box-shadow:0 16px 32px rgba(15,23,42,0.9);
+      padding:10px;
+      margin-top:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
+      pointer-events:none;
+    }
+    .card-inner{position:relative;z-index:1;}
 
-    body {
-      margin: 0;
-      padding: 8px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
-      color: var(--text);
-      font-size: 15px;
+    .case-title{
+      font-size:0.96rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
+    }
+    .case-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+      margin-bottom:6px;
+    }
+    .meta-line{
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-top:2px;
     }
 
-    .app {
-      max-width: 480px;
-      margin: 0 auto;
+    .input-row{
+      display:flex;
+      gap:6px;
+      margin-top:6px;
+    }
+    input[type="text"]{
+      flex:1;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      padding:8px 10px;
+      font-size:0.9rem;
+      outline:none;
+    }
+    input::placeholder{color:var(--muted);}
+    .btn-join{
+      border-radius:var(--radius-pill);
+      border:none;
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      color:#fef2f2;
+      padding:8px 12px;
+      font-size:0.86rem;
+      font-weight:600;
+      cursor:pointer;
+      box-shadow:0 8px 16px rgba(239,68,68,0.6);
     }
 
-    .card {
-      background: var(--card);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
-      padding: 10px 10px;
-      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.9);
-      margin-top: 8px;
+    .monitor{
+      margin-top:4px;
+      border-radius:16px;
+      border:1px solid #111827;
+      background:radial-gradient(circle at top,#0f172a,#020617 55%);
+      padding:8px;
+      box-shadow:0 10px 28px rgba(0,0,0,0.8);
+      position:relative;
+      overflow:hidden;
+    }
+    .monitor-grid{
+      position:absolute;
+      inset:0;
+      opacity:0.25;
+      background-image:
+        linear-gradient(to right,#1f2937 1px,transparent 1px),
+        linear-gradient(to bottom,#1f2937 1px,transparent 1px);
+      background-size:16px 10px;
+      pointer-events:none;
+    }
+    .monitor-header{
+      display:flex;
+      justify-content:space-between;
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .ekg-line{
+      position:relative;
+      height:80px;
+      overflow:hidden;
+    }
+    .ekg-strip{
+      position:absolute;
+      top:50%;
+      left:0;
+      transform:translate3d(0,-50%,0);
+      width:720px;
+      height:60px;
+      display:flex;
+    }
+    .ekg-strip svg{
+      width:240px;
+      height:60px;
+    }
+    .ekg-strip.sinus path{stroke:#22c55e;}
+    .ekg-strip.vf path{stroke:#f97373;}
+    .ekg-strip.vt path{stroke:#facc15;}
+    .ekg-strip.asystole path{stroke:#4b5563;}
+    .ekg-strip.pea path{stroke:#38bdf8;}
+    .ekg-strip.torsades path{stroke:#f97316;}
+
+    .ekg-strip.anim{
+      animation:ekg-move 1.2s linear infinite;
+    }
+    @keyframes ekg-move{
+      from{transform:translate3d(0,-50%,0);}
+      to{transform:translate3d(-240px,-50%,0);}
     }
 
-    .brand {
-      font-weight: 700;
-      font-size: 1.06rem;
-      color: var(--heading);
+    .monitor-footer{
+      margin-top:2px;
+      font-size:0.8rem;
+      color:var(--muted);
+      display:flex;
+      justify-content:space-between;
     }
 
-    .pill {
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      padding: 3px 9px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: rgba(15,23,42,0.9);
+    .timer-pill{
+      border-radius:var(--radius-pill);
+      border:1px solid #52525b;
+      padding:3px 9px;
+      font-size:0.8rem;
+      color:#fbbf24;
+      font-variant-numeric:tabular-nums;
+      display:inline-block;
+      margin-top:4px;
     }
 
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 10px rgba(34,197,94,0.9);
+    .btn-row{
+      margin-top:8px;
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+    }
+    .btn{
+      border-radius:14px;
+      border:1px solid var(--border);
+      background:rgba(15,23,42,0.97);
+      color:var(--text);
+      padding:9px 10px;
+      font-size:0.9rem;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      cursor:pointer;
+      transition:all .15s ease-out;
+    }
+    .btn span.label{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+    .btn.shock{
+      border-color:#b91c1c;
+      box-shadow:0 0 0 1px rgba(239,68,68,0.45);
+    }
+    .btn.noShock{
+      border-color:#6b7280;
+    }
+    .btn.cardioversion{
+      border-color:#0ea5e9;
+      box-shadow:0 0 0 1px rgba(56,189,248,0.35);
+    }
+    .btn[disabled]{opacity:0.5;cursor:default;box-shadow:none;}
+    .btn.selected{
+      outline:2px solid #22c55e;
+      outline-offset:1px;
     }
 
-    .top-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 4px;
+    .feedback{
+      margin-top:4px;
+      font-size:0.8rem;
+      color:var(--muted);
     }
+    .feedback.ok{color:#22c55e;}
+    .feedback.bad{color:var(--danger);}
 
-    .scenario-title {
-      font-size: 0.92rem;
-      color: var(--heading);
-      margin-bottom: 3px;
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      z-index:50;
     }
-
-    .scenario-text {
-      font-size: 0.88rem;
-      color: var(--text);
-      margin-bottom: 4px;
-      max-height: 120px;
-      overflow-y: auto;
+    .modal.show{display:flex;}
+    .modal-backdrop{
+      position:absolute;
+      inset:0;
+      background:rgba(0,0,0,0.75);
     }
-
-    .helper {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
+    .modal-card{
+      position:relative;
+      background:#020617;
+      border-radius:18px;
+      border:1px solid #374151;
+      padding:14px;
+      width:min(420px,90vw);
+      box-shadow:0 20px 40px rgba(0,0,0,0.8);
     }
-
-    .controls {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
+    .modal-title{
+      font-size:0.92rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
     }
-
-    .btn {
-      border: none;
-      border-radius: var(--radius-pill);
-      padding: 10px 12px;
-      font-size: 0.95rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease-out;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      outline: none;
-      width: 100%;
+    .modal-body{
+      font-size:0.85rem;
+      color:var(--text);
+      max-height:220px;
+      overflow-y:auto;
+      white-space:pre-wrap;
     }
-
-    .btn-main {
-      background: radial-gradient(circle at top left, #fb923c, #f97316);
-      color: #0b1120;
-      box-shadow: 0 10px 20px rgba(248,113,22,0.55);
-    }
-
-    .btn-cardio {
-      background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-      color: #020617;
-      box-shadow: 0 10px 20px rgba(56,189,248,0.55);
-    }
-
-    .btn-sec {
-      background: rgba(15,23,42,0.95);
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
-    .btn-small {
-      font-size: 0.8rem;
-      padding: 6px 10px;
-    }
-
-    .btn[disabled] {
-      opacity: 0.45;
-      cursor: default;
-      box-shadow: none;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      padding: 8px 10px;
-      background: #020617;
-      color: var(--text);
-      font-size: 0.9rem;
-      outline: none;
-    }
-
-    input[type="text"]::placeholder {
-      color: var(--muted);
-    }
-
-    .meta-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .feedback {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .feedback.ok { color: var(--accent); }
-    .feedback.bad { color: var(--danger); }
-
-    .badge-answer {
-      margin-top: 4px;
-      font-size: 0.8rem;
-      color: var(--muted);
+    .btn-modal{
+      margin-top:8px;
+      border-radius:var(--radius-pill);
+      border:none;
+      padding:7px 12px;
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      color:#fef2f2;
+      font-size:0.84rem;
+      font-weight:600;
+      cursor:pointer;
+      display:inline-flex;
+      margin-left:auto;
     }
   </style>
 </head>
 <body>
   <div class="app">
-    <div class="top-bar">
-      <div class="brand">Defi Simülatörü</div>
+    <header class="top-bar">
+      <div class="brand">Defi ALS Sim</div>
       <div class="pill">
         <span class="pill-dot"></span>
-        Skorun: <span id="myScore">0</span> puan
+        Skorun: <span id="myScore">0</span> p
       </div>
-    </div>
+    </header>
 
-    <!-- Nickname kartı -->
-    <div class="card" id="joinCard">
-      <div class="scenario-title">Katıl</div>
-      <div class="helper">
-        Nickini yaz, eğitmenin başlattığı workshop oturumuna bağlan.
+    <!-- Katıl kartı -->
+    <section class="card" id="joinCard">
+      <div class="card-inner">
+        <div class="case-title">Katıl</div>
+        <div class="case-body">
+          Nickini yaz ve <strong>ALS ritim simülasyonu</strong> oturumuna bağlan.
+        </div>
+        <div class="input-row">
+          <input id="nicknameInput" type="text" maxlength="20" placeholder="Örn. ShockDoc" />
+          <button id="joinBtn" class="btn-join">Katıl</button>
+        </div>
+        <div id="joinFeedback" class="feedback"></div>
       </div>
-      <div class="input-row">
-        <input id="nicknameInput" type="text" maxlength="20"
-               placeholder="Örn. KardiyoRafi" />
-        <button id="joinBtn" class="btn btn-small btn-main">Katıl</button>
-      </div>
-      <div id="joinFeedback" class="feedback"></div>
-    </div>
+    </section>
 
-    <!-- Soru kartı -->
-    <div class="card" id="quizCard" style="display:none;">
-      <div class="scenario-title" id="scenarioTitle">Olgu başlığı</div>
-      <div class="scenario-text" id="scenarioText">Olgular eğitmen tarafından başlatılacak.</div>
+    <!-- Sim kartı -->
+    <section class="card" id="simCard" style="display:none;">
+      <div class="card-inner">
+        <div class="case-title" id="caseTitle">Olgu başlığı</div>
+        <div class="case-body" id="caseNarrative">
+          Eğitmen olguyu ve ritmi başlattığında burada göreceksin.
+        </div>
 
-      <div class="meta-row">
-        <span>Olgular eğitmen ekranına göre ilerliyor.</span>
-        <span>Olgu: <span id="sceneIndex">–</span>/<span id="sceneTotal">–</span></span>
-      </div>
+        <div class="monitor">
+          <div class="monitor-grid"></div>
+          <div class="monitor-header">
+            <span>Lead II</span>
+            <span>ALS Sim</span>
+          </div>
+          <div class="ekg-line">
+            <div class="ekg-strip asystole" id="ekgStrip">
+              <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                <polyline id="ekgPath1" fill="none" stroke="#4b5563" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round"
+                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+              </svg>
+              <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                <polyline id="ekgPath2" fill="none" stroke="#4b5563" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round"
+                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+              </svg>
+              <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                <polyline id="ekgPath3" fill="none" stroke="#4b5563" stroke-width="2"
+                  stroke-linejoin="round" stroke-linecap="round"
+                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+              </svg>
+            </div>
+          </div>
+          <div class="monitor-footer">
+            <span>HR: ?</span>
+            <span id="timerLabel">Süre: –</span>
+          </div>
+        </div>
 
-      <div class="controls">
-        <button id="defibBtn" class="btn btn-main" disabled>
-          ⚡ Defibrilasyon (200 J)
-        </button>
-        <button id="cardioBtn" class="btn btn-cardio" disabled>
-          ⚡ Senkron kardiyoversiyon
-        </button>
-        <button id="noShockBtn" class="btn btn-sec" disabled>
-          🤚 Şok yok / KPR / ilaç
-        </button>
-      </div>
+        <div class="btn-row">
+          <button id="btnShock" class="btn shock">
+            <span class="label">⚡ Şokla</span>
+            <span class="meta-line">VF/pVT algoritması</span>
+          </button>
+          <button id="btnNoShock" class="btn noShock">
+            <span class="label">⏸ Şoklama</span>
+            <span class="meta-line">Asistoli / PEA / sinüs</span>
+          </button>
+          <button id="btnCardio" class="btn cardioversion">
+            <span class="label">❤️ Senkron KV</span>
+            <span class="meta-line">İnstabil SVT / AF / VT (nabız var)</span>
+          </button>
+        </div>
 
-      <div id="answerStatus" class="badge-answer">
-        Eğitmen yeni bir soru başlattığında butonlar aktif olacaktır.
+        <div id="answerStatus" class="feedback">
+          Eğitmen ritmi açtığında 5–10 sn içinde karar ver.
+        </div>
       </div>
-      <div id="questionInfo" class="feedback"></div>
-    </div>
+    </section>
 
-    <!-- Info kartı -->
-    <div class="card">
-      <div class="scenario-title">Bilgi</div>
-      <div class="helper">
-        Bu uygulama, ERC 2025 ALS defibrilasyon ve kardiyoversiyon kararlarını tartışmak için
-        hazırlanmış interaktif bir araçtır; gerçek hasta yönetiminin yerini tutmaz.
+    <!-- Bilgi kartı -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="case-title">Bilgi</div>
+        <div class="feedback">
+          İlk doğru yaklaşım 20 puan, sonra 19–18… en az 15 puan.
+          Süre bittiğinde yeni yanıt kabul edilmez.
+        </div>
       </div>
+    </section>
+  </div>
+
+  <!-- Açıklama popup -->
+  <div id="exModal" class="modal">
+    <div class="modal-backdrop"></div>
+    <div class="modal-card">
+      <div class="modal-title" id="exModalTitle">Olgu açıklaması</div>
+      <div class="modal-body" id="exModalBody"></div>
+      <button id="exModalClose" class="btn-modal">Tamam</button>
     </div>
   </div>
 
@@ -274,262 +427,421 @@
       appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
       measurementId: "G-SY348RPCVZ"
     };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db     = firebase.database();
+    const rootRef= db.ref("defiSim");
 
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.database();
-    const rootRef = db.ref("defiSim");
+    const CONFIG_URL = "defi-als-config.json";
 
-    const SCENES = [
-      { id: 1, correctAction: "defib" },
-      { id: 2, correctAction: "no-shock" },
-      { id: 3, correctAction: "cardioversion" },
-      { id: 4, correctAction: "cardioversion" },
-      { id: 5, correctAction: "no-shock" },
-      { id: 6, correctAction: "no-shock" },
-      { id: 7, correctAction: "defib" },
-      { id: 8, correctAction: "defib" }
-    ];
+    let CONFIG       = null;
+    let CASES        = [];
+    let configLoaded = false;
 
-    // Aynı metinleri host ile tutarlı yapmak için:
-    const SCENE_TEXTS = [
-      {
-        title: "Olgu 1 – Ani kollaps",
-        text:
-          "65 yaş erkek, acil serviste triyaj sırasında aniden yere yığılıyor. Bilinci kapalı, solunum normal değil, palpabl nabız alınamıyor. Ekip olarak KPR başlatıyorsunuz ve monitöre bağlanıyorsunuz."
-      },
-      {
-        title: "Olgu 2 – Şok sonrası değerlendirme",
-        text:
-          "Aynı hastaya bir şok uygulandı ve 2 dk KPR yapıldı. Şimdi kısa ritim kontrolündesiniz. Hasta gözlerini açıyor, komut alıyor ve hareket etmeye başlıyor."
-      },
-      {
-        title: "Olgu 3 – Genç erişkin, hipotansif taşikardi",
-        text:
-          "35 yaş kadın, çarpıntı ve baş dönmesi ile geliyor. TA 70/40 mmHg, soğuk, soluk, bilinç bulanık. Nabız çok hızlı ve düzenli hissediliyor."
-      },
-      {
-        title: "Olgu 4 – Yaşlı hasta, kronik aritmi öyküsü",
-        text:
-          "72 yaş erkek, uzun süredir düzensiz kalp atımı öyküsü var. Şimdi göğüs ağrısı, nefes darlığı ve sersemlik ile geliyor. TA 80/50 mmHg, nabız hızlı ve düzensiz."
-      },
-      {
-        title: "Olgu 5 – Nabızsız, elektriksel aktivite belirsiz",
-        text:
-          "Acilde yatan bir hastaya çağrılıyorsunuz. Yatağında yanıtsız, normal solumuyor ve palpabl nabız alınamıyor. Ekip KPR başlatıyor, sen monitöre bakıyorsun."
-      },
-      {
-        title: "Olgu 6 – Nabız yok, monitörde elektriksel aktivite",
-        text:
-          "İleri yaş bir hasta, serviste ani kötüleşme sonrası acile alınıyor. Monitörde bir ritim görüyorsun ancak nabız palpe edemiyorsun. Hasta yanıtsız ve apneik."
-      },
-      {
-        title: "Olgu 7 – Geniş kompleks, nabız alınamıyor",
-        text:
-          "50 yaş erkek, göğüs ağrısı sonrası aniden bilincini kaybediyor. Olay yerinde ve acilde nabız alınamıyor. Monitörde hızlı, geniş kompleksli elektriksel aktivite görüyorsun."
-      },
-      {
-        title: "Olgu 8 – Uzamış QT öykülü hasta",
-        text:
-          "Uzamış QT öyküsü olan bir hasta, çarpıntı sonrası ani olarak bilincini kaybediyor. Nabız alınamıyor. Monitörde şekli zaman içinde değişen hızlı bir ritim görüyorsun."
-      }
-    ];
+    let sessionToken    = null;
+    let triedAutoJoin   = false;
+    let playerId        = null;
+    let nickname        = null;
 
-    const joinCard = document.getElementById("joinCard");
-    const quizCard = document.getElementById("quizCard");
+    let currentCaseIndex   = null;
+    let currentCaseId      = null;
+    let currentRhythmActive= false;
+    let currentReveal      = false;
+
+    let answeredCases   = {};
+    let shownExplanation= {};
+    let timerInterval   = null;
+    let timerRemaining  = 0;
+
+    // DOM
+    const joinCard      = document.getElementById("joinCard");
+    const simCard       = document.getElementById("simCard");
     const nicknameInput = document.getElementById("nicknameInput");
-    const joinBtn = document.getElementById("joinBtn");
-    const joinFeedback = document.getElementById("joinFeedback");
+    const joinBtn       = document.getElementById("joinBtn");
+    const joinFeedback  = document.getElementById("joinFeedback");
 
-    const scenarioTitle = document.getElementById("scenarioTitle");
-    const scenarioText = document.getElementById("scenarioText");
-    const defibBtn = document.getElementById("defibBtn");
-    const cardioBtn = document.getElementById("cardioBtn");
-    const noShockBtn = document.getElementById("noShockBtn");
-    const answerStatus = document.getElementById("answerStatus");
-    const questionInfo = document.getElementById("questionInfo");
-    const myScoreSpan = document.getElementById("myScore");
-    const sceneIndexSpan = document.getElementById("sceneIndex");
-    const sceneTotalSpan = document.getElementById("sceneTotal");
+    const caseTitleEl   = document.getElementById("caseTitle");
+    const caseNarrEl    = document.getElementById("caseNarrative");
+    const answerStatus  = document.getElementById("answerStatus");
+    const myScoreEl     = document.getElementById("myScore");
 
-    sceneTotalSpan.textContent = SCENES.length;
+    const ekgStripEl    = document.getElementById("ekgStrip");
+    const ekgPath1      = document.getElementById("ekgPath1");
+    const ekgPath2      = document.getElementById("ekgPath2");
+    const ekgPath3      = document.getElementById("ekgPath3");
+    const timerLabel    = document.getElementById("timerLabel");
 
-    let playerId = null;
-    let nickname = null;
-    let currentQuestionId = null;
-    let currentSceneIndex = null;
-    let answeredQuestions = {}; // qId -> true
+    const btnShock      = document.getElementById("btnShock");
+    const btnNoShock    = document.getElementById("btnNoShock");
+    const btnCardio     = document.getElementById("btnCardio");
 
-    // localStorage'da varsa kullan
-    const storedId = localStorage.getItem("defiSimPlayerId");
-    const storedNick = localStorage.getItem("defiSimNickname");
-    if (storedId && storedNick) {
-      playerId = storedId;
-      nickname = storedNick;
-      joinCard.style.display = "none";
-      quizCard.style.display = "block";
-      answerStatus.textContent = "Eğitmen yeni soru başlattığında butonlar aktif olacak.";
+    const exModal       = document.getElementById("exModal");
+    const exModalTitle  = document.getElementById("exModalTitle");
+    const exModalBody   = document.getElementById("exModalBody");
+    const exModalClose  = document.getElementById("exModalClose");
+
+    const EKG_SHAPES = {
+      sinus: "0,30 10,30 20,30 30,20 32,40 34,10 36,50 38,25 40,30 50,30 60,30 70,30 80,30 90,20 92,40 94,12 96,50 98,25 100,30 110,30 120,30 130,30 140,20 142,40 144,10 146,50 148,25 150,30 160,30 170,30 180,30 190,20 192,40 194,12 196,50 198,25 200,30 210,30 220,30 230,30 240,30",
+      vf:   "0,30 6,35 8,26 13,26 18,36 20,37 26,25 28,24 31,33 34,36 38,26 40,26 46,34 53,36 58,30 61,26 68,26 75,27 77,37 78,34 83,33 88,27 92,29 96,37 103,37 109,29 112,26 120,25 127,29 127,35 128,32 135,33 138,26 139,33 141,41 143,28 146,36 148,38 154,28 160,32 164,41 171,36 173,29 179,37 183,42 186,41 189,28 193,25 199,27 204,35 207,33 212,25 216,28 218,37 220,37 227,27 233,23 236,28 240,30",
+      vt:   "0,30 5,30 10,20 15,10 20,50 25,40 30,30 35,30 40,20 45,10 50,50 55,40 60,30 65,30 70,20 75,10 80,50 85,40 90,30 95,30 100,20 105,10 110,50 115,40 120,30 125,30 130,20 135,10 140,50 145,40 150,30 155,30 160,20 165,10 170,50 175,40 180,30 185,30 190,20 195,10 200,50 205,40 210,30 215,30 220,20 225,10 230,50 235,40 240,30",
+      asystole: "0,30 40,30 80,30 120,30 160,30 200,30 240,30",
+      pea:  "0,30 10,30 20,30 28,20 30,18 32,40 34,22 36,30 46,30 56,30 64,22 66,40 68,18 70,30 80,30 90,30 98,22 100,40 102,18 104,30 114,30 124,30 132,22 134,40 136,18 138,30 148,30 158,30 166,22 168,40 170,18 172,30 182,30 192,30 200,22 202,40 204,18 206,30 216,30 226,30 234,22 236,40 238,18 240,30",
+      torsades: "0,30 5,25 10,20 15,15 20,10 25,15 30,20 35,25 40,30 45,35 50,40 55,45 60,50 65,45 70,40 75,35 80,30 85,25 90,20 95,15 100,10 105,15 110,20 115,25 120,30 125,35 130,40 135,45 140,50 145,45 150,40 155,35 160,30 165,25 170,20 175,15 180,10 185,15 190,20 195,25 200,30 205,35 210,40 215,45 220,50 225,45 230,40 235,35 240,30"
+    };
+
+    function safeCase(idx){
+      if(!CASES.length) return null;
+      if(idx<0) idx=0;
+      if(idx>=CASES.length) idx=CASES.length-1;
+      return CASES[idx];
     }
 
-    function enableAnswerButtons(enable) {
-      defibBtn.disabled = !enable;
-      cardioBtn.disabled = !enable;
-      noShockBtn.disabled = !enable;
-    }
-
-    function joinSession() {
-      const nick = nicknameInput.value.trim();
-      if (!nick) {
-        joinFeedback.textContent = "Lütfen bir nick yaz.";
-        return;
-      }
-      nickname = nick;
-      if (!playerId) {
-        playerId = "p_" + Math.random().toString(36).substr(2, 9);
-      }
-      const playerRef = rootRef.child("players").child(playerId);
-      playerRef.update({ nickname: nickname, score: 0 });
-      localStorage.setItem("defiSimPlayerId", playerId);
-      localStorage.setItem("defiSimNickname", nickname);
-      joinCard.style.display = "none";
-      quizCard.style.display = "block";
-      answerStatus.textContent = "Eğitmen yeni soru başlattığında butonlar aktif olacak.";
-      joinFeedback.textContent = "";
-    }
-
-    joinBtn.addEventListener("click", joinSession);
-    nicknameInput.addEventListener("keydown", e => {
-      if (e.key === "Enter") joinSession();
-    });
-
-    // Skor dinle
-    function attachScoreListener() {
-      if (!playerId) return;
+    function attachScoreListener(){
+      if(!playerId) return;
       rootRef.child("players").child(playerId).child("score")
-        .on("value", snap => {
-          const val = snap.val() || 0;
-          myScoreSpan.textContent = val;
+        .on("value",snap=>{
+          myScoreEl.textContent = snap.val() || 0;
         });
     }
 
-    // Yeni soru dinleyicileri
-    rootRef.child("currentSceneIndex").on("value", snap => {
-      const idx = snap.val();
-      if (idx === null || idx === undefined) return;
-      currentSceneIndex = idx;
-      const sText = SCENE_TEXTS[idx] || {};
-      sceneIndexSpan.textContent = idx + 1;
-      scenarioTitle.textContent = sText.title || ("Olgu " + (idx + 1));
-      scenarioText.textContent = sText.text || "";
-    });
-
-    rootRef.child("currentQuestionId").on("value", snap => {
-      const qId = snap.val();
-      if (!qId) {
-        currentQuestionId = null;
-        enableAnswerButtons(false);
-        questionInfo.textContent = "Eğitmen henüz soru başlatmadı.";
-        return;
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval = null;
       }
-      currentQuestionId = qId;
-      questionInfo.textContent =
-        "Yeni soru başladı. Doğru yanıt verenler içinde ilk 6 kişi daha yüksek puan alır.";
-      if (answeredQuestions[qId]) {
-        enableAnswerButtons(false);
-        answerStatus.textContent = "Bu soruya zaten cevap verdin.";
-      } else {
-        enableAnswerButtons(true);
-        answerStatus.textContent = "Seçimini yap. Yanıtın geri alınamaz.";
-      }
-    });
-
-    function describeActionKey(key) {
-      if (key === "defib") return "defibrilasyon";
-      if (key === "cardioversion") return "senkron kardiyoversiyon";
-      if (key === "no-shock") return "şok yok / KPR / ilaç";
-      return "uygun yaklaşım";
     }
 
-    function computePoints(orderPosition) {
-      if (orderPosition <= 0) return 0;
-      if (orderPosition === 1) return 20;
-      if (orderPosition === 2) return 19;
-      if (orderPosition === 3) return 18;
-      if (orderPosition === 4) return 17;
-      if (orderPosition === 5) return 16;
-      // 6 ve sonrası
+    function startTimerForCurrent(){
+      stopTimer();
+      if(!configLoaded || currentCaseIndex==null){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      const c = safeCase(currentCaseIndex);
+      if(!c){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      timerRemaining = c.timeLimitSec || 8;
+      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+      timerInterval = setInterval(()=>{
+        timerRemaining -= 1;
+        if(timerRemaining <= 0){
+          stopTimer();
+          timerLabel.textContent="Süre: 0 sn";
+          return;
+        }
+        timerLabel.textContent="Süre: "+timerRemaining+" sn";
+      },1000);
+    }
+
+    function updateButtonsState(){
+      const canAnswer = configLoaded && currentCaseId && currentRhythmActive && !currentReveal && playerId;
+      const already   = currentCaseId && answeredCases[currentCaseId];
+      const disabled  = !canAnswer || already;
+      [btnShock, btnNoShock, btnCardio].forEach(btn => btn.disabled = disabled);
+    }
+
+    function applyRhythm(key, animate){
+      const k = key || "sinus";
+      const shape = EKG_SHAPES[k] || EKG_SHAPES["sinus"];
+      ekgPath1.setAttribute("points", shape);
+      ekgPath2.setAttribute("points", shape);
+      ekgPath3.setAttribute("points", shape);
+      ekgStripEl.className = "ekg-strip " + k + (animate ? " anim" : "");
+    }
+
+    function renderCase(){
+      if(!configLoaded || currentCaseIndex==null) return;
+      const c = safeCase(currentCaseIndex);
+      if(!c) return;
+
+      // Yeni olgu / yeni caseId geldiğinde modal ve highlight'ları sıfırla
+      exModal.classList.remove("show");
+      [btnShock, btnNoShock, btnCardio].forEach(b=>b.classList.remove("selected"));
+      answerStatus.className = "feedback";
+
+      caseTitleEl.textContent = c.title || ("Olgu " + (currentCaseIndex+1));
+      caseNarrEl.textContent  = c.narrative || "";
+
+      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "asystole";
+      applyRhythm(rhythmKey, !!currentRhythmActive);
+
+      if(!currentCaseId){
+        answerStatus.textContent = "Eğitmen olguyu ve ritmi başlattığında karar verebileceksin.";
+      }else if(!currentRhythmActive && !currentReveal){
+        answerStatus.textContent = "Ritim kapalı. Yeni olgu için eğitmeni bekle.";
+      }else if(currentRhythmActive){
+        if(answeredCases[currentCaseId]){
+          answerStatus.textContent = "Bu olguyu yanıtladın. Yeni olgu bekle.";
+        }else{
+          answerStatus.textContent = "5–10 sn içinde karar ver.";
+        }
+      }else if(currentReveal){
+        answerStatus.textContent = "Doğru yaklaşım gösterildi.";
+      }
+      updateButtonsState();
+    }
+
+    function computePoints(orderPosition){
+      if(orderPosition<=0) return 0;
+      if(orderPosition===1) return 20;
+      if(orderPosition===2) return 19;
+      if(orderPosition===3) return 18;
+      if(orderPosition===4) return 17;
+      if(orderPosition===5) return 16;
       return 15;
     }
 
-    function sendAnswer(actionType) {
-      if (!playerId || currentQuestionId == null || currentSceneIndex == null) return;
-      if (answeredQuestions[currentQuestionId]) return;
+    function openExplanationModal(isCorrect, c){
+      if(!c) return;
+      const key = c.id || (currentCaseId || "");
+      if(shownExplanation[key]) return;
+      shownExplanation[key] = true;
 
-      const scene = SCENES[currentSceneIndex] || {};
-      const correctAction = scene.correctAction;
-      const isCorrect = (actionType === correctAction);
+      exModalTitle.textContent = isCorrect ? "Doğru yaklaşım" : "Olgunun açıklaması";
 
-      enableAnswerButtons(false);
-      answeredQuestions[currentQuestionId] = true;
-      answerStatus.textContent = "Cevabın kaydedildi. Eğitmenle birlikte açıklamayı dinle.";
+      let body = "";
+      if(c.correctAction === "shock"){
+        body += "Doğru yaklaşım: Şokla (VF/pVT algoritması)\n\n";
+      }else if(c.correctAction === "noShock"){
+        body += "Doğru yaklaşım: Şoklama (şoklanamaz ritim)\n\n";
+      }else if(c.correctAction === "cardioversion"){
+        body += "Doğru yaklaşım: Senkron kardiyoversiyon\n\n";
+      }
+      if(c.explanation) body += c.explanation;
 
-      const answersRef = rootRef.child("answers").child(String(currentQuestionId));
-      const playerAnswerRef = answersRef.child(playerId);
+      exModalBody.textContent = body;
+      exModal.classList.add("show");
+    }
 
-      if (!isCorrect) {
-        playerAnswerRef.set({
+    function closeExplanationModal(){
+      exModal.classList.remove("show");
+    }
+    exModalClose.addEventListener("click", closeExplanationModal);
+    exModal.addEventListener("click", e=>{
+      if(e.target === exModal) closeExplanationModal();
+    });
+
+    function sendAction(actionKey){
+      if(!playerId || !configLoaded || currentCaseIndex==null || !currentCaseId) return;
+      if(!currentRhythmActive || currentReveal) return;
+      if(answeredCases[currentCaseId]) return;
+
+      const c = safeCase(currentCaseIndex);
+      if(!c) return;
+
+      answeredCases[currentCaseId] = true;
+      updateButtonsState();
+
+      [btnShock, btnNoShock, btnCardio].forEach(b=>b.classList.remove("selected"));
+      if(actionKey==="shock")        btnShock.classList.add("selected");
+      else if(actionKey==="noShock") btnNoShock.classList.add("selected");
+      else if(actionKey==="cardioversion") btnCardio.classList.add("selected");
+
+      const isCorrect = (actionKey === c.correctAction);
+      const caseIdStr = String(currentCaseId);
+      const answersRef   = rootRef.child("answers").child(caseIdStr);
+      const playerAnsRef = answersRef.child(playerId);
+
+      if(!isCorrect){
+        playerAnsRef.set({
           nickname: nickname || "Anonim",
-          answer: actionType,
+          action: actionKey,
           correct: false,
           points: 0,
           ts: Date.now()
         });
-        questionInfo.textContent =
-          "Yanlış/uygunsuz yaklaşım. Doğru stratejiyi eğitmen ekranından takip et.";
-        questionInfo.className = "feedback bad";
+        answerStatus.textContent = "Bu olguda yaklaşım ERC ile uyumlu değil.";
+        answerStatus.className   = "feedback bad";
+        openExplanationModal(false, c);
         return;
       }
 
-      // Doğruysa, order hesaplayıp puan ver
-      const orderRef = rootRef.child("answerOrder").child(String(currentQuestionId));
-      orderRef.transaction(cur => (cur || 0) + 1, (err, committed, snap) => {
-        if (!committed || !snap) return;
-        const position = snap.val();
-        const pts = computePoints(position);
+      const orderRef = rootRef.child("answerOrder").child(caseIdStr);
+      orderRef.transaction(cur => (cur || 0) + 1, (err, committed, snap)=>{
+        if(!committed || !snap) return;
+        const pos = snap.val();
+        const pts = computePoints(pos);
 
-        playerAnswerRef.set({
+        playerAnsRef.set({
           nickname: nickname || "Anonim",
-          answer: actionType,
+          action: actionKey,
           correct: true,
-          position: position,
+          position: pos,
           points: pts,
           ts: Date.now()
         });
 
-        const playerScoreRef = rootRef.child("players").child(playerId).child("score");
-        playerScoreRef.transaction(cur => (cur || 0) + pts);
+        const scoreRef = rootRef.child("players").child(playerId).child("score");
+        scoreRef.transaction(cur => (cur || 0) + pts);
 
-        questionInfo.textContent =
-          "Doğru yaklaşımdı. Bu soruda sıralamadaki yerin: " + position +
-          ". Aldığın puan: " + pts + ".";
-        questionInfo.className = "feedback ok";
+        answerStatus.textContent = "Doğru yaklaşım. Sıra: " + pos + " • Puan: " + pts;
+        answerStatus.className   = "feedback ok";
+        openExplanationModal(true, c);
       });
     }
 
-    defibBtn.addEventListener("click", () => sendAnswer("defib"));
-    cardioBtn.addEventListener("click", () => sendAnswer("cardioversion"));
-    noShockBtn.addEventListener("click", () => sendAnswer("no-shock"));
+    btnShock.addEventListener("click",      ()=>sendAction("shock"));
+    btnNoShock.addEventListener("click",    ()=>sendAction("noShock"));
+    btnCardio.addEventListener("click",     ()=>sendAction("cardioversion"));
 
-    // localStorage'dan geldiysen skor listener'ı bağla
-    if (playerId) attachScoreListener();
-    else {
-      // join sonrası bağlanacak
-      rootRef.child("players").once("value", () => {});
+    function joinSession(){
+      const nick = nicknameInput.value.trim();
+      if(!nick){
+        joinFeedback.textContent = "Nick zorunlu.";
+        return;
+      }
+      nickname = nick;
+      if(!playerId){
+        playerId = "p_" + Math.random().toString(36).substr(2,9);
+      }
+      const playerRef = rootRef.child("players").child(playerId);
+      playerRef.update({ nickname:nickname, score:0 });
+
+      if(sessionToken){
+        localStorage.setItem("defiSimSessionToken", String(sessionToken));
+      }else{
+        localStorage.removeItem("defiSimSessionToken");
+      }
+      localStorage.setItem("defiSimPlayerId", playerId);
+      localStorage.setItem("defiSimNickname", nickname);
+
+      joinCard.style.display = "none";
+      simCard.style.display  = "block";
+      joinFeedback.textContent = "";
+      answerStatus.textContent = "Eğitmen ritmi açtığında karar verebileceksin.";
+
+      attachScoreListener();
+      renderCase();
+      updateButtonsState();
+    }
+    joinBtn.addEventListener("click", joinSession);
+    nicknameInput.addEventListener("keydown", e=>{ if(e.key==="Enter") joinSession(); });
+
+    function tryAutoJoin(){
+      if(!sessionToken || triedAutoJoin) return;
+      triedAutoJoin = true;
+
+      const storedSession = localStorage.getItem("defiSimSessionToken");
+      const storedId      = localStorage.getItem("defiSimPlayerId");
+      const storedNick    = localStorage.getItem("defiSimNickname");
+
+      if(storedId && storedNick && storedNick.trim() && storedNick!=="Anonim" &&
+         storedSession && String(storedSession)===String(sessionToken)){
+        playerId = storedId;
+        nickname = storedNick;
+        joinCard.style.display = "none";
+        simCard.style.display  = "block";
+        answerStatus.textContent = "Eğitmen ritmi açtığında karar verebileceksin.";
+        attachScoreListener();
+        renderCase();
+        updateButtonsState();
+      }else{
+        joinCard.style.display = "block";
+        simCard.style.display  = "none";
+      }
     }
 
-    // Join sonrası skor listener'ı bağlamak için küçük gecikme
-    joinBtn.addEventListener("click", () => {
-      setTimeout(attachScoreListener, 500);
-    });
+    function handleSessionTokenChange(newToken){
+      if(!newToken){
+        sessionToken = null;
+        return;
+      }
+      if(sessionToken && sessionToken!==newToken){
+        // Oturum resetlenmiş: tamamen temizle
+        playerId = null;
+        nickname = null;
+        answeredCases = {};
+        shownExplanation = {};
+        stopTimer();
+        timerLabel.textContent = "Süre: –";
+        myScoreEl.textContent  = "0";
+
+        localStorage.removeItem("defiSimPlayerId");
+        localStorage.removeItem("defiSimNickname");
+        localStorage.removeItem("defiSimSessionToken");
+
+        joinCard.style.display = "block";
+        simCard.style.display  = "none";
+        joinFeedback.textContent = "Oturum yenilendi, yeniden katıl.";
+      }
+      sessionToken = newToken;
+      tryAutoJoin();
+    }
+
+    function attachDbListeners(){
+      rootRef.child("sessionToken").on("value",snap=>{
+        const val = snap.val();
+        if(val) handleSessionTokenChange(val);
+      });
+
+      rootRef.child("currentCaseIndex").on("value",snap=>{
+        const idx = snap.val();
+        if(idx === null || idx === undefined) return;
+        currentCaseIndex = idx;
+        renderCase();
+      });
+
+      rootRef.child("currentCaseId").on("value",snap=>{
+        const newId = snap.val();
+        if(newId !== currentCaseId){
+          currentCaseId = newId;
+          stopTimer();
+          timerLabel.textContent = currentCaseId ? "Süre: –" : "Süre: –";
+          renderCase();
+        }
+      });
+
+      rootRef.child("currentRhythmActive").on("value",snap=>{
+        currentRhythmActive = !!snap.val();
+        if(currentRhythmActive){
+          startTimerForCurrent();
+          if(currentCaseId && !answeredCases[currentCaseId]){
+            answerStatus.textContent = "5–10 sn içinde karar ver.";
+          }
+        }else{
+          stopTimer();
+          if(currentCaseId && !answeredCases[currentCaseId]){
+            timerLabel.textContent = "Süre: 0 sn";
+            answerStatus.textContent = "Süre bitti; bu olguyu artık yanıtlayamazsın.";
+          }
+        }
+        renderCase();
+        updateButtonsState();
+      });
+
+      rootRef.child("currentReveal").on("value",snap=>{
+        const prev = currentReveal;
+        currentReveal = !!snap.val();
+        updateButtonsState();
+
+        // Eğitmen "Doğru yaklaşımı göster"e bastığında,
+        // açıklamayı henüz görmemiş olanlara popup aç
+        if(currentReveal && !prev && configLoaded && currentCaseIndex!=null){
+          const c = safeCase(currentCaseIndex);
+          if(c) openExplanationModal(false, c);
+        }
+      });
+    }
+
+    async function loadConfig(){
+      try{
+        const res = await fetch(CONFIG_URL,{cache:"no-store"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        CONFIG = await res.json();
+        CASES  = (CONFIG.cases || []).slice();
+        configLoaded = true;
+        attachDbListeners();
+      }catch(e){
+        console.error(e);
+        caseTitleEl.textContent = "Config yüklenemedi";
+        caseNarrEl.textContent  = "defi-als-config.json dosyasını aynı klasöre koyduğundan emin ol.";
+      }
+    }
+
+    loadConfig();
   </script>
 </body>
 </html>

@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defi Quiz – Eğitmen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+
+  <!-- QRCode -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --border:#1f2937;
+      --accent:#f97373;
+      --danger:#ef4444;
+      --text:#e5e7eb;
+      --muted:#9ca3af;
+      --heading:#fef2f2;
+      --radius-lg:20px;
+      --radius-pill:999px;
+    }
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      padding:10px;
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      color:var(--text);
+      font-size:15px;
+    }
+    .app{max-width:1200px;margin:0 auto;}
+
+    .top-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+    }
+    .brand{
+      font-size:1.05rem;
+      font-weight:800;
+      letter-spacing:.06em;
+      text-transform:uppercase;
+      color:var(--heading);
+    }
+    .top-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border-radius:var(--radius-pill);
+      border:1px solid var(--border);
+      padding:4px 10px;
+      font-size:0.78rem;
+      color:var(--muted);
+      background:rgba(15,23,42,0.97);
+    }
+    .dot-live{
+      width:9px;height:9px;border-radius:999px;
+      background:var(--danger);
+      box-shadow:0 0 12px rgba(239,68,68,0.9);
+    }
+    .small{font-size:0.78rem;}
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
+      gap:10px;
+    }
+    @media(max-width:900px){
+      .layout{grid-template-columns:minmax(0,1fr);}
+    }
+
+    .card{
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border);
+      background:var(--card);
+      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
+      pointer-events:none;
+    }
+    .card-inner{position:relative;z-index:1;}
+
+    .section-title{
+      font-size:0.9rem;
+      color:var(--muted);
+      margin-bottom:4px;
+      text-transform:uppercase;
+      letter-spacing:.08em;
+    }
+    .question-title{
+      font-size:1rem;
+      font-weight:600;
+      color:var(--heading);
+      margin-bottom:4px;
+    }
+    .question-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+      margin-bottom:6px;
+    }
+
+    .progress-wrap{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:8px;
+      margin-bottom:6px;
+    }
+    .progress-label{
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+    .progress-track{
+      flex:1;
+      height:4px;
+      border-radius:999px;
+      background:#0f172a;
+      overflow:hidden;
+    }
+    .progress-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#f97373,#facc15);
+      transition:width .3s ease-out;
+    }
+
+    .option-list{
+      margin-top:4px;
+    }
+    .option-row{
+      border-radius:14px;
+      border:1px solid #1f2937;
+      background:rgba(15,23,42,0.96);
+      padding:6px 8px;
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:8px;
+      font-size:0.9rem;
+      margin-bottom:4px;
+    }
+    .option-label{
+      display:flex;
+      gap:6px;
+      align-items:flex-start;
+    }
+    .option-badge{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:1px solid #4b5563;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:0.78rem;
+      color:var(--muted);
+      flex-shrink:0;
+    }
+    .option-text{
+      color:var(--text);
+    }
+    .option-row.correct{
+      border-color:#22c55e;
+      box-shadow:0 0 0 1px rgba(34,197,94,0.6);
+    }
+    .option-row.correct .option-badge{
+      border-color:#22c55e;
+      color:#22c55e;
+    }
+
+    .timer-status-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:6px;
+      gap:6px;
+    }
+    .timer-pill{
+      border-radius:var(--radius-pill);
+      border:1px solid #52525b;
+      font-size:0.8rem;
+      padding:3px 10px;
+      color:#fbbf24;
+      font-variant-numeric:tabular-nums;
+    }
+
+    .meta-line{
+      font-size:0.8rem;
+      color:var(--muted);
+    }
+
+    .btn-row{
+      margin-top:8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:6px;
+    }
+    .btn{
+      border-radius:var(--radius-pill);
+      border:1px solid #374151;
+      background:rgba(15,23,42,0.97);
+      color:var(--text);
+      font-size:0.82rem;
+      font-weight:600;
+      padding:6px 10px;
+      display:inline-flex;
+      gap:6px;
+      align-items:center;
+      cursor:pointer;
+      transition:all .15s ease-out;
+    }
+    .btn-main{
+      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      border:none;
+      color:#fef2f2;
+      box-shadow:0 10px 24px rgba(239,68,68,0.7);
+    }
+    .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
+    .btn-danger{color:var(--danger);border-color:#4b5563;}
+
+    .score-list{
+      margin-top:6px;
+      font-size:0.86rem;
+      max-height:260px;
+      overflow-y:auto;
+    }
+    .score-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:3px 0;
+      border-bottom:1px dashed #1f2937;
+    }
+    .score-row span:first-child{
+      max-width:160px;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
+    }
+
+    .qr-box{
+      margin-top:6px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      align-items:center;
+    }
+    .qr-frame{
+      width:140px;
+      height:140px;
+      background:#f9fafb;
+      border-radius:16px;
+      border:2px solid #111827;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      box-shadow:0 10px 24px rgba(15,23,42,0.9);
+    }
+    #qrcodeQuiz{
+      width:120px;
+      height:120px;
+    }
+    .qr-text{
+      font-size:0.8rem;
+      color:var(--muted);
+      flex:1 1 120px;
+      word-wrap:break-word;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="top-bar">
+      <div class="brand">Defi Quiz – Eğitmen</div>
+      <div class="top-pill">
+        <span class="dot-live"></span>
+        <span>Defibrilasyon / KV Quiz</span>
+        <span id="sessionLabel" class="small"></span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- SOL: Soru -->
+      <section class="card">
+        <div class="card-inner">
+          <div class="section-title">Soru</div>
+
+          <div class="progress-wrap">
+            <div class="progress-label" id="progressLabel">Soru – / –</div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progressFill"></div>
+            </div>
+          </div>
+
+          <div class="question-title" id="questionTitle">Soru başlığı</div>
+          <div class="question-body" id="questionStem">
+            Config yükleniyor (defi-quiz-config.json)…
+          </div>
+
+          <div id="optionsList" class="option-list"></div>
+
+          <div class="timer-status-row">
+            <span class="timer-pill" id="timerLabel">Süre: –</span>
+            <span class="meta-line" id="statusLine">
+              Soruyu kısaca tanıt; hazır olduğunda "Soruyu başlat" ile süreyi aç.
+            </span>
+          </div>
+
+          <div class="btn-row">
+            <button id="btnPrev" class="btn">⟵ Önceki soru</button>
+            <button id="btnNext" class="btn">Sonraki soru ⟶</button>
+            <button id="btnStart" class="btn btn-main">▶ Soruyu başlat</button>
+            <button id="btnReveal" class="btn">✅ Doğru yanıtı göster</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- SAĞ: QR + skor -->
+      <aside class="card">
+        <div class="card-inner">
+          <div class="section-title">Katılımcılar & QR</div>
+
+          <div class="qr-box">
+            <div class="qr-frame">
+              <div id="qrcodeQuiz"></div>
+            </div>
+            <div class="qr-text">
+              Katılımcılar bu QR’ı okutup <strong>Defi Quiz</strong> katılımcı sayfasına bağlanır.
+              <br/><br/>
+              Kısa URL:<br/>
+              <span id="playerUrlText" class="small"></span>
+            </div>
+          </div>
+
+          <div class="meta-line" style="margin-top:8px;">
+            Toplam katılımcı: <span id="playerCount">0</span>
+          </div>
+
+          <div class="section-title" style="margin-top:8px;">Skor Tablosu</div>
+          <div id="scoreList" class="score-list"></div>
+
+          <div class="btn-row" style="margin-top:8px;">
+            <button id="btnResetSession" class="btn btn-danger small">
+              🔁 Oturumu sıfırla
+            </button>
+          </div>
+          <div class="meta-line small">
+            Oturumu sıfırladığında: tüm skorlar, yanıtlar ve eski nickler silinir.
+            QR aynı kalır; herkes yeniden nickname girer.
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyDzzwE5VHZAiP2k8P_iocDaq7uGm1zN1cE",
+      authDomain: "defi-quiz.firebaseapp.com",
+      databaseURL: "https://defi-quiz-default-rtdb.europe-west1.firebasedatabase.app",
+      projectId: "defi-quiz",
+      storageBucket: "defi-quiz.firebasestorage.app",
+      messagingSenderId: "642741899462",
+      appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
+      measurementId: "G-SY348RPCVZ"
+    };
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+    }
+    const db      = firebase.database();
+    const rootRef = db.ref("defiQuiz");
+
+    const CONFIG_URL = "defi-quiz-config.json";
+
+    let CONFIG       = null;
+    let QUESTIONS    = [];
+    let TOTAL_Q      = 0;
+    let configLoaded = false;
+
+    let sessionToken      = null;
+    let currentIndex      = 0;
+    let currentQuestionId = null;
+    let questionActive    = false;
+    let reveal            = false;
+
+    let timerInterval = null;
+    let timerRemaining = 0;
+
+    // DOM
+    const questionTitleEl = document.getElementById("questionTitle");
+    const questionStemEl  = document.getElementById("questionStem");
+    const optionsListEl   = document.getElementById("optionsList");
+    const timerLabel      = document.getElementById("timerLabel");
+    const statusLine      = document.getElementById("statusLine");
+
+    const btnPrev         = document.getElementById("btnPrev");
+    const btnNext         = document.getElementById("btnNext");
+    const btnStart        = document.getElementById("btnStart");
+    const btnReveal       = document.getElementById("btnReveal");
+    const btnReset        = document.getElementById("btnResetSession");
+
+    const sessionLabel    = document.getElementById("sessionLabel");
+    const playerCountEl   = document.getElementById("playerCount");
+    const scoreListEl     = document.getElementById("scoreList");
+    const playerUrlText   = document.getElementById("playerUrlText");
+
+    const progressLabel   = document.getElementById("progressLabel");
+    const progressFill    = document.getElementById("progressFill");
+
+    function safeQuestion(idx){
+      if(!QUESTIONS.length) return null;
+      if(idx<0) idx=0;
+      if(idx>=QUESTIONS.length) idx=QUESTIONS.length-1;
+      return QUESTIONS[idx];
+    }
+
+    function stopTimer(){
+      if(timerInterval){
+        clearInterval(timerInterval);
+        timerInterval=null;
+      }
+    }
+
+    function startTimerForCurrent(){
+      stopTimer();
+      const q = safeQuestion(currentIndex);
+      if(!q){
+        timerLabel.textContent="Süre: –";
+        return;
+      }
+      timerRemaining = q.timeLimitSec || 10;
+      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+      timerInterval = setInterval(()=>{
+        timerRemaining -= 1;
+        if(timerRemaining <= 0){
+          stopTimer();
+          timerLabel.textContent="Süre: 0 sn";
+          rootRef.update({ questionActive:false });
+        }else{
+          timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+        }
+      },1000);
+    }
+
+    function updateProgress(){
+      if(!TOTAL_Q || currentIndex==null){
+        progressLabel.textContent = "Soru – / –";
+        progressFill.style.width  = "0%";
+        return;
+      }
+      const idx = currentIndex + 1;
+      progressLabel.textContent = "Soru " + idx + " / " + TOTAL_Q;
+      const pct = Math.max(0, Math.min(1, idx / TOTAL_Q));
+      progressFill.style.width = (pct * 100).toFixed(1) + "%";
+    }
+
+    function renderQuestion(){
+      if(!configLoaded) return;
+      const q = safeQuestion(currentIndex);
+      if(!q){
+        questionTitleEl.textContent = "Soru yok";
+        questionStemEl.textContent  = "";
+        optionsListEl.innerHTML     = "";
+        return;
+      }
+
+      questionTitleEl.textContent = q.title || ("Soru " + (currentIndex+1));
+      questionStemEl.textContent  = q.stem  || "";
+
+      optionsListEl.innerHTML = "";
+      (q.options || []).forEach((opt,idx)=>{
+        const row = document.createElement("div");
+        row.className = "option-row";
+        if(reveal && idx === q.correctIndex){
+          row.classList.add("correct");
+        }
+        const left = document.createElement("div");
+        left.className = "option-label";
+
+        const badge = document.createElement("div");
+        badge.className = "option-badge";
+        badge.textContent = String.fromCharCode(65 + idx);
+
+        const text = document.createElement("div");
+        text.className = "option-text";
+        text.textContent = opt;
+
+        left.appendChild(badge);
+        left.appendChild(text);
+
+        row.appendChild(left);
+        optionsListEl.appendChild(row);
+      });
+
+      if(!currentQuestionId){
+        statusLine.textContent = "Soruyu tanıt; hazır olduğunda 'Soruyu başlat'.";
+      }else if(!questionActive && !reveal){
+        statusLine.textContent = "Bu soru şu anda pasif. Yeni soru ya da aynı soruyu tekrar başlatabilirsin.";
+      }else if(questionActive){
+        statusLine.textContent = "Soru aktif, katılımcılar yanıtlıyor.";
+      }else if(reveal){
+        statusLine.textContent = "Doğru yanıt gösterildi, tartışma modundasın.";
+      }
+
+      updateProgress();
+    }
+
+    function initQR(){
+      try{
+        let href = window.location.href;
+        const playerUrl = href.replace(/defi-quiz-host(\.html)?/,"defi-quiz-player.html");
+        playerUrlText.textContent = playerUrl;
+        const box = document.getElementById("qrcodeQuiz");
+        box.innerHTML = "";
+        new QRCode(box,{
+          text: playerUrl,
+          width:120,
+          height:120
+        });
+      }catch(e){console.error(e);}
+    }
+    initQR();
+
+    // Butonlar
+    btnPrev.addEventListener("click",()=>{
+      if(!configLoaded) return;
+      currentIndex = Math.max(0, currentIndex-1);
+      currentQuestionId = null;
+      questionActive = false;
+      reveal = false;
+      stopTimer();
+      timerRemaining = 0;
+      timerLabel.textContent = "Süre: –";
+      rootRef.update({
+        currentQuestionIndex: currentIndex,
+        currentQuestionId: null,
+        questionActive: false,
+        reveal: false
+      });
+      renderQuestion();
+    });
+
+    btnNext.addEventListener("click",()=>{
+      if(!configLoaded) return;
+      currentIndex = Math.min(TOTAL_Q-1, currentIndex+1);
+      currentQuestionId = null;
+      questionActive = false;
+      reveal = false;
+      stopTimer();
+      timerRemaining = 0;
+      timerLabel.textContent = "Süre: –";
+      rootRef.update({
+        currentQuestionIndex: currentIndex,
+        currentQuestionId: null,
+        questionActive: false,
+        reveal: false
+      });
+      renderQuestion();
+    });
+
+    function startQuestion(){
+      if(!configLoaded) return;
+      const q = safeQuestion(currentIndex);
+      if(!q) return;
+
+      const newId = "q_" + q.id + "_" + Date.now();
+      currentQuestionId = newId;
+      questionActive    = true;
+      reveal            = false;
+
+      stopTimer();
+      startTimerForCurrent();
+
+      const updates = {};
+      updates["currentQuestionIndex"]    = currentIndex;
+      updates["currentQuestionId"]       = currentQuestionId;
+      updates["questionActive"]          = true;
+      updates["reveal"]                  = false;
+      updates["answerOrder/"+currentQuestionId] = 0;
+      updates["answers/"+currentQuestionId]     = null;
+      rootRef.update(updates);
+
+      renderQuestion();
+    }
+    btnStart.addEventListener("click", startQuestion);
+
+    btnReveal.addEventListener("click",()=>{
+      if(!currentQuestionId) return;
+      rootRef.update({ reveal:true, questionActive:false });
+      stopTimer();
+      timerLabel.textContent = "Süre: 0 sn";
+    });
+
+    btnReset.addEventListener("click",()=>{
+      if(!confirm("Tüm skorlar, yanıtlar ve eski nickler silinecek. Emin misin?")) return;
+      stopTimer();
+      const newToken = Date.now();
+      const resetData = {
+        sessionToken:newToken,
+        currentQuestionIndex:0,
+        currentQuestionId:null,
+        questionActive:false,
+        reveal:false,
+        players:null,
+        answers:null,
+        answerOrder:null
+      };
+      rootRef.set(resetData);
+      sessionToken = newToken;
+      sessionLabel.textContent = "#" + String(newToken).slice(-4);
+
+      currentIndex      = 0;
+      currentQuestionId = null;
+      questionActive    = false;
+      reveal            = false;
+      timerRemaining    = 0;
+      timerLabel.textContent = "Süre: –";
+      scoreListEl.innerHTML   = "";
+      playerCountEl.textContent = "0";
+      statusLine.textContent = "Yeni quiz oturumu başlatıldı.";
+      renderQuestion();
+    });
+
+    function attachDbListeners(){
+      rootRef.child("sessionToken").on("value",snap=>{
+        const val = snap.val();
+        if(val){
+          if(sessionToken && sessionToken !== val){
+            stopTimer();
+            timerRemaining = 0;
+            timerLabel.textContent = "Süre: –";
+            currentQuestionId = null;
+            questionActive = false;
+            reveal = false;
+            statusLine.textContent = "Yeni oturum algılandı.";
+          }
+          sessionToken = val;
+          sessionLabel.textContent = "#" + String(val).slice(-4);
+        }
+      });
+
+      rootRef.child("currentQuestionIndex").on("value",snap=>{
+        const idx = snap.val();
+        if(idx === null || idx === undefined) return;
+        currentIndex = idx;
+        renderQuestion();
+      });
+
+      rootRef.child("currentQuestionId").on("value",snap=>{
+        currentQuestionId = snap.val();
+        renderQuestion();
+      });
+
+      rootRef.child("questionActive").on("value",snap=>{
+        questionActive = !!snap.val();
+        if(questionActive){
+          startTimerForCurrent();
+        }else{
+          stopTimer();
+          if(currentQuestionId){
+            timerLabel.textContent = "Süre: 0 sn";
+          }else{
+            timerLabel.textContent = "Süre: –";
+          }
+        }
+        renderQuestion();
+      });
+
+      rootRef.child("reveal").on("value",snap=>{
+        reveal = !!snap.val();
+        renderQuestion();
+      });
+
+      rootRef.child("players").on("value",snap=>{
+        const val = snap.val() || {};
+        const arr = Object.entries(val).map(([id,p])=>({
+          id,
+          nickname: p.nickname || "Anonim",
+          score:    p.score    || 0
+        }));
+        arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
+        playerCountEl.textContent = arr.length;
+        scoreListEl.innerHTML = "";
+        arr.forEach((p,idx)=>{
+          const row  = document.createElement("div");
+          row.className = "score-row";
+          const left  = document.createElement("span");
+          const right = document.createElement("span");
+          left.textContent  = (idx+1)+". "+p.nickname;
+          right.textContent = p.score+" p";
+          row.appendChild(left);
+          row.appendChild(right);
+          scoreListEl.appendChild(row);
+        });
+      });
+    }
+
+    async function loadConfig(){
+      try{
+        const res = await fetch(CONFIG_URL,{cache:"no-store"});
+        if(!res.ok) throw new Error("HTTP "+res.status);
+        CONFIG    = await res.json();
+        QUESTIONS = (CONFIG.questions || []).slice();
+        TOTAL_Q   = QUESTIONS.length;
+        configLoaded = true;
+
+        attachDbListeners();
+        renderQuestion();
+
+        rootRef.child("currentQuestionIndex").once("value",s=>{
+          if(!s.exists()){
+            rootRef.update({ currentQuestionIndex:0 });
+          }
+        });
+        rootRef.child("sessionToken").once("value",snap=>{
+          if(!snap.exists()){
+            const t = Date.now();
+            rootRef.update({ sessionToken:t });
+            sessionToken = t;
+            sessionLabel.textContent = "#" + String(t).slice(-4);
+          }
+        });
+      }catch(e){
+        console.error(e);
+        questionTitleEl.textContent = "Config yüklenemedi";
+        questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koyduğundan emin ol.";
+      }
+    }
+
+    loadConfig();
+  </script>
+</body>
+</html>
