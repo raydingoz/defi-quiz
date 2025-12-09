@@ -232,17 +232,26 @@
       align-items:center;
       gap:6px;
     }
-    .btn.shock{
-      border-color:#b91c1c;
-      box-shadow:0 0 0 1px rgba(239,68,68,0.45);
-    }
-    .btn.noShock{
-      border-color:#6b7280;
-    }
-    .btn.cardioversion{
-      border-color:#0ea5e9;
-      box-shadow:0 0 0 1px rgba(56,189,248,0.35);
-    }
+.btn.shock{
+  background:radial-gradient(circle at top left,#fecaca,#b91c1c);
+  color:#111827;
+  border-color:#ef4444;
+  box-shadow:0 0 24px rgba(248,113,113,0.55);
+}
+
+.btn.noShock{
+  background:linear-gradient(to right,#020617,#111827);
+  color:#e5e7eb;
+  border-color:#6b7280;
+}
+
+.btn.cardioversion{
+  background:radial-gradient(circle at top left,#bae6fd,#0369a1);
+  color:#0f172a;
+  border-color:#38bdf8;
+  box-shadow:0 0 24px rgba(56,189,248,0.5);
+}
+
     .btn[disabled]{opacity:0.5;cursor:default;box-shadow:none;}
     .btn.selected{
       outline:2px solid #22c55e;
@@ -374,19 +383,17 @@
         </div>
 
         <div class="btn-row">
-          <button id="btnShock" class="btn shock">
-            <span class="label">⚡ Şokla</span>
-            <span class="meta-line">VF/pVT algoritması</span>
-          </button>
-          <button id="btnNoShock" class="btn noShock">
-            <span class="label">⏸ Şoklama</span>
-            <span class="meta-line">Asistoli / PEA / sinüs</span>
-          </button>
-          <button id="btnCardio" class="btn cardioversion">
-            <span class="label">❤️ Senkron KV</span>
-            <span class="meta-line">İnstabil SVT / AF / VT (nabız var)</span>
-          </button>
-        </div>
+  <button id="btnShock" class="btn shock">
+    <span class="label">⚡ Defibrilasyon</span>
+  </button>
+  <button id="btnNoShock" class="btn noShock">
+    <span class="label">⏸ Şok Yok</span>
+  </button>
+  <button id="btnCardio" class="btn cardioversion">
+    <span class="label">❤️ Kardiyoversiyon</span>
+  </button>
+</div>
+
 
         <div id="answerStatus" class="feedback">
           Eğitmen ritmi açtığında 5–10 sn içinde karar ver.
