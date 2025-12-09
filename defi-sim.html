@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defibrilasyon Simülatörü – ERC 2025 ALS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #020617;
+      --panel: #020617;
+      --border: #1e293b;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --danger: #f97373;
+      --warning: #fbbf24;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --heading: #f9fafb;
+      --radius-lg: 20px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 16px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .shell {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: 1.4rem;
+      color: var(--heading);
+    }
+
+    p {
+      margin: 4px 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+      background: rgba(15,23,42,0.95);
+    }
+    .badge-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(34,197,94,0.9);
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background: linear-gradient(135deg, #020617 0%, #020617 100%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 12px 14px;
+      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.9);
+      margin-top: 10px;
+    }
+
+    .layout {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    @media (min-width: 768px) {
+      body { padding: 24px; }
+      h1 { font-size: 1.6rem; }
+      .layout {
+        flex-direction: row;
+      }
+      .col-left {
+        flex: 1.5;
+      }
+      .col-right {
+        flex: 1;
+      }
+    }
+
+    /* MONİTÖR */
+
+    .monitor-card {
+      padding: 10px 12px;
+    }
+
+    .monitor-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      color: var(--muted);
+    }
+
+    .monitor-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .monitor-led {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 12px rgba(34,197,94,0.9);
+      animation: led-pulse 1.4s ease-in-out infinite;
+    }
+
+    .monitor-screen {
+      border-radius: 16px;
+      background: #000000;
+      border: 1px solid #0f172a;
+      padding: 8px 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(15,23,42,0.6) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.6) 1px, transparent 1px);
+      background-size: 0.5rem 0.5rem;
+      opacity: 0.5;
+      pointer-events: none;
+    }
+
+    .ekg-line {
+      position: relative;
+      height: 60px;
+      overflow: hidden;
+    }
+
+    .ekg-line::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-repeat: repeat-x;
+      background-size: 200px 60px;
+      animation: ekg-move 1.1s linear infinite;
+      filter: drop-shadow(0 0 6px #22c55e);
+    }
+
+    /* Normal sinus ritmi */
+    .ekg-nsr::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Cpolyline points='0,30 20,30 30,10 32,50 34,30 70,30 80,12 82,52 84,30 120,30 130,10 132,50 134,30 170,30 180,12 182,52 184,30 200,30' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+
+    /* VF benzeri "kaotik" */
+    .ekg-vf::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Cpolyline points='0,30 8,5 16,40 24,10 32,48 40,8 48,45 56,12 64,50 72,6 80,42 88,8 96,40 104,10 112,48 120,12 128,46 136,8 144,42 152,6 160,40 168,12 176,48 184,8 192,42 200,30' fill='none' stroke='%23f97373' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+
+    /* pVT için daha düzenli ama geniş kompleks */
+    .ekg-pvt::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Cpolyline points='0,30 10,10 20,50 30,10 40,50 50,10 60,50 70,10 80,50 90,10 100,50 110,10 120,50 130,10 140,50 150,10 160,50 170,10 180,50 190,10 200,30' fill='none' stroke='%23fb923c' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+
+    /* Asistol – düz çizgi */
+    .ekg-asystole::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Cpolyline points='0,30 200,30' fill='none' stroke='%236b7280' stroke-width='2'/%3E%3C/svg%3E");
+    }
+
+    /* PEA – düşük amplitüde, organizeli */
+    .ekg-pea::after {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='60'%3E%3Cpolyline points='0,32 20,32 30,26 32,36 34,32 70,32 80,27 82,37 84,32 120,32 130,26 132,36 134,32 170,32 180,27 182,37 184,32 200,32' fill='none' stroke='%2393c5fd' stroke-width='1.6' stroke-linejoin='round'/%3E%3C/svg%3E");
+    }
+
+    .monitor-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: var(--muted);
+    }
+
+    .tag {
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+    }
+    .tag-shockable {
+      border-color: #fb923c;
+      color: #fed7aa;
+      background: rgba(251,146,60,0.12);
+    }
+    .tag-nonshock {
+      border-color: #38bdf8;
+      color: #bae6fd;
+      background: rgba(56,189,248,0.12);
+    }
+    .tag-postshock {
+      border-color: #22c55e;
+      color: #bbf7d0;
+      background: rgba(34,197,94,0.18);
+    }
+
+    /* KONTROL PANELİ */
+
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: var(--radius-pill);
+      padding: 12px 14px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease-out;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      outline: none;
+      width: 100%;
+    }
+
+    .btn-main {
+      background: radial-gradient(circle at top left, #fb923c, #f97316);
+      color: #1f2933;
+      box-shadow: 0 14px 28px rgba(248,113,22,0.45);
+    }
+    .btn-main:active {
+      transform: translateY(1px) scale(0.99);
+      box-shadow: 0 8px 16px rgba(248,113,22,0.4);
+    }
+
+    .btn-sec {
+      background: rgba(15,23,42,0.95);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+    .btn-sec:active {
+      transform: translateY(1px);
+    }
+
+    .btn-next {
+      margin-top: 4px;
+      background: rgba(15,23,42,0.95);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      padding: 8px 10px;
+    }
+
+    .btn-small {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+
+    .btn[disabled] {
+      opacity: 0.5;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .scenario-title {
+      font-size: 0.95rem;
+      color: var(--heading);
+      margin-bottom: 4px;
+    }
+
+    .scenario-text {
+      font-size: 0.9rem;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .feedback {
+      margin-top: 6px;
+      font-size: 0.9rem;
+    }
+    .feedback.ok {
+      color: var(--accent);
+    }
+    .feedback.bad {
+      color: var(--danger);
+    }
+    .feedback.info {
+      color: var(--muted);
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+
+    .pill {
+      border-radius: var(--radius-pill);
+      padding: 3px 9px;
+      border: 1px solid var(--border);
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .score-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .progress {
+      margin-top: 6px;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #22c55e, #4ade80);
+      transform-origin: left;
+      transition: width 0.25s ease-out;
+    }
+
+    .hint {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .hint strong {
+      color: #e5e7eb;
+    }
+
+    /* Şok flash overlay */
+
+    .shock-flash {
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.15s ease-out;
+      z-index: 999;
+    }
+
+    /* Animasyonlar */
+
+    @keyframes ekg-move {
+      from { transform: translateX(0); }
+      to { transform: translateX(-200px); }
+    }
+
+    @keyframes led-pulse {
+      0%, 100% { transform: scale(1); opacity: 0.9; }
+      50% { transform: scale(1.3); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+  <div class="shock-flash" id="shockFlash"></div>
+
+  <div class="shell">
+    <div class="top-bar">
+      <div>
+        <h1>Defibrilasyon Simülatörü</h1>
+        <p>ERC 2025 ALS – Şoklanabilir / şoklanamaz ritimlerde karar verme pratiği.</p>
+      </div>
+      <div class="badge">
+        <span class="badge-dot"></span>
+        2025 ALS – Defibrilasyon odaklı
+      </div>
+    </div>
+
+    <div class="layout">
+      <!-- SOL: MONİTÖR -->
+      <div class="col-left">
+        <div class="card monitor-card">
+          <div class="monitor-header">
+            <div class="monitor-label">
+              <span class="monitor-led"></span>
+              <span>Lead II</span>
+            </div>
+            <div>
+              <span id="rhythmLabel">VF</span> •
+              <span id="rateLabel">– bpm</span>
+            </div>
+          </div>
+
+          <div class="monitor-screen">
+            <div class="grid"></div>
+            <div id="ekgLine" class="ekg-line ekg-vf"></div>
+          </div>
+
+          <div class="monitor-footer">
+            <span id="shockabilityTag" class="tag tag-shockable">
+              Şoklanabilir ritim
+            </span>
+            <span id="phaseLabel" class="tag">
+              Tanıklı arrest
+            </span>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="meta-row">
+            <span class="pill score-pill">
+              Skor:
+              <strong id="scoreValue">0</strong> puan
+            </span>
+            <span class="pill">
+              Olgu:
+              <span id="sceneIndex">1</span>/<span id="sceneTotal">1</span>
+            </span>
+          </div>
+          <div class="progress">
+            <div id="progressFill" class="progress-fill"></div>
+          </div>
+          <p class="hint">
+            <strong>İpucu:</strong> VF / pVT → şoklanabilir; asistol / PEA → şok yok, KPR + ilaç.
+          </p>
+        </div>
+      </div>
+
+      <!-- SAĞ: SENARYO & KONTROLLER -->
+      <div class="col-right">
+        <div class="card">
+          <div class="scenario-title" id="scenarioTitle">
+            Olgu 1 – Tanıklı VF arrest
+          </div>
+          <div class="scenario-text" id="scenarioText">
+            Senaryo yükleniyor...
+          </div>
+
+          <div class="controls">
+            <button id="shockBtn" class="btn btn-main">
+              ⚡ ŞOK VER (200 J bifazik)
+            </button>
+            <button id="noShockBtn" class="btn btn-sec">
+              🤚 ŞOK YOK / KPR'ye devam
+            </button>
+            <button id="nextBtn" class="btn btn-next" disabled>
+              Sonraki olguya geç
+            </button>
+          </div>
+
+          <div id="feedback" class="feedback info">
+            Hazırsan ilk olguyu incele ve karar ver.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="scenario-title">Kısa not – ERC 2025 ALS</div>
+          <ul style="padding-left:18px; margin:4px 0; font-size:0.85rem; color:var(--muted);">
+            <li>VF / nabızsız VT: Mümkün olan en kısa sürede defibrilasyon.</li>
+            <li>Her şoktan sonra: 2 dk yüksek kaliteli KPR, ritim kontrolü aralarda.</li>
+            <li>Asistol / PEA: Şok YOK. KPR + adrenalin algoritması.</li>
+            <li>“3’lü şok” yok; ardışık KPR döngüleri ve tekli şoklar var.</li>
+          </ul>
+          <button id="restartBtn" class="btn btn-small btn-sec" style="margin-top:4px;">
+            🔁 Simülasyonu baştan başlat
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Basit defibrilasyon/ALS 2025 odaklı sahne listesi
+    const SCENES = [
+      {
+        id: 1,
+        title: "Olgu 1 – Tanıklı VF arrest",
+        text: "65 yaş, tanıklı kardiyak arrest. Monitörde kaba VF. Defibrilatör hazır, padler yerinde, KPR sürüyor.",
+        rhythm: "VF",
+        rate: "kaotik",
+        shockable: true,
+        phase: "Tanıklı arrest",
+        correctAction: "shock",
+        explanationOk:
+          "VF şoklanabilir ritimdir. ERC 2025 ALS: Mümkün olan en kısa sürede defibrilasyon + hemen ardından 2 dk KPR.",
+        explanationBad:
+          "VF / nabızsız VT'de şok gecikmesi kötü prognozla ilişkilidir. Öncelik defibrilasyondur; 'şok yok' yanlış.",
+      },
+      {
+        id: 2,
+        title: "Olgu 2 – Şok sonrası değerlendirme",
+        text: "Şok sonrası hemen KPR yapıldı, şimdi kısa ritim kontrolündesin. Monitörde organize, dar QRS ritmi ve hasta hareket etmeye başlıyor.",
+        rhythm: "NSR",
+        rate: "80",
+        shockable: false,
+        phase: "Şok sonrası",
+        correctAction: "no-shock",
+        explanationOk:
+          "Organize ritim ve klinik iyileşme var. Tekrar şok verilmez; hemodinami değerlendirilir, ileri yaşam desteği planlanır.",
+        explanationBad:
+          "Organize ritimde, özellikle hasta uyanırken ek şok verilmez. Şok artık indikasyon dışıdır.",
+      },
+      {
+        id: 3,
+        title: "Olgu 3 – Asistol",
+        text: "Hasta bilinci kapalı, palpabl nabız yok. Monitörde düz çizgiye yakın çizgi, gerçek asistol. Tüm derivasyonlar kontrol edilmiş.",
+        rhythm: "asystole",
+        rate: "0",
+        shockable: false,
+        phase: "Şoklanamaz ritim",
+        correctAction: "no-shock",
+        explanationOk:
+          "Asistol şoklanamaz ritimdir. ERC 2025 ALS: KPR, adrenalin ve geri dönüşebilir nedenlerin (4H/4T) yönetimi esastır.",
+        explanationBad:
+          "Asistolde şok önerilmez. 'Şok ver' zaman kaybına ve KPR kesintisine neden olur.",
+      },
+      {
+        id: 4,
+        title: "Olgu 4 – PEA (düşük voltajlı)",
+        text: "Monitörde dar QRS'e benzeyen, düşük amplitüdlü ritim var. Nabız yok, klinik arrest. PEA olarak değerlendiriyorsun.",
+        rhythm: "PEA",
+        rate: "40",
+        shockable: false,
+        phase: "Şoklanamaz ritim",
+        correctAction: "no-shock",
+        explanationOk:
+          "PEA şoklanamaz ritimdir. Tedavi: KPR, adrenalin ve altta yatan nedenlerin (hipovolemi, hipoksi, tamponad, TEP vb.) düzeltilmesi.",
+        explanationBad:
+          "PEA'de defibrilasyon etkili değildir. Şok yerine KPR ve 4H/4T yaklaşımı önceliklidir.",
+      },
+      {
+        id: 5,
+        title: "Olgu 5 – Nabızsız VT",
+        text: "Geniş QRS’li, düzenli ritim; nabız yok. Nabızsız VT olarak değerlendiriyorsun.",
+        rhythm: "pVT",
+        rate: "160",
+        shockable: true,
+        phase: "Şoklanabilir ritim",
+        correctAction: "shock",
+        explanationOk:
+          "Nabızsız VT şoklanabilir ritimdir. Defibrilasyon + 2 dk KPR, uygun zamanda adrenalin ve amiodaron planlanır.",
+        explanationBad:
+          "Nabızsız VT'de şok gecikmesi kaçınılmaz olarak prognozu bozar. 'Şok yok' kararı yanlıştır.",
+      },
+    ];
+
+    const ekgLine = document.getElementById("ekgLine");
+    const rhythmLabel = document.getElementById("rhythmLabel");
+    const rateLabel = document.getElementById("rateLabel");
+    const shockabilityTag = document.getElementById("shockabilityTag");
+    const phaseLabel = document.getElementById("phaseLabel");
+
+    const scenarioTitle = document.getElementById("scenarioTitle");
+    const scenarioText = document.getElementById("scenarioText");
+    const scoreValue = document.getElementById("scoreValue");
+    const sceneIndex = document.getElementById("sceneIndex");
+    const sceneTotal = document.getElementById("sceneTotal");
+    const progressFill = document.getElementById("progressFill");
+    const feedback = document.getElementById("feedback");
+
+    const shockBtn = document.getElementById("shockBtn");
+    const noShockBtn = document.getElementById("noShockBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const restartBtn = document.getElementById("restartBtn");
+    const shockFlash = document.getElementById("shockFlash");
+
+    let currentIndex = 0;
+    let score = 0;
+    let locked = false;
+
+    sceneTotal.textContent = SCENES.length;
+
+    function updateMonitor(scene, fromShockSuccess = false) {
+      // EKG sınıfları
+      ekgLine.className = "ekg-line";
+      if (scene.rhythm === "VF") ekgLine.classList.add("ekg-vf");
+      else if (scene.rhythm === "NSR") ekgLine.classList.add("ekg-nsr");
+      else if (scene.rhythm === "asystole") ekgLine.classList.add("ekg-asystole");
+      else if (scene.rhythm === "PEA") ekgLine.classList.add("ekg-pea");
+      else if (scene.rhythm === "pVT") ekgLine.classList.add("ekg-pvt");
+      else ekgLine.classList.add("ekg-nsr");
+
+      rhythmLabel.textContent = scene.rhythm;
+      rateLabel.textContent = scene.rate ? scene.rate + " bpm" : "– bpm";
+
+      phaseLabel.textContent = scene.phase || "";
+
+      if (scene.rhythm === "VF" || scene.rhythm === "pVT") {
+        shockabilityTag.textContent = "Şoklanabilir ritim";
+        shockabilityTag.className = "tag tag-shockable";
+      } else if (scene.rhythm === "NSR") {
+        shockabilityTag.textContent = "Organize ritim";
+        shockabilityTag.className = "tag tag-postshock";
+      } else {
+        shockabilityTag.textContent = "Şoklanamaz ritim";
+        shockabilityTag.className = "tag tag-nonshock";
+      }
+
+      // Eğer sahne şok sonrası NSR'ye geçtiyse küçük bir not
+      if (fromShockSuccess && scene.rhythm === "NSR") {
+        feedback.textContent = "Ritim organize oldu – başarılı defibrilasyon sonrası görüntü.";
+        feedback.className = "feedback ok";
+      }
+    }
+
+    function renderScene() {
+      const s = SCENES[currentIndex];
+      sceneIndex.textContent = currentIndex + 1;
+      scenarioTitle.textContent = s.title;
+      scenarioText.textContent = s.text;
+
+      const progress = ((currentIndex) / SCENES.length) * 100;
+      progressFill.style.width = progress + "%";
+
+      feedback.textContent = "Ritmi incele ve karar ver: Şok mu, şok yok mu?";
+      feedback.className = "feedback info";
+
+      locked = false;
+      nextBtn.disabled = true;
+
+      updateMonitor(s);
+    }
+
+    function triggerShockFlash() {
+      shockFlash.style.opacity = "1";
+      setTimeout(() => {
+        shockFlash.style.opacity = "0";
+      }, 120);
+    }
+
+    function handleAction(action) {
+      if (locked) return;
+      const s = SCENES[currentIndex];
+      locked = true;
+      nextBtn.disabled = false;
+
+      const isCorrect = action === s.correctAction;
+      let delta = 0;
+
+      if (isCorrect) {
+        delta = 10;
+        score += delta;
+        scoreValue.textContent = score;
+        feedback.textContent = s.explanationOk || "Doğru.";
+        feedback.className = "feedback ok";
+      } else {
+        delta = -5;
+        score += delta;
+        if (score < 0) score = 0;
+        scoreValue.textContent = score;
+        feedback.textContent = s.explanationBad || "Yanlış karar.";
+        feedback.className = "feedback bad";
+      }
+
+      // Şok verildiyse kısa animasyon
+      if (action === "shock") {
+        triggerShockFlash();
+
+        // Şoklanabilir ritimde doğru zamanda şok → NSR animasyonu
+        if (s.shockable && isCorrect) {
+          setTimeout(() => {
+            const pseudoPostShockScene = {
+              ...s,
+              rhythm: "NSR",
+              rate: "80",
+              phase: "Şok sonrası"
+            };
+            updateMonitor(pseudoPostShockScene, true);
+          }, 350);
+        }
+      }
+
+      // Son sahne ise next buton yazısını değiştir
+      if (currentIndex === SCENES.length - 1) {
+        nextBtn.textContent = "Oturumu bitir";
+      } else {
+        nextBtn.textContent = "Sonraki olguya geç";
+      }
+    }
+
+    shockBtn.addEventListener("click", () => handleAction("shock"));
+    noShockBtn.addEventListener("click", () => handleAction("no-shock"));
+
+    nextBtn.addEventListener("click", () => {
+      if (currentIndex < SCENES.length - 1) {
+        currentIndex++;
+        renderScene();
+      } else {
+        // Oturum bitti
+        feedback.textContent =
+          "Simülasyon tamamlandı. Toplam skorun: " + score +
+          " puan. En çok zorlanılan olguları tartışmak için bu ekranı kullanabilirsin.";
+        feedback.className = "feedback ok";
+        progressFill.style.width = "100%";
+        locked = true;
+        nextBtn.disabled = true;
+      }
+    });
+
+    restartBtn.addEventListener("click", () => {
+      currentIndex = 0;
+      score = 0;
+      scoreValue.textContent = score;
+      nextBtn.disabled = true;
+      nextBtn.textContent = "Sonraki olguya geç";
+      renderScene();
+    });
+
+    // Başlangıç
+    renderScene();
+  </script>
+</body>
+</html>
