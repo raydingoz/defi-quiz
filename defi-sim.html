@@ -2,21 +2,20 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defibrilasyon Simülatörü – ERC 2025 ALS</title>
+  <title>Defi Simülatörü</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <style>
     :root {
       --bg: #020617;
       --card: #020617;
-      --border: #1e293b;
+      --border: #1f2937;
       --accent: #22c55e;
       --danger: #f97373;
-      --warning: #fbbf24;
       --text: #e5e7eb;
       --muted: #94a3b8;
       --heading: #f9fafb;
-      --radius-lg: 20px;
+      --radius-lg: 18px;
       --radius-pill: 999px;
     }
 
@@ -24,48 +23,17 @@
 
     body {
       margin: 0;
-      padding: 16px;
+      padding: 8px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont,
         "Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #0f172a 0, #020617 50%, #000 100%);
+      background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
       color: var(--text);
-      font-size: 16px;
+      font-size: 15px;
     }
 
-    .shell {
-      max-width: 960px;
+    .app {
+      max-width: 480px;
       margin: 0 auto;
-    }
-
-    h1 {
-      margin: 0 0 4px;
-      font-size: 1.4rem;
-      color: var(--heading);
-    }
-
-    p {
-      margin: 4px 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      font-size: 0.75rem;
-      color: var(--muted);
-      background: rgba(15,23,42,0.95);
-    }
-    .badge-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 10px rgba(34,197,94,0.9);
     }
 
     .top-bar {
@@ -73,42 +41,51 @@
       justify-content: space-between;
       align-items: center;
       gap: 8px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
+      margin-bottom: 6px;
+    }
+
+    .brand {
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--heading);
+    }
+
+    .pill {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.9);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 10px rgba(34,197,94,0.9);
     }
 
     .card {
-      background: linear-gradient(135deg, #020617 0%, #020617 100%);
+      background: var(--card);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      padding: 12px 14px;
-      box-shadow: 0 18px 35px rgba(15, 23, 42, 0.9);
-      margin-top: 10px;
-    }
-
-    .layout {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    @media (min-width: 768px) {
-      body { padding: 24px; }
-      h1 { font-size: 1.6rem; }
-      .layout { flex-direction: row; }
-      .col-left { flex: 1.5; }
-      .col-right { flex: 1; }
+      padding: 10px 10px;
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.9);
+      margin-top: 8px;
     }
 
     /* MONİTÖR */
-
-    .monitor-card { padding: 10px 12px; }
 
     .monitor-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       margin-bottom: 4px;
       color: var(--muted);
     }
@@ -131,7 +108,7 @@
       border-radius: 16px;
       background: #000000;
       border: 1px solid #0f172a;
-      padding: 8px 10px;
+      padding: 6px 8px;
       position: relative;
       overflow: hidden;
     }
@@ -140,16 +117,16 @@
       position: absolute;
       inset: 0;
       background-image:
-        linear-gradient(rgba(15,23,42,0.6) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(15,23,42,0.6) 1px, transparent 1px);
+        linear-gradient(rgba(15,23,42,0.55) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15,23,42,0.55) 1px, transparent 1px);
       background-size: 0.5rem 0.5rem;
-      opacity: 0.5;
+      opacity: 0.55;
       pointer-events: none;
     }
 
     .ekg-line {
       position: relative;
-      height: 60px;
+      height: 52px;
       overflow: hidden;
     }
 
@@ -164,23 +141,23 @@
       filter: drop-shadow(0 0 6px #22c55e);
     }
 
-    /* Ritim gizli (hazırlık ekranı) */
+    /* Ritim gizli (hazırlık) */
     .ekg-off::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 240,30' fill='none' stroke='%231f2937' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E");
       filter: none;
     }
 
-    /* NSR – detaylı P-QRS-T, birden fazla kompleks */
+    /* NSR */
     .ekg-nsr::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 8,30 12,28 14,32 16,30 22,30 26,26 28,20 30,10 32,40 34,30 40,30 48,30 56,30 60,28 62,32 64,30 70,30 74,26 76,20 78,10 80,40 82,30 88,30 96,30 104,30 108,28 110,32 112,30 118,30 122,26 124,20 126,10 128,40 130,30 136,30 144,30 152,30 156,28 158,32 160,30 166,30 170,26 172,20 174,10 176,40 178,30 184,30 192,30 200,30 204,28 206,32 208,30 214,30 218,26 220,20 222,10 224,40 226,30 232,30 240,30' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* VF – ince dişli, fibrilatuar */
+    /* VF */
     .ekg-vf::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,10 8,42 12,18 16,46 20,12 24,40 28,14 32,46 36,18 40,38 44,20 48,44 52,16 56,40 60,14 64,46 68,18 72,38 76,22 80,44 84,16 88,40 92,12 96,46 100,18 104,38 108,20 112,44 116,16 120,40 124,14 128,48 132,18 136,38 140,22 144,44 148,16 152,40 156,12 160,46 164,18 168,38 172,20 176,44 180,16 184,40 188,14 192,48 196,18 200,38 204,22 208,44 212,16 216,40 220,12 224,46 228,18 232,38 236,20 240,30' fill='none' stroke='%23f97373' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* pVT – düzenli geniş VT */
+    /* pVT */
     .ekg-pvt::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 6,12 12,48 18,12 24,48 30,12 36,48 42,12 48,48 54,12 60,48 66,12 72,48 78,12 84,48 90,12 96,48 102,12 108,48 114,12 120,48 126,12 132,48 138,12 144,48 150,12 156,48 162,12 168,48 174,12 180,48 186,12 192,48 198,12 204,48 210,12 216,48 222,12 228,48 234,12 240,30' fill='none' stroke='%23fb923c' stroke-width='2.1' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
@@ -190,12 +167,12 @@
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,12 8,48 12,8 16,52 20,6 24,50 28,10 32,46 36,14 40,42 44,18 48,38 52,22 56,34 60,26 64,30 68,34 72,38 76,42 80,46 84,48 88,46 92,44 96,40 100,36 104,32 108,30 112,28 116,32 120,36 124,40 128,44 132,48 136,50 140,48 144,44 148,40 152,36 156,32 160,30 164,28 168,26 172,24 176,22 180,20 184,18 188,22 192,26 196,30 200,34 204,38 208,42 212,46 216,48 220,46 224,42 228,38 232,34 236,30 240,30' fill='none' stroke='%23fb7185' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* Düzenli dar kompleks taşikardi (SVT) */
+    /* SVT tipi düzenli taşikardi */
     .ekg-tachy::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,24 6,18 8,30 10,36 12,30 20,30 24,24 26,18 28,30 30,36 32,30 40,30 44,24 46,18 48,30 50,36 52,30 60,30 64,24 66,18 68,30 70,36 72,30 80,30 84,24 86,18 88,30 90,36 92,30 100,30 104,24 106,18 108,30 110,36 112,30 120,30 124,24 126,18 128,30 130,36 132,30 140,30 144,24 146,18 148,30 150,36 152,30 160,30 164,24 166,18 168,30 170,36 172,30 180,30 184,24 186,18 188,30 190,36 192,30 200,30 204,24 206,18 208,30 210,36 212,30 220,30 224,24 226,18 228,30 230,36 232,30 240,30' fill='none' stroke='%23facc15' stroke-width='1.9' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
 
-    /* Hızlı AF – düzensiz */
+    /* Hızlı AF benzeri düzensiz taşikardi */
     .ekg-tachy-irreg::after {
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='60'%3E%3Cpolyline points='0,30 4,26 6,20 8,32 10,28 12,30 18,30 22,22 24,16 26,34 28,30 30,32 36,30 40,24 42,18 44,32 46,28 48,30 54,30 58,20 60,16 62,36 64,30 66,32 72,30 76,26 78,18 80,34 82,30 84,32 90,30 94,22 96,18 98,34 100,30 102,32 108,30 112,24 114,20 116,32 118,28 120,30 126,30 130,22 132,16 134,34 136,30 138,32 144,30 148,26 150,18 152,34 154,30 156,32 162,30 166,24 168,20 170,32 172,28 174,30 180,30 184,22 186,16 188,34 190,30 192,32 198,30 202,26 204,18 206,34 208,30 210,32 216,30 220,24 222,20 224,32 226,28 228,30 234,30 238,22 240,30' fill='none' stroke='%2381a7ff' stroke-width='1.8' stroke-linejoin='round' stroke-linecap='round'/%3E%3C/svg%3E");
     }
@@ -214,7 +191,7 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       margin-top: 4px;
       color: var(--muted);
     }
@@ -231,67 +208,50 @@
       background: rgba(34,197,94,0.18);
     }
 
-    /* KONTROLLER */
+    /* BUTONLAR */
 
     .controls {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 10px;
+      gap: 6px;
+      margin-top: 8px;
     }
 
     .btn {
       border: none;
       border-radius: var(--radius-pill);
-      padding: 12px 14px;
-      font-size: 1rem;
+      padding: 10px 12px;
+      font-size: 0.95rem;
       font-weight: 600;
       cursor: pointer;
       transition: all 0.15s ease-out;
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
+      gap: 6px;
       outline: none;
       width: 100%;
     }
 
     .btn-main {
       background: radial-gradient(circle at top left, #fb923c, #f97316);
-      color: #1f2933;
-      box-shadow: 0 14px 28px rgba(248,113,22,0.45);
+      color: #0b1120;
+      box-shadow: 0 10px 20px rgba(248,113,22,0.55);
     }
     .btn-main:active {
       transform: translateY(1px) scale(0.99);
-      box-shadow: 0 8px 16px rgba(248,113,22,0.4);
     }
 
     .btn-cardio {
       background: radial-gradient(circle at top left, #38bdf8, #0ea5e9);
-      color: #0b1120;
-      box-shadow: 0 14px 28px rgba(56,189,248,0.45);
-    }
-    .btn-cardio:active {
-      transform: translateY(1px) scale(0.99);
-      box-shadow: 0 8px 16px rgba(56,189,248,0.4);
+      color: #020617;
+      box-shadow: 0 10px 20px rgba(56,189,248,0.55);
     }
 
     .btn-sec {
       background: rgba(15,23,42,0.95);
       border: 1px solid var(--border);
       color: var(--muted);
-    }
-    .btn-sec:active {
-      transform: translateY(1px);
-    }
-
-    .btn-next {
-      margin-top: 4px;
-      background: rgba(15,23,42,0.95);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.9rem;
-      padding: 8px 10px;
     }
 
     .btn-small {
@@ -306,48 +266,33 @@
     }
 
     .scenario-title {
-      font-size: 0.95rem;
+      font-size: 0.92rem;
       color: var(--heading);
-      margin-bottom: 4px;
+      margin-bottom: 3px;
     }
 
     .scenario-text {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       color: var(--text);
-      margin-bottom: 4px;
-      max-height: 120px;
+      margin-bottom: 2px;
+      max-height: 90px;
       overflow-y: auto;
     }
 
-    .feedback {
-      margin-top: 6px;
-      font-size: 0.9rem;
+    .helper {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
     }
-    .feedback.ok { color: var(--accent); }
-    .feedback.bad { color: var(--danger); }
-    .feedback.info { color: var(--muted); }
 
     .meta-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 8px;
-      font-size: 0.85rem;
-      margin-top: 4px;
-    }
-
-    .pill {
-      border-radius: var(--radius-pill);
-      padding: 3px 9px;
-      border: 1px solid var(--border);
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-
-    .score-pill {
-      display: inline-flex;
-      align-items: center;
       gap: 6px;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: var(--muted);
     }
 
     .progress {
@@ -369,7 +314,7 @@
       transition: width 0.25s ease-out;
     }
 
-    /* Şok flash overlay */
+    /* Şok flash */
 
     .shock-flash {
       position: fixed;
@@ -378,7 +323,60 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.15s ease-out;
-      z-index: 999;
+      z-index: 900;
+    }
+
+    /* MODAL (Sonuç) */
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 950;
+      padding: 12px;
+    }
+
+    .modal {
+      background: #020617;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 12px 12px 10px;
+      max-width: 420px;
+      width: 100%;
+      box-shadow: 0 18px 40px rgba(0,0,0,0.9);
+      font-size: 0.9rem;
+    }
+
+    .modal-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .modal-title.ok { color: var(--accent); }
+    .modal-title.bad { color: var(--danger); }
+
+    .modal-body {
+      font-size: 0.88rem;
+      color: var(--text);
+      margin-bottom: 8px;
+      max-height: 140px;
+      overflow-y: auto;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .feedback {
+      margin-top: 4px;
+      font-size: 0.8rem;
+      color: var(--muted);
     }
 
     /* Animasyonlar */
@@ -390,56 +388,11 @@
 
     @keyframes led-pulse {
       0%, 100% { transform: scale(1); opacity: 0.9; }
-      50% { transform: scale(1.3); opacity: 1; }
+      50% { transform: scale(1.25); opacity: 1; }
     }
 
-    /* Küçük ekran (S21 vb) optimizasyonu */
-    @media (max-width: 480px) {
-      body {
-        padding: 8px;
-        font-size: 14px;
-      }
-      h1 {
-        font-size: 1.2rem;
-      }
-      .card {
-        padding: 8px 10px;
-        border-radius: 16px;
-        margin-top: 6px;
-      }
-      .monitor-card {
-        padding: 8px 8px;
-      }
-      .monitor-screen {
-        padding: 6px 8px;
-      }
-      .ekg-line {
-        height: 48px;
-      }
-      .scenario-text {
-        font-size: 0.85rem;
-        max-height: 90px;
-      }
-      .btn {
-        padding: 9px 10px;
-        font-size: 0.9rem;
-      }
-      .btn-small {
-        padding: 5px 8px;
-        font-size: 0.78rem;
-      }
-      .meta-row {
-        font-size: 0.8rem;
-      }
-    }
-
-    @media (max-height: 740px) {
-      .layout {
-        gap: 6px;
-      }
-      .card {
-        margin-top: 6px;
-      }
+    /* Daha dar ekran ayarı */
+    @media (max-height: 700px) {
       .scenario-text {
         max-height: 80px;
       }
@@ -449,116 +402,115 @@
 <body>
   <div class="shock-flash" id="shockFlash"></div>
 
-  <div class="shell">
-    <div class="top-bar">
-      <div>
-        <h1>Defibrilasyon Simülatörü</h1>
-        <p>ERC 2025 ALS – ritmi tanı, 5 saniye içinde doğru stratejiyi seç.</p>
+  <!-- MODAL -->
+  <div class="modal-backdrop" id="resultBackdrop">
+    <div class="modal">
+      <div id="modalTitle" class="modal-title">Sonuç</div>
+      <div id="modalBody" class="modal-body">
+        Açıklama buraya gelecek.
       </div>
-      <div class="badge">
-        <span class="badge-dot"></span>
-        Defibrilasyon & kardiyoversiyon odaklı
+      <div class="modal-footer">
+        <button id="modalNextBtn" class="btn btn-small btn-main">Sonraki olgu</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="app">
+    <div class="top-bar">
+      <div class="brand">Defi Simülatörü</div>
+      <div class="pill">
+        <span class="pill-dot"></span>
+        Ritim tanı – 5 sn
       </div>
     </div>
 
-    <div class="layout">
-      <!-- SOL: MONİTÖR -->
-      <div class="col-left">
-        <div class="card monitor-card">
-          <div class="monitor-header">
-            <div class="monitor-label">
-              <span class="monitor-led"></span>
-              <span>Lead II</span>
-            </div>
-            <div>
-              HR: <span id="rateLabel">–</span> •
-              Süre: <span id="timerLabel">—</span> sn
-            </div>
-          </div>
-
-          <div class="monitor-screen">
-            <div class="grid"></div>
-            <div id="ekgLine" class="ekg-line ekg-off"></div>
-          </div>
-
-          <div class="monitor-footer">
-            <span id="phaseLabel" class="tag">Olgu hazırlık</span>
-            <span id="modeHint" class="tag">Ritim gizli – başlatınca gözükecek</span>
-          </div>
+    <!-- MONİTÖR -->
+    <div class="card">
+      <div class="monitor-header">
+        <div class="monitor-label">
+          <span class="monitor-led"></span>
+          <span>Lead II</span>
         </div>
-
-        <div class="card">
-          <div class="meta-row">
-            <span class="pill score-pill">
-              Skor:
-              <strong id="scoreValue">0</strong> puan
-            </span>
-            <span class="pill">
-              Olgu:
-              <span id="sceneIndex">1</span>/<span id="sceneTotal">1</span>
-            </span>
-          </div>
-          <div class="progress">
-            <div id="progressFill" class="progress-fill"></div>
-          </div>
+        <div>
+          HR: <span id="rateLabel">–</span> •
+          Süre: <span id="timerLabel">—</span> sn
         </div>
       </div>
 
-      <!-- SAĞ: SENARYO & KONTROLLER -->
-      <div class="col-right">
-        <div class="card">
-          <div class="scenario-title" id="scenarioTitle">
-            Olgu 1 – Tanıklı VF arrest
-          </div>
-          <div class="scenario-text" id="scenarioText">
-            Senaryo yükleniyor...
-          </div>
+      <div class="monitor-screen">
+        <div class="grid"></div>
+        <div id="ekgLine" class="ekg-line ekg-off"></div>
+      </div>
 
-          <div class="controls">
-            <button id="startBtn" class="btn btn-sec">
-              ▶ Ritmi göster & süreyi başlat
-            </button>
-            <button id="defibBtn" class="btn btn-main" disabled>
-              ⚡ Defibrilasyon (200 J)
-            </button>
-            <button id="cardioBtn" class="btn btn-cardio" disabled>
-              ⚡ Senkron kardiyoversiyon
-            </button>
-            <button id="noShockBtn" class="btn btn-sec" disabled>
-              🤚 Şok yok / KPR / ilaç
-            </button>
-            <button id="nextBtn" class="btn btn-next" disabled>
-              Sonraki olguya geç
-            </button>
-          </div>
+      <div class="monitor-footer">
+        <span id="phaseLabel" class="tag">Olgu hazırlık</span>
+        <span id="modeHint" class="tag">Ritim gizli – başlatınca gözükecek</span>
+      </div>
+    </div>
 
-          <div style="margin-top:8px; font-size:0.8rem; color:var(--muted);">
-            İleri seviye (opsiyonel): Bu olguda hangi ilaç öncelikli?
-          </div>
-          <div class="controls" style="gap:6px; margin-top:4px;">
-            <button id="epiBtn" class="btn btn-small btn-sec">💊 Adrenalin</button>
-            <button id="mgBtn" class="btn btn-small btn-sec">💊 Magnezyum</button>
-            <button id="lidoBtn" class="btn btn-small btn-sec">💊 Lidokain / Amiodaron</button>
-          </div>
-          <div id="medFeedback" class="feedback info" style="font-size:0.8rem;">
-            İlaç seçimi puanı değiştirmez, sadece geri bildirim verir.
-          </div>
+    <!-- SKOR / İLERLEME -->
+    <div class="card">
+      <div class="meta-row">
+        <span class="pill">
+          Skor: <strong id="scoreValue">0</strong> puan
+        </span>
+        <span class="pill">
+          Olgu: <span id="sceneIndex">1</span>/<span id="sceneTotal">1</span>
+        </span>
+      </div>
+      <div class="progress">
+        <div id="progressFill" class="progress-fill"></div>
+      </div>
+    </div>
 
-          <div id="feedback" class="feedback info" style="margin-top:8px;">
-            Olgu metnini oku, hazır olduğunda ritmi başlat.
-          </div>
-        </div>
+    <!-- OLGU & KONTROL -->
+    <div class="card">
+      <div class="scenario-title" id="scenarioTitle">
+        Olgu 1
+      </div>
+      <div class="scenario-text" id="scenarioText">
+        Senaryo yükleniyor...
+      </div>
 
-        <div class="card">
-          <div class="scenario-title">Simülasyonu sıfırla</div>
-          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:6px;">
-            Bu sayfa gerçek hasta yönetiminin yerini tutmaz; 2025 ALS algoritmasını
-            tartışmak için oyunlaştırılmış bir araçtır.
-          </p>
-          <button id="restartBtn" class="btn btn-small btn-sec">
-            🔁 Baştan başlat
-          </button>
-        </div>
+      <div class="controls">
+        <button id="startBtn" class="btn btn-sec">
+          ▶ Ritmi göster & süreyi başlat
+        </button>
+        <button id="defibBtn" class="btn btn-main" disabled>
+          ⚡ Defibrilasyon (200 J)
+        </button>
+        <button id="cardioBtn" class="btn btn-cardio" disabled>
+          ⚡ Senkron kardiyoversiyon
+        </button>
+        <button id="noShockBtn" class="btn btn-sec" disabled>
+          🤚 Şok yok / KPR / ilaç
+        </button>
+      </div>
+
+      <div class="helper">
+        İleri seviye (opsiyonel): Bu olguda hangi ilaç öncelikli?
+      </div>
+      <div class="controls" style="gap:4px; margin-top:4px;">
+        <button id="epiBtn" class="btn btn-small btn-sec">💊 Adrenalin</button>
+        <button id="mgBtn" class="btn btn-small btn-sec">💊 Magnezyum</button>
+        <button id="lidoBtn" class="btn btn-small btn-sec">💊 Lidokain / Amiodaron</button>
+      </div>
+      <div id="medFeedback" class="feedback">
+        İlaç seçimi puanı değiştirmez, sadece geri bildirim verir.
+      </div>
+    </div>
+
+    <!-- RESET -->
+    <div class="card">
+      <div class="scenario-title">Oturumu sıfırla</div>
+      <div class="helper">
+        Bu araç, gerçek hasta yönetiminin yerini tutmaz. ALS algoritmasını tartışmak
+        için oyunlaştırılmış bir simülasyondur.
+      </div>
+      <div class="controls" style="margin-top:6px;">
+        <button id="restartBtn" class="btn btn-small btn-sec">
+          🔁 Baştan başlat
+        </button>
       </div>
     </div>
   </div>
@@ -566,131 +518,140 @@
   <script>
     const TIME_LIMIT_MS = 5000;
 
+    // Olgu metinleri: ritim ipucu yok, paramedik/hemşire sunumu gibi
     const SCENES = [
       {
         id: 1,
-        title: "Olgu 1 – Tanıklı VF arrest",
-        text: "65 yaş, tanıklı kardiyak arrest. Monitörde kaba VF’ye benzer, ince dişli fibrilasyon. KPR başlatılmış, defibrilatör hazır.",
+        title: "Olgu 1 – Ani kollaps",
+        text:
+          "65 yaş erkek, acil serviste triya j sırasında aniden yere yığılıyor. Bilinci kapalı, solunum normal değil, palpabl nabız alınamıyor. Ekip olarak KPR başlatıyorsunuz ve monitöre bağlanıyorsunuz.",
         wave: "vf",
         hr: "—",
-        phase: "Tanıklı arrest",
+        phase: "Resüsitasyon",
         correctAction: "defib",
         convertToNSR: true,
         postHr: "90",
         med: "lido",
         explanationOk:
-          "VF şoklanabilir ritimdir. ERC 2025 ALS: Mümkün olan en kısa sürede defibrilasyon ve hemen ardından 2 dk kesintisiz KPR.",
+          "Ani kollaps, nabızsız hasta ve şoklanabilir ritim varlığı defibrilasyon endikasyonudur. ERC 2025 ALS: Mümkün olan en kısa sürede defibrilasyon, ardından 2 dk kesintisiz KPR.",
         explanationBad:
-          "VF / nabızsız VT’de geciken defibrilasyon kötü prognozla ilişkilidir. Bu tabloda öncelik defibrilasyondur."
+          "Nabızsız, ritmi şoklanabilir bir tabloda geciken veya atlanan defibrilasyon prognozu kötüleştirir. Bu olguda öncelik defibrilasyondur."
       },
       {
         id: 2,
-        title: "Olgu 2 – Şok sonrası ritim kontrolü",
-        text: "İlk şok ve 2 dk KPR sonrası kısa ritim kontrolündesin. Monitörde organize, dar QRS ritmi var; hasta gözünü açıp hareket etmeye başlıyor.",
+        title: "Olgu 2 – Şok sonrası değerlendirme",
+        text:
+          "Aynı hastaya bir şok uygulandı ve 2 dk KPR yapıldı. Şimdi kısa ritim kontrolündesiniz. Monitöre bakarken hasta gözlerini açıyor, komut alıyor ve hareket etmeye başlıyor.",
         wave: "nsr",
         hr: "80",
-        phase: "Şok sonrası ritim kontrolü",
+        phase: "Şok sonrası kontrol",
         correctAction: "no-shock",
         convertToNSR: false,
         med: null,
         explanationOk:
-          "Organize ritim ve klinik iyileşme var. Ek şok verilmez; hemodinamik değerlendirme ve ileri yaşam desteği planlanır.",
+          "Klinik iyileşme ve organize bir dolaşım bulgusu varken ek şok uygulanmaz. Bundan sonra hemodinamik değerlendirme, oksijenlenme ve ileri tedavi planlanır.",
         explanationBad:
-          "Organize ritimde ve hasta toparlarken tekrar defibrilasyon uygulanmaz; bu durumda şok vermek yanlış olur."
+          "Şok sonrası hasta belirgin toparlamışken tekrar defibrilasyon yapmak gereksiz ve zararlı olabilir; odak hemodinamik stabilizasyon olmalıdır."
       },
       {
         id: 3,
-        title: "Olgu 3 – Hemodinamik instabil SVT",
-        text: "35 yaş, çarpıntı, hipotansiyon (TA 70/40), soğuk ekstremiteler. Monitörde düzenli ve dar kompleks taşikardi; nabız alınabiliyor.",
+        title: "Olgu 3 – Genç erişkin, hipotansif taşikardi",
+        text:
+          "35 yaş kadın, çarpıntı ve baş dönmesi şikâyetiyle getiriliyor. TA 70/40 mmHg, soğuk ve soluk, hafif bilinç bulanıklığı var. Nabız çok hızlı ve düzenli hissediliyor.",
         wave: "tachy",
         hr: "190",
-        phase: "Taşikardi (nabız var)",
+        phase: "Nabızlı taşikardi",
         correctAction: "cardioversion",
         convertToNSR: true,
         postHr: "90",
         med: null,
         explanationOk:
-          "Hemodinamik instabil dar QRS SVT'de senkron kardiyoversiyon endikedir. 200 J defibrilasyon modu yerine senkronize şok tercih edilir.",
+          "Hemodinamik olarak instabil, nabızlı taşikardide senkron kardiyoversiyon endikedir. İlaçlarla oyalanmak veya sadece izlemek yerine ritmin elektriksel olarak düzeltilmesi gerekir.",
         explanationBad:
-          "Bu tabloda defibrilasyon modu veya sadece beklemek/ilaçla oyalanmak uygun değildir; hemodinamik instabil taşikardide senkron kardiyoversiyon ilk seçenektir."
+          "Bu klinik tabloda defibrilasyon modu veya sadece farmakolojik yaklaşım yetersiz olabilir; hemodinamik instabil taşikardide senkron kardiyoversiyon ilk seçenektir."
       },
       {
         id: 4,
-        title: "Olgu 4 – Hızlı AF ve hipotansiyon",
-        text: "72 yaş, bilinen AF. Hızlı ventrikül yanıtlı, düzensiz taşikardi; TA 80/50, bilinç bulanık, göğüs ağrısı var. Nabız alınabiliyor.",
+        title: "Olgu 4 – Yaşlı hasta, kronik aritmi öyküsü",
+        text:
+          "72 yaş erkek, uzun süredir düzensiz kalp atımı öyküsü var. Şimdi göğüs ağrısı, nefes darlığı ve sersemlik hissi ile getiriliyor. TA 80/50 mmHg, soğuk terli, nabız çok hızlı ve düzensiz.",
         wave: "tachy-irreg",
         hr: "150",
-        phase: "Taşikardi (nabız var)",
+        phase: "Nabızlı taşikardi",
         correctAction: "cardioversion",
         convertToNSR: true,
         postHr: "90",
         med: null,
         explanationOk:
-          "Hemodinamik instabil AF'de acil senkron kardiyoversiyon endikedir. Sadece ilaçla yavaşlatmaya çalışmak gecikmeye yol açabilir.",
+          "Daha önce aritmi öyküsü olan bu hastada, şu anda belirgin hipotansiyon ve semptom var. Hemodinamik instabil düzensiz taşikardilerde acil senkron kardiyoversiyon endikedir.",
         explanationBad:
-          "Hızlı AF ve hipotansiyonda beklemek veya sadece ilaçla yetinmek uygun değildir; acil senkron kardiyoversiyon gerekir."
+          "Bu durumda sadece hız düşürücü ilaçlarla zaman kaybetmek uygun değildir; klinik instabilite karşısında elektriksel kardiyoversiyon geciktirilmemelidir."
       },
       {
         id: 5,
-        title: "Olgu 5 – Asistol",
-        text: "Hasta yanıtsız, palpabl nabız yok. Monitörde düz çizgiye yakın, gerçek asistol; farklı derivasyonlar kontrol edilmiş.",
+        title: "Olgu 5 – Nabızsız, elektriksel aktivite belirsiz",
+        text:
+          "Acilde yatan bir hastaya çağrılıyorsunuz. Yatağında yanıtsız, normal solumuyor ve palpabl nabız alınamıyor. Ekip KPR başlatıyor, sen monitöre bakarak ritmi yorumluyorsun.",
         wave: "asystole",
         hr: "0",
-        phase: "Arrest ritmi",
+        phase: "Arrest değerlendirme",
         correctAction: "no-shock",
         convertToNSR: false,
         med: "epi",
         explanationOk:
-          "Asistol şoklanamaz ritimdir. KPR, adrenalin ve geri dönüşebilir nedenlerin (4H/4T) düzeltilmesi esastır; defibrilasyon önerilmez.",
+          "Şoklanamaz arrest tablolarında tedavi; yüksek kaliteli KPR, adrenalin uygulaması ve geri dönüşebilir nedenlerin (4H/4T) düzeltilmesidir. Bu durumda defibrilasyon endikasyonu yoktur.",
         explanationBad:
-          "Asistolde şok uygulamak sadece KPR’yi keser ve zaman kaybettirir; ritim şoklanamaz olduğu için defibrilasyon etkili değildir."
+          "Şoklanamaz ritimlerde defibrilasyon sadece KPR'yi keser ve zaman kaybettirir. Bu tabloda şok değil; KPR, adrenalin ve nedenlerin düzeltilmesi ön plandadır."
       },
       {
         id: 6,
-        title: "Olgu 6 – PEA",
-        text: "Monitörde düşük voltajlı, organize bir ritim var; ancak nabız alınamıyor. Klinik olarak arrest tablosu ile uyumlu.",
+        title: "Olgu 6 – Nabız yok, monitörde elektriksel aktivite",
+        text:
+          "İleri yaş bir hasta, serviste ani kötüleşme sonrası acile alınıyor. Monitörde bir ritim görüyorsunuz ancak ne radial ne de femoral nabız palpe edemiyorsunuz. Hasta yanıtsız ve apneik.",
         wave: "pea",
         hr: "40",
-        phase: "Arrest ritmi",
+        phase: "Arrest değerlendirme",
         correctAction: "no-shock",
         convertToNSR: false,
         med: "epi",
         explanationOk:
-          "PEA şoklanamaz ritimdir. Tedavi KPR, adrenalin ve 4H/4T’ye yönelik nedensel yaklaşımdır.",
+          "Bu tablo nabızsız elektriksel aktivite ile uyumludur ve şoklanamaz arrest olarak kabul edilir. Tedavi; KPR, adrenalin ve 4H/4T başta olmak üzere altta yatan nedenlere yönelik yaklaşımdır.",
         explanationBad:
-          "PEA’de defibrilasyon etkin değildir. Şok yerine KPR ve altta yatan nedenlerin düzeltilmesine odaklanılmalıdır."
+          "Elektriksel aktivite görüldüğü için refleks olarak şok vermek isteyebilirsiniz ancak PEA şoklanamaz bir ritimdir. Şok yerine KPR ve nedene yönelik tedavi esastır."
       },
       {
         id: 7,
-        title: "Olgu 7 – Nabızsız VT",
-        text: "Geniş QRS'li, düzenli ritim; palpabl nabız yok. Nabızsız VT olarak değerlendiriyorsun.",
+        title: "Olgu 7 – Geniş kompleks, nabız alınamıyor",
+        text:
+          "50 yaş erkek, göğüs ağrısı hikâyesi sonrası aniden bilincini kaybediyor. Olay yerinde ve acilde nabız alınamıyor. Monitörde hızlı, geniş kompleksli bir elektriksel aktivite görüyorsun.",
         wave: "pvt",
         hr: "160",
-        phase: "Arrest ritmi",
+        phase: "Resüsitasyon",
         correctAction: "defib",
         convertToNSR: true,
         postHr: "90",
         med: "lido",
         explanationOk:
-          "Nabızsız VT şoklanabilir ritimdir. Defibrilasyon + ardından 2 dk KPR, uygun zamanda adrenalin ve amiodaron/lidokain ile yönetilir.",
+          "Nabızsız, geniş kompleksli ve düzenli ritim nabızsız VT ile uyumludur ve şoklanabilir. Defibrilasyon + ardından 2 dk KPR, uygun zamanda adrenalin ve amiodaron/lidokain önerilir.",
         explanationBad:
-          "Nabızsız VT’de defibrilasyondan kaçınmak veya sadece ilaç/KPR ile yetinmek uygun değildir; şok gecikmesi prognozu bozar."
+          "Bu tabloda defibrilasyondan kaçınmak veya sadece KPR/ilaçla yetinmek uygun değildir; nabızsız VT şoklanabilir bir ritimdir ve gecikme prognozu bozar."
       },
       {
         id: 8,
-        title: "Olgu 8 – Torsades de pointes",
-        text: "Uzamış QT öyküsü olan bir hastada, senkronize olmayan polimorfik VT benzeri ritim; amplitüd dalgalanıyor. Nabız alınamıyor.",
+        title: "Olgu 8 – Uzamış QT öykülü hasta, çöküş sonrası",
+        text:
+          "Uzamış QT öyküsü olduğu bilinen bir hasta, göğüs çarpıntısı sonrası ani olarak bilincini kaybediyor. Nabız alınamıyor. Monitörde, şekli zaman içinde değişen hızlı bir ritim görüyorsun.",
         wave: "torsades",
         hr: "220",
-        phase: "Arrest ritmi (torsades)",
+        phase: "Resüsitasyon",
         correctAction: "defib",
         convertToNSR: true,
         postHr: "90",
         med: "mg",
         explanationOk:
-          "Torsades de pointes genellikle uzamış QT zemininde gelişen polimorfik VT’dir. Nabızsız tabloda defibrilasyon + magnezyum replasmanı uygundur.",
+          "Uzamış QT öyküsü olan bu hastada nabızsız, polimorfik VT tablosu torsades de pointes ile uyumludur. Defibrilasyonun yanı sıra magnezyum replasmanı da önemlidir.",
         explanationBad:
-          "Torsades’te magnezyum replasmanı kritik; nabız yoksa defibrilasyon da gerekir. Sadece adrenalin ya da lidokain ile yetinmek doğru değildir."
+          "Torsades’te sadece adrenalin veya lidokainle yetinmek yetersizdir; nabızsız tabloda defibrilasyon + magnezyum tedavisi gerekir."
       }
     ];
 
@@ -706,20 +667,23 @@
     const sceneIndex = document.getElementById("sceneIndex");
     const sceneTotal = document.getElementById("sceneTotal");
     const progressFill = document.getElementById("progressFill");
-    const feedback = document.getElementById("feedback");
     const medFeedback = document.getElementById("medFeedback");
 
     const startBtn = document.getElementById("startBtn");
     const defibBtn = document.getElementById("defibBtn");
     const cardioBtn = document.getElementById("cardioBtn");
     const noShockBtn = document.getElementById("noShockBtn");
-    const nextBtn = document.getElementById("nextBtn");
     const restartBtn = document.getElementById("restartBtn");
     const shockFlash = document.getElementById("shockFlash");
 
     const epiBtn = document.getElementById("epiBtn");
     const mgBtn = document.getElementById("mgBtn");
     const lidoBtn = document.getElementById("lidoBtn");
+
+    const resultBackdrop = document.getElementById("resultBackdrop");
+    const modalTitle = document.getElementById("modalTitle");
+    const modalBody = document.getElementById("modalBody");
+    const modalNextBtn = document.getElementById("modalNextBtn");
 
     let currentIndex = 0;
     let score = 0;
@@ -747,13 +711,12 @@
 
     function updateMonitorActive(scene, fromShockSuccess = false) {
       ekgLine.className = "ekg-line";
-      const wave = scene.wave || "nsr";
-      ekgLine.classList.add("ekg-" + wave);
+      ekgLine.classList.add("ekg-" + (scene.wave || "nsr"));
 
       rateLabel.textContent = scene.hr ? scene.hr : "–";
       phaseLabel.textContent = scene.phase || "";
 
-      if (fromShockSuccess && wave === "nsr") {
+      if (fromShockSuccess && (scene.wave === "nsr" || scene.wave === undefined)) {
         modeHint.textContent = "Ritim organize oldu";
         modeHint.className = "tag tag-postshock";
       } else {
@@ -811,14 +774,11 @@
       const progress = (currentIndex / SCENES.length) * 100;
       progressFill.style.width = progress + "%";
 
-      feedback.textContent = "Olgu metnini oku, hazır olduğunda ritmi başlat.";
-      feedback.className = "feedback info";
       medFeedback.textContent = "İlaç seçimi puanı değiştirmez, sadece geri bildirim verir.";
-      medFeedback.className = "feedback info";
+      medFeedback.className = "feedback";
 
       locked = false;
       hasStarted = false;
-      nextBtn.disabled = true;
       startBtn.disabled = false;
       setAnswerButtonsDisabled(true);
 
@@ -829,23 +789,31 @@
     }
 
     function triggerShockFlash(actionType) {
-      if (actionType === "cardioversion") {
-        shockFlash.style.background = "#e0f2fe";
-      } else {
-        shockFlash.style.background = "#ffffff";
-      }
+      shockFlash.style.background = actionType === "cardioversion" ? "#e0f2fe" : "#ffffff";
       shockFlash.style.opacity = "1";
       setTimeout(() => {
         shockFlash.style.opacity = "0";
       }, 120);
     }
 
+    function openResultModal(isCorrect, text, isLast) {
+      modalTitle.textContent = isCorrect ? "Doğru yaklaşım" : "Yanlış / Eksik yaklaşım";
+      modalTitle.className = "modal-title " + (isCorrect ? "ok" : "bad");
+      modalBody.textContent = text;
+      modalNextBtn.textContent = isLast ? "Oturumu bitir" : "Sonraki olgu";
+      resultBackdrop.style.display = "flex";
+    }
+
+    function closeResultModal() {
+      resultBackdrop.style.display = "none";
+    }
+
     function handleAction(actionType) {
       if (locked || !hasStarted) return;
       const s = SCENES[currentIndex];
       locked = true;
-      nextBtn.disabled = false;
       setAnswerButtonsDisabled(true);
+      startBtn.disabled = true;
       resetTimer();
 
       const isCorrect = actionType === s.correctAction;
@@ -854,14 +822,10 @@
       if (isCorrect) {
         delta = 10;
         score += delta;
-        feedback.textContent = s.explanationOk || "Doğru.";
-        feedback.className = "feedback ok";
       } else {
         delta = -5;
         score += delta;
         if (score < 0) score = 0;
-        feedback.textContent = s.explanationBad || "Yanlış karar.";
-        feedback.className = "feedback bad";
       }
       scoreValue.textContent = score;
 
@@ -870,21 +834,15 @@
 
         if (s.convertToNSR && isCorrect) {
           setTimeout(() => {
-            const postScene = {
-              wave: "nsr",
-              hr: s.postHr || "80",
-              phase: "Şok sonrası"
-            };
+            const postScene = { wave: "nsr", hr: s.postHr || "80", phase: "Şok sonrası" };
             updateMonitorActive(postScene, true);
           }, 350);
         }
       }
 
-      if (currentIndex === SCENES.length - 1) {
-        nextBtn.textContent = "Oturumu bitir";
-      } else {
-        nextBtn.textContent = "Sonraki olguya geç";
-      }
+      const explanation = isCorrect ? (s.explanationOk || "Doğru.") : (s.explanationBad || "Yanlış karar.");
+      const isLast = currentIndex === SCENES.length - 1;
+      openResultModal(isCorrect, explanation, isLast);
     }
 
     function describeActionKey(key) {
@@ -897,15 +855,16 @@
     function handleTimeout() {
       if (locked || !hasStarted) return;
       locked = true;
-      nextBtn.disabled = false;
       setAnswerButtonsDisabled(true);
+      startBtn.disabled = true;
 
       const s = SCENES[currentIndex];
       const correctText = describeActionKey(s.correctAction);
-      feedback.textContent =
-        "Süre doldu. Bu olguda doğru yaklaşım: " + correctText + ". " +
-        (s.explanationOk || "");
-      feedback.className = "feedback bad";
+      const msg =
+        "Süre doldu. Bu olguda doğru yaklaşım: " +
+        correctText + ". " + (s.explanationOk || "");
+      const isLast = currentIndex === SCENES.length - 1;
+      openResultModal(false, msg, isLast);
     }
 
     function medLabel(code) {
@@ -919,20 +878,22 @@
       const s = SCENES[currentIndex];
       if (!s.med) {
         medFeedback.textContent =
-          "Bu olguda asıl kritik olan enerji stratejisi (defibrilasyon / kardiyoversiyon); ilaç seçimi ikincil.";
-        medFeedback.className = "feedback info";
+          "Bu olguda asıl kritik olan enerji stratejisi (defi/kardiyoversiyon); ilaç ikincil sıradadır.";
+        medFeedback.className = "feedback";
         return;
       }
 
       if (choice === s.med) {
         medFeedback.textContent =
           "Bu olguda ilaç açısından en uygun seçenek: " + medLabel(choice) + ".";
-        medFeedback.className = "feedback ok";
+        medFeedback.className = "feedback";
+        medFeedback.style.color = "#22c55e";
       } else {
         medFeedback.textContent =
           "Bu olguda öncelikli ilaç: " + medLabel(s.med) +
-          ". " + medLabel(choice) + " ikinci planda veya farklı bir endikasyonda.";
-        medFeedback.className = "feedback bad";
+          ". " + medLabel(choice) + " ikincil veya farklı endikasyonda düşünülür.";
+        medFeedback.className = "feedback";
+        medFeedback.style.color = "#f97373";
       }
     }
 
@@ -943,8 +904,6 @@
       setAnswerButtonsDisabled(false);
       const s = SCENES[currentIndex];
       updateMonitorActive(s);
-      feedback.textContent = "Ritime bak, 5 sn içinde karar ver.";
-      feedback.className = "feedback info";
       startTimer();
     });
 
@@ -952,22 +911,27 @@
     cardioBtn.addEventListener("click", () => handleAction("cardioversion"));
     noShockBtn.addEventListener("click", () => handleAction("no-shock"));
 
-    nextBtn.addEventListener("click", () => {
+    modalNextBtn.addEventListener("click", () => {
+      closeResultModal();
       if (currentIndex < SCENES.length - 1) {
         currentIndex++;
         renderScene();
       } else {
+        // Oturum bitti
         resetTimer();
         timerLabel.textContent = "—";
-        feedback.textContent =
-          "Simülasyon tamamlandı. Toplam skorun: " + score +
-          " puan. Zorlandığın olguları tartışmak için bu ekranı kullanabilirsin.";
-        feedback.className = "feedback ok";
-        progressFill.style.width = "100%";
-        locked = true;
-        nextBtn.disabled = true;
-        startBtn.disabled = true;
+        phaseLabel.textContent = "Oturum tamamlandı";
+        modeHint.textContent = "Toplam skor: " + score + " puan";
+        modeHint.className = "tag tag-postshock";
         setAnswerButtonsDisabled(true);
+        startBtn.disabled = true;
+      }
+    });
+
+    resultBackdrop.addEventListener("click", (e) => {
+      if (e.target === resultBackdrop) {
+        // backdrop'a tıklayınca, sadece açıklamayı görsün diye kapatmayalım
+        // istersek ileride kapatma eklenir
       }
     });
 
@@ -975,8 +939,6 @@
       currentIndex = 0;
       score = 0;
       scoreValue.textContent = score;
-      nextBtn.disabled = true;
-      nextBtn.textContent = "Sonraki olguya geç";
       renderScene();
     });
 
