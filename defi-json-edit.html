@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Defi ALS JSON Editör</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #050208;
+      --card: #080b15;
+      --border: #27272f;
+      --accent: #f97373;
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --muted: #9ca3af;
+      --heading: #fef2f2;
+      --radius-lg: 16px;
+      --radius-pill: 999px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      padding: 8px;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #7f1d1d 0, #020617 40%, #000 100%);
+      color: var(--text);
+      font-size: 14px;
+    }
+
+    .app {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: minmax(0, 3fr) minmax(0, 2.4fr);
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 10px;
+      box-shadow: 0 14px 26px rgba(15,23,42,0.9);
+      margin-top: 6px;
+    }
+
+    .title-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .brand {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--heading);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .pill {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      padding: 3px 9px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(15,23,42,0.96);
+    }
+
+    .pill-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--danger);
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.95);
+    }
+
+    .section-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: var(--heading);
+      margin: 4px 0 6px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: minmax(0,1fr) minmax(0,1fr);
+      gap: 6px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      margin-bottom: 6px;
+    }
+
+    .field label {
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    input[type="text"],
+    input[type="number"],
+    select,
+    textarea {
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      padding: 6px 8px;
+      font-size: 0.84rem;
+      outline: none;
+    }
+
+    input[type="text"]::placeholder,
+    textarea::placeholder {
+      color: #6b7280;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .btn {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      padding: 6px 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      background: rgba(15,23,42,0.96);
+      color: var(--muted);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.1s ease-out;
+    }
+
+    .btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-main {
+      background: radial-gradient(circle at top left, #f97373, #b91c1c);
+      border: none;
+      color: #fef2f2;
+      box-shadow: 0 10px 22px rgba(239, 68, 68, 0.65);
+    }
+
+    .btn-danger {
+      border-color: #7f1d1d;
+      color: #fecaca;
+      background: rgba(127,29,29,0.4);
+    }
+
+    .btn-sm {
+      padding: 4px 8px;
+      font-size: 0.75rem;
+    }
+
+    .info {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .info strong {
+      color: var(--accent);
+    }
+
+    textarea.code {
+      width: 100%;
+      min-height: 260px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      font-size: 0.8rem;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      font-size: 0.75rem;
+      color: var(--muted);
+      gap: 4px;
+    }
+
+    .badge span.dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .small {
+      font-size: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <!-- SOL: Meta + Olgu formu -->
+    <div>
+      <div class="card">
+        <div class="title-bar">
+          <div class="brand">Defi ALS JSON Editör</div>
+          <div class="pill">
+            <span class="pill-dot"></span>
+            <span id="sceneCounter">15 vaka</span>
+          </div>
+        </div>
+
+        <div class="section-title">Genel ayarlar (meta)</div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Config adı</label>
+            <input type="text" id="metaNameInput" />
+          </div>
+          <div class="field">
+            <label>Versiyon</label>
+            <input type="text" id="metaVersionInput" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Player URL (QR buraya gider)</label>
+            <input type="text" id="metaPlayerUrlInput" />
+          </div>
+          <div class="field">
+            <label>Host URL</label>
+            <input type="text" id="metaHostUrlInput" />
+          </div>
+        </div>
+
+        <div class="section-title">Tema renkleri</div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Arka plan (bg)</label>
+            <input type="text" id="themeBgInput" placeholder="#050208" />
+          </div>
+          <div class="field">
+            <label>Kart (card)</label>
+            <input type="text" id="themeCardInput" placeholder="#080b15" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Sınır (border)</label>
+            <input type="text" id="themeBorderInput" placeholder="#27272f" />
+          </div>
+          <div class="field">
+            <label>Vurgu (accent)</label>
+            <input type="text" id="themeAccentInput" placeholder="#f97373" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Danger</label>
+            <input type="text" id="themeDangerInput" placeholder="#ef4444" />
+          </div>
+          <div class="field">
+            <label>Metin (text)</label>
+            <input type="text" id="themeTextInput" placeholder="#e5e7eb" />
+          </div>
+        </div>
+        <div class="grid-2">
+          <div class="field">
+            <label>Muted</label>
+            <input type="text" id="themeMutedInput" placeholder="#9ca3af" />
+          </div>
+          <div class="field">
+            <label>Başlık (heading)</label>
+            <input type="text" id="themeHeadingInput" placeholder="#fef2f2" />
+          </div>
+        </div>
+
+        <div class="info small">
+          Bu alanları doldurman zorunlu değil; sadece temayı kod tarafında JSON’dan okumak istersen kullanılır.
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title">
+            Olgu düzenleyici
+          </div>
+          <div class="badge">
+            <span class="dot"></span>
+            <span id="currentSceneLabel">Olgu 1 / 15</span>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Olgu ID</label>
+            <input type="number" id="sceneIdInput" min="1" />
+          </div>
+          <div class="field">
+            <label>Kategori</label>
+            <select id="sceneCategoryInput">
+              <option value="adult-als">adult-als</option>
+              <option value="adult-trauma">adult-trauma</option>
+              <option value="pediatric-als">pediatric-als</option>
+              <option value="pediatric-trauma">pediatric-trauma</option>
+              <option value="other">other</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Yaş grubu</label>
+            <select id="sceneAgeGroupInput">
+              <option value="adult">adult</option>
+              <option value="pediatric">pediatric</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Süre limiti (sn)</label>
+            <input type="number" id="sceneTimeLimitInput" min="1" max="60" />
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Başlık</label>
+          <input type="text" id="sceneTitleInput" />
+        </div>
+
+        <div class="field">
+          <label>Olgu metni</label>
+          <textarea id="sceneTextInput"></textarea>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Ritim (wave)</label>
+            <select id="sceneWaveInput">
+              <option value="nsr">nsr (sinüs)</option>
+              <option value="vf">vf</option>
+              <option value="pvt">pvt</option>
+              <option value="torsades">torsades</option>
+              <option value="tachy">tachy</option>
+              <option value="tachy-irreg">tachy-irreg</option>
+              <option value="pea">pea</option>
+              <option value="asystole">asystole</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Doğru aksiyon</label>
+            <select id="sceneCorrectActionInput">
+              <option value="defib">defib (defibrilasyon)</option>
+              <option value="cardioversion">cardioversion</option>
+              <option value="no-shock">no-shock (şok yok)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Faz (phase)</label>
+          <input type="text" id="scenePhaseInput" placeholder="Resüsitasyon, Nabızlı taşikardi, vb." />
+        </div>
+
+        <div class="field">
+          <label>Tag’ler (virgülle ayır)</label>
+          <input type="text" id="sceneTagsInput" placeholder="vf, trauma, pediatric, ..." />
+        </div>
+
+        <div class="btn-row">
+          <button id="prevSceneBtn" class="btn btn-sm">⬅ Önceki olgu</button>
+          <button id="nextSceneBtn" class="btn btn-sm">Sonraki olgu ➡</button>
+          <button id="addSceneBtn" class="btn btn-sm btn-main">＋ Yeni olgu ekle</button>
+          <button id="deleteSceneBtn" class="btn btn-sm btn-danger">🗑 Bu olguyu sil</button>
+        </div>
+
+        <div class="info small">
+          Not: Olgu listesi sıralaması, JSON’daki <strong>scenes</strong> dizisinin sırası ile aynıdır. ID’leri de düzenleyebilirsin; kod tarafında scene.id’ye göre çalıştırmak istersen bu alanı kullanırsın.
+        </div>
+      </div>
+    </div>
+
+    <!-- SAĞ: JSON önizleme + aksiyonlar -->
+    <div>
+      <div class="card">
+        <div class="flex-between">
+          <div class="section-title">JSON önizleme</div>
+          <div class="btn-row">
+            <button id="copyJsonBtn" class="btn btn-sm">📋 JSON’u kopyala</button>
+            <button id="downloadJsonBtn" class="btn btn-sm btn-main">💾 JSON indir</button>
+          </div>
+        </div>
+        <textarea id="jsonOutput" class="code" spellcheck="false"></textarea>
+        <div class="info small">
+          Bu çıktıyı doğrudan projede <strong>config dosyası</strong> olarak kullanabilir, host/player kodunda
+          JSON’dan <code>meta</code> ve <code>scenes</code> okuyabilirsin.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // --- Varsayılan JSON data ---
+    const defaultData = {
+      meta: {
+        version: "1.0.0",
+        name: "Defi-ALS-Workshop",
+        playerUrl: "https://raydingoz.github.io/defi-quiz/defi-sim-player.html",
+        hostUrl: "https://raydingoz.github.io/defi-quiz/defi-sim-host.html",
+        theme: {
+          bg: "#050208",
+          card: "#080b15",
+          border: "#27272f",
+          accent: "#f97373",
+          danger: "#ef4444",
+          text: "#e5e7eb",
+          muted: "#9ca3af",
+          heading: "#fef2f2"
+        }
+      },
+      scenes: [
+        {
+          id: 1,
+          title: "Olgu 1 – Erişkin ani kollaps (OHCA)",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["vf", "ohca", "defibrillation"],
+          text: "58 yaş erkek, evde aniden kollabe oluyor. Olay yerinde yanıtsız, normal solumuyor, nabız alınamıyor. Ekip KPR başlatıyor ve acile getirilir getirilmez monitöre bağlanıyor.",
+          wave: "vf",
+          phase: "Resüsitasyon",
+          correctAction: "defib",
+          timeLimitSec: 6
+        },
+        {
+          id: 2,
+          title: "Olgu 2 – Travma sonrası PEA",
+          category: "adult-trauma",
+          ageGroup: "adult",
+          tags: ["trauma", "pea", "nonshockable"],
+          text: "Yüksekten düşme sonrası 40 yaş erkek acile getiriliyor. Şiddetli göğüs ve batın travması öyküsü var. Monitörde organize elektriksel aktivite görülüyor ancak nabız alınamıyor, hasta apneik ve yanıtsız.",
+          wave: "pea",
+          phase: "Arrest değerlendirme",
+          correctAction: "no-shock",
+          timeLimitSec: 8
+        },
+        {
+          id: 3,
+          title: "Olgu 3 – Hipotansif SVT",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["svt", "unstable", "cardioversion"],
+          text: "32 yaş kadın, çarpıntı ve göğüs ağrısı ile geliyor. TA 70/40 mmHg, soğuk ve terli, bilinç bulanık. Nabız çok hızlı ve düzenli, geniş olmayan QRS kompleksleri var.",
+          wave: "tachy",
+          phase: "Nabızlı taşikardi",
+          correctAction: "cardioversion",
+          timeLimitSec: 7
+        },
+        {
+          id: 4,
+          title: "Olgu 4 – Hızlı AF, hipotansif",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["af", "irregular", "cardioversion"],
+          text: "74 yaş erkek, bilinen atriyal fibrilasyon öyküsü var. Bu kez hızlı çarpıntı, nefes darlığı ve baş dönmesi ile geliyor. TA 80/50 mmHg, nabız düzensiz hızlı.",
+          wave: "tachy-irreg",
+          phase: "Nabızlı taşikardi",
+          correctAction: "cardioversion",
+          timeLimitSec: 7
+        },
+        {
+          id: 5,
+          title: "Olgu 5 – Asistol (travma dışı)",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["asystole", "nonshockable"],
+          text: "Kronik hastalıkları olan 82 yaş kadın, evde yanıtsız bulunuyor. Acilde monitorize edildiğinde düz çizgiye yakın elektriksel aktivite, nabız yok, normal solunum yok.",
+          wave: "asystole",
+          phase: "Arrest değerlendirme",
+          correctAction: "no-shock",
+          timeLimitSec: 6
+        },
+        {
+          id: 6,
+          title: "Olgu 6 – Nabızsız geniş kompleks VT",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["pvt", "shockable", "defibrillation"],
+          text: "50 yaş erkek, şiddetli göğüs ağrısı sonrası acil bekleme alanında yere yığılıyor. Nabız alınamıyor, normal solumuyor. Monitörde hızlı, geniş kompleksli ritim görülüyor.",
+          wave: "pvt",
+          phase: "Resüsitasyon",
+          correctAction: "defib",
+          timeLimitSec: 6
+        },
+        {
+          id: 7,
+          title: "Olgu 7 – Torsades de pointes",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["torsades", "shockable", "magnesium"],
+          text: "Uzamış QT öyküsü olan 45 yaş kadın, senkop sonrası acile getiriliyor. Monitöre alındığında morfolojisi ve amplitüdü dalgalanan hızlı bir ritim görülüyor. Nabız alınamıyor.",
+          wave: "torsades",
+          phase: "Resüsitasyon",
+          correctAction: "defib",
+          timeLimitSec: 7
+        },
+        {
+          id: 8,
+          title: "Olgu 8 – ROSC sonrası ritim kontrolü",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["rosc", "postshock", "nsr"],
+          text: "VF nedeniyle defibrile edilen 60 yaş erkek hastada kısa süre önce ROSC sağladınız. Hasta gözlerini açıyor, komut alıyor. Monitörde düzenli bir ritim izleniyor.",
+          wave: "nsr",
+          phase: "Şok sonrası kontrol",
+          correctAction: "no-shock",
+          timeLimitSec: 6
+        },
+        {
+          id: 9,
+          title: "Olgu 9 – Pediatrik VF (medikal arrest)",
+          category: "pediatric-als",
+          ageGroup: "pediatric",
+          tags: ["pediatric", "vf", "defibrillation"],
+          text: "10 yaş erkek çocuk, spor salonunda egzersiz sırasında aniden kollabe oluyor. Olay yerinde KPR başlatılmış, acile getirildiğinde monitöre bağlandığında kaba titreşimli kaotik bir ritim görülüyor.",
+          wave: "vf",
+          phase: "Pediatrik resüsitasyon",
+          correctAction: "defib",
+          timeLimitSec: 7
+        },
+        {
+          id: 10,
+          title: "Olgu 10 – Pediatrik asfiksi arrest (asistol)",
+          category: "pediatric-als",
+          ageGroup: "pediatric",
+          tags: ["pediatric", "asphyxial", "asystole"],
+          text: "2 yaş kız çocuk, uzun süren solunum sıkıntısı sonrası evde apneik ve yanıtsız bulunuyor. Acilde monitöre bağlandığında düz çizgiye yakın elektriksel aktivite ve nabız yok.",
+          wave: "asystole",
+          phase: "Pediatrik resüsitasyon",
+          correctAction: "no-shock",
+          timeLimitSec: 8
+        },
+        {
+          id: 11,
+          title: "Olgu 11 – Pediatrik SVT, kötü perfüzyon",
+          category: "pediatric-als",
+          ageGroup: "pediatric",
+          tags: ["pediatric", "svt", "cardioversion"],
+          text: "6 yaş erkek çocuk, çarpıntı ve halsizlik ile getiriliyor. TA düşük, kapiller dolum zamanı uzamış, çocuk soluk ve letarjik. Monitörde dar QRS ile çok hızlı düzenli ritim görülüyor.",
+          wave: "tachy",
+          phase: "Pediatrik nabızlı taşikardi",
+          correctAction: "cardioversion",
+          timeLimitSec: 7
+        },
+        {
+          id: 12,
+          title: "Olgu 12 – Pediatrik travma arrest, PEA",
+          category: "pediatric-trauma",
+          ageGroup: "pediatric",
+          tags: ["pediatric", "trauma", "pea"],
+          text: "8 yaş çocuk, araç içi trafik kazası sonrası travmalı olarak acile getiriliyor. Şiddetli göğüs ve batın travması var. Monitörde organize elektriksel aktivite, fakat nabız yok ve çocuk apneik.",
+          wave: "pea",
+          phase: "Pediatrik travma arrest",
+          correctAction: "no-shock",
+          timeLimitSec: 8
+        },
+        {
+          id: 13,
+          title: "Olgu 13 – Pediatrik travma, VF (defi dahil)",
+          category: "pediatric-trauma",
+          ageGroup: "pediatric",
+          tags: ["pediatric", "trauma", "vf", "defibrillation"],
+          text: "12 yaş erkek, elektrik akımına maruziyet sonrası travmalı olarak acile getiriliyor. Kısa süre sonra nabız alınamaz hale geliyor, KPR başlatılıyor. Monitörde kaotik, kaba titreşimli hızlı bir ritim görülüyor.",
+          wave: "vf",
+          phase: "Pediatrik travma resüsitasyonu",
+          correctAction: "defib",
+          timeLimitSec: 7
+        },
+        {
+          id: 14,
+          title: "Olgu 14 – Geniş kompleks taşikardi, nabız var, instabil",
+          category: "adult-als",
+          ageGroup: "adult",
+          tags: ["wide-tachy", "cardioversion"],
+          text: "55 yaş erkek, çarpıntı ve göğüs ağrısı ile acile geliyor. TA 80/50 mmHg, soluk ve terli, bilinç bulanık. Monitörde geniş QRS'li düzenli hızlı ritim görülüyor, nabız palpe edilebiliyor.",
+          wave: "pvt",
+          phase: "Nabızlı geniş kompleks taşikardi",
+          correctAction: "cardioversion",
+          timeLimitSec: 7
+        },
+        {
+          id: 15,
+          title: "Olgu 15 – Travma sonrası sinüs taşikardisi",
+          category: "adult-trauma",
+          ageGroup: "adult",
+          tags: ["trauma", "sinus-tachy", "no-shock"],
+          text: "30 yaş erkek, motosiklet kazası sonrası acile getiriliyor. Bilinci açık ancak ajite, TA 90/60 mmHg, nabız 130/dk, soluk ve soğuk. Monitörde dar QRS'li düzenli ritim, travmaya ve hipovolemiye sekonder sinüs taşikardisi düşünülüyor.",
+          wave: "tachy",
+          phase: "Travma resüsitasyonu",
+          correctAction: "no-shock",
+          timeLimitSec: 8
+        }
+      ]
+    };
+
+    let data = JSON.parse(JSON.stringify(defaultData));
+    let currentSceneIndex = 0;
+
+    // Meta alan referansları
+    const metaNameInput = document.getElementById("metaNameInput");
+    const metaVersionInput = document.getElementById("metaVersionInput");
+    const metaPlayerUrlInput = document.getElementById("metaPlayerUrlInput");
+    const metaHostUrlInput = document.getElementById("metaHostUrlInput");
+
+    const themeBgInput = document.getElementById("themeBgInput");
+    const themeCardInput = document.getElementById("themeCardInput");
+    const themeBorderInput = document.getElementById("themeBorderInput");
+    const themeAccentInput = document.getElementById("themeAccentInput");
+    const themeDangerInput = document.getElementById("themeDangerInput");
+    const themeTextInput = document.getElementById("themeTextInput");
+    const themeMutedInput = document.getElementById("themeMutedInput");
+    const themeHeadingInput = document.getElementById("themeHeadingInput");
+
+    // Scene alan referansları
+    const sceneCounter = document.getElementById("sceneCounter");
+    const currentSceneLabel = document.getElementById("currentSceneLabel");
+
+    const sceneIdInput = document.getElementById("sceneIdInput");
+    const sceneCategoryInput = document.getElementById("sceneCategoryInput");
+    const sceneAgeGroupInput = document.getElementById("sceneAgeGroupInput");
+    const sceneTimeLimitInput = document.getElementById("sceneTimeLimitInput");
+    const sceneTitleInput = document.getElementById("sceneTitleInput");
+    const sceneTextInput = document.getElementById("sceneTextInput");
+    const sceneWaveInput = document.getElementById("sceneWaveInput");
+    const sceneCorrectActionInput = document.getElementById("sceneCorrectActionInput");
+    const scenePhaseInput = document.getElementById("scenePhaseInput");
+    const sceneTagsInput = document.getElementById("sceneTagsInput");
+
+    // Butonlar
+    const prevSceneBtn = document.getElementById("prevSceneBtn");
+    const nextSceneBtn = document.getElementById("nextSceneBtn");
+    const addSceneBtn = document.getElementById("addSceneBtn");
+    const deleteSceneBtn = document.getElementById("deleteSceneBtn");
+    const copyJsonBtn = document.getElementById("copyJsonBtn");
+    const downloadJsonBtn = document.getElementById("downloadJsonBtn");
+
+    const jsonOutput = document.getElementById("jsonOutput");
+
+    function updateMetaForm() {
+      const m = data.meta || {};
+      metaNameInput.value = m.name || "";
+      metaVersionInput.value = m.version || "";
+      metaPlayerUrlInput.value = m.playerUrl || "";
+      metaHostUrlInput.value = m.hostUrl || "";
+
+      const t = m.theme || {};
+      themeBgInput.value = t.bg || "";
+      themeCardInput.value = t.card || "";
+      themeBorderInput.value = t.border || "";
+      themeAccentInput.value = t.accent || "";
+      themeDangerInput.value = t.danger || "";
+      themeTextInput.value = t.text || "";
+      themeMutedInput.value = t.muted || "";
+      themeHeadingInput.value = t.heading || "";
+    }
+
+    function applyMetaFromForm() {
+      if (!data.meta) data.meta = {};
+      const m = data.meta;
+      m.name = metaNameInput.value.trim();
+      m.version = metaVersionInput.value.trim();
+      m.playerUrl = metaPlayerUrlInput.value.trim();
+      m.hostUrl = metaHostUrlInput.value.trim();
+      if (!m.theme) m.theme = {};
+      const t = m.theme;
+      t.bg = themeBgInput.value.trim();
+      t.card = themeCardInput.value.trim();
+      t.border = themeBorderInput.value.trim();
+      t.accent = themeAccentInput.value.trim();
+      t.danger = themeDangerInput.value.trim();
+      t.text = themeTextInput.value.trim();
+      t.muted = themeMutedInput.value.trim();
+      t.heading = themeHeadingInput.value.trim();
+    }
+
+    function updateSceneForm() {
+      const total = data.scenes.length;
+      if (total === 0) {
+        currentSceneLabel.textContent = "Olgu yok";
+        sceneCounter.textContent = "0 vaka";
+        return;
+      }
+      if (currentSceneIndex < 0) currentSceneIndex = 0;
+      if (currentSceneIndex >= total) currentSceneIndex = total - 1;
+
+      const s = data.scenes[currentSceneIndex];
+      currentSceneLabel.textContent = `Olgu ${currentSceneIndex+1} / ${total}`;
+      sceneCounter.textContent = `${total} vaka`;
+
+      sceneIdInput.value = s.id ?? "";
+      sceneCategoryInput.value = s.category || "adult-als";
+      sceneAgeGroupInput.value = s.ageGroup || "adult";
+      sceneTimeLimitInput.value = s.timeLimitSec ?? 6;
+      sceneTitleInput.value = s.title || "";
+      sceneTextInput.value = s.text || "";
+      sceneWaveInput.value = s.wave || "nsr";
+      sceneCorrectActionInput.value = s.correctAction || "no-shock";
+      scenePhaseInput.value = s.phase || "";
+      sceneTagsInput.value = (s.tags || []).join(", ");
+    }
+
+    function applySceneFromForm() {
+      const total = data.scenes.length;
+      if (total === 0) return;
+      const s = data.scenes[currentSceneIndex];
+
+      const idVal = parseInt(sceneIdInput.value, 10);
+      s.id = Number.isFinite(idVal) ? idVal : s.id;
+
+      s.category = sceneCategoryInput.value || "adult-als";
+      s.ageGroup = sceneAgeGroupInput.value || "adult";
+
+      const tl = parseInt(sceneTimeLimitInput.value, 10);
+      s.timeLimitSec = Number.isFinite(tl) ? tl : s.timeLimitSec || 6;
+
+      s.title = sceneTitleInput.value.trim();
+      s.text = sceneTextInput.value.trim();
+      s.wave = sceneWaveInput.value || "nsr";
+      s.correctAction = sceneCorrectActionInput.value || "no-shock";
+      s.phase = scenePhaseInput.value.trim();
+
+      const tags = sceneTagsInput.value
+        .split(",")
+        .map(t => t.trim())
+        .filter(t => t.length > 0);
+      s.tags = tags;
+    }
+
+    function renderJson() {
+      jsonOutput.value = JSON.stringify(data, null, 2);
+    }
+
+    // --- Event bağlama ---
+
+    // Meta inputları
+    [
+      metaNameInput, metaVersionInput, metaPlayerUrlInput, metaHostUrlInput,
+      themeBgInput, themeCardInput, themeBorderInput, themeAccentInput,
+      themeDangerInput, themeTextInput, themeMutedInput, themeHeadingInput
+    ].forEach(el => {
+      el.addEventListener("input", () => {
+        applyMetaFromForm();
+        renderJson();
+      });
+    });
+
+    // Scene inputları
+    [
+      sceneIdInput, sceneCategoryInput, sceneAgeGroupInput, sceneTimeLimitInput,
+      sceneTitleInput, sceneTextInput, sceneWaveInput, sceneCorrectActionInput,
+      scenePhaseInput, sceneTagsInput
+    ].forEach(el => {
+      el.addEventListener("input", () => {
+        applySceneFromForm();
+        renderJson();
+        updateSceneForm(); // ID/tags vs normalize olsun
+      });
+    });
+
+    prevSceneBtn.addEventListener("click", () => {
+      applySceneFromForm();
+      if (currentSceneIndex > 0) currentSceneIndex--;
+      updateSceneForm();
+      renderJson();
+    });
+
+    nextSceneBtn.addEventListener("click", () => {
+      applySceneFromForm();
+      if (currentSceneIndex < data.scenes.length - 1) currentSceneIndex++;
+      updateSceneForm();
+      renderJson();
+    });
+
+    addSceneBtn.addEventListener("click", () => {
+      applySceneFromForm();
+      const newId = (data.scenes[data.scenes.length - 1]?.id || data.scenes.length) + 1;
+      const newScene = {
+        id: newId,
+        title: "Yeni olgu",
+        category: "adult-als",
+        ageGroup: "adult",
+        tags: [],
+        text: "",
+        wave: "nsr",
+        phase: "",
+        correctAction: "no-shock",
+        timeLimitSec: 6
+      };
+      data.scenes.push(newScene);
+      currentSceneIndex = data.scenes.length - 1;
+      updateSceneForm();
+      renderJson();
+    });
+
+    deleteSceneBtn.addEventListener("click", () => {
+      if (data.scenes.length <= 1) {
+        alert("En az 1 olgu kalmalı.");
+        return;
+      }
+      if (!confirm("Bu olguyu silmek istediğine emin misin?")) return;
+      data.scenes.splice(currentSceneIndex, 1);
+      if (currentSceneIndex >= data.scenes.length) {
+        currentSceneIndex = data.scenes.length - 1;
+      }
+      updateSceneForm();
+      renderJson();
+    });
+
+    copyJsonBtn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(jsonOutput.value);
+        alert("JSON panoya kopyalandı.");
+      } catch (e) {
+        alert("Kopyalama başarısız oldu, elle seçip kopyalayabilirsin.");
+      }
+    });
+
+    downloadJsonBtn.addEventListener("click", () => {
+      const blob = new Blob([jsonOutput.value], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = (data.meta?.name || "defi-als-config") + ".json";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+
+    // Başlangıçta formu yükle
+    function init() {
+      updateMetaForm();
+      updateSceneForm();
+      renderJson();
+    }
+    init();
+  </script>
+</body>
+</html>
