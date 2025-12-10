@@ -991,6 +991,9 @@
       height = clamp(h, 30, 400);
       baseline = clamp(b, 0, height);
 
+      setOverlayOffset("x", overlayOffsetX);
+      setOverlayOffset("y", overlayOffsetY);
+
       widthInput.value = width;
       heightInput.value = height;
       baselineInput.value = baseline;
