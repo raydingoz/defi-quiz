@@ -172,6 +172,10 @@
       margin-top: 4px;
     }
 
+    .hint.small {
+      font-size: 0.74rem;
+    }
+
     .hint strong { color: var(--heading); }
 
     select,
@@ -413,6 +417,17 @@
             <input type="range" id="overlayOpacity" min="0" max="100" value="45" />
             <span id="overlayOpacityLabel">45%</span>
           </div>
+          <div class="overlay-slider">
+            <span>Ölçek</span>
+            <input type="range" id="overlayScale" min="50" max="220" value="100" />
+            <span id="overlayScaleLabel">100%</span>
+          </div>
+          <div class="overlay-slider" style="flex-wrap:wrap;">
+            <span>Taşı (px)</span>
+            <label style="display:flex; align-items:center; gap:4px;">X <input type="number" id="overlayOffsetX" value="0" style="width:70px;"></label>
+            <label style="display:flex; align-items:center; gap:4px;">Y <input type="number" id="overlayOffsetY" value="0" style="width:70px;"></label>
+            <button id="overlayResetBtn" class="btn">Sıfırla</button>
+          </div>
           <span id="overlayName" style="color: var(--heading); font-size:0.78rem;"></span>
           <div class="hint small" style="margin:0;">Kendi EKG görselini rehber olarak ekleyip izleyerek çizebilirsin.</div>
         </div>
@@ -523,6 +538,9 @@
     let overlayOpacity = 0.45;
     let overlayVisible = true;
     let overlayFileName = "";
+    let overlayScale = 1;
+    let overlayOffsetX = 0;
+    let overlayOffsetY = 0;
 
     const drawArea = document.getElementById("drawArea");
     const previewArea = document.getElementById("previewArea");
@@ -552,6 +570,11 @@
     const overlayOpacityLbl = document.getElementById("overlayOpacityLabel");
     const overlayToggle     = document.getElementById("overlayToggle");
     const overlayNameLbl    = document.getElementById("overlayName");
+    const overlayScaleInp   = document.getElementById("overlayScale");
+    const overlayScaleLbl   = document.getElementById("overlayScaleLabel");
+    const overlayOffsetXInp = document.getElementById("overlayOffsetX");
+    const overlayOffsetYInp = document.getElementById("overlayOffsetY");
+    const overlayResetBtn   = document.getElementById("overlayResetBtn");
 
     const widthInput = document.getElementById("widthInput");
     const heightInput = document.getElementById("heightInput");
@@ -588,6 +611,27 @@
       overlayOpacity = pct / 100;
       overlayOpacityInp.value = pct;
       overlayOpacityLbl.textContent = `${pct}%`;
+    }
+
+    function setOverlayScale(percent) {
+      const min = Number(overlayScaleInp?.min) || 50;
+      const max = Number(overlayScaleInp?.max) || 220;
+      const pct = clamp(Number(percent) || 100, min, max);
+      overlayScale = pct / 100;
+      overlayScaleInp.value = pct;
+      overlayScaleLbl.textContent = `${pct}%`;
+    }
+
+    function setOverlayOffset(axis, value) {
+      const limit = axis === "x" ? width * 2 : height * 2;
+      const v = clamp(Number(value) || 0, -limit, limit);
+      if (axis === "x") {
+        overlayOffsetX = v;
+        overlayOffsetXInp.value = v;
+      } else {
+        overlayOffsetY = v;
+        overlayOffsetYInp.value = v;
+      }
     }
 
     function ensureRhythmOption(name) {
@@ -800,8 +844,10 @@
       if (overlayDataUrl && overlayVisible) {
         const img = document.createElementNS(ns, "image");
         img.setAttribute("href", overlayDataUrl);
-        img.setAttribute("width", width);
-        img.setAttribute("height", height);
+        img.setAttribute("width", width * overlayScale);
+        img.setAttribute("height", height * overlayScale);
+        img.setAttribute("x", overlayOffsetX);
+        img.setAttribute("y", overlayOffsetY);
         img.setAttribute("opacity", overlayOpacity.toFixed(2));
         drawArea.appendChild(img);
       }
@@ -981,6 +1027,28 @@
       renderAll();
     });
 
+    overlayScaleInp.addEventListener("input", (e) => {
+      setOverlayScale(e.target.value);
+      renderAll();
+    });
+
+    overlayOffsetXInp.addEventListener("input", (e) => {
+      setOverlayOffset("x", e.target.value);
+      renderAll();
+    });
+
+    overlayOffsetYInp.addEventListener("input", (e) => {
+      setOverlayOffset("y", e.target.value);
+      renderAll();
+    });
+
+    overlayResetBtn.addEventListener("click", () => {
+      setOverlayScale(100);
+      setOverlayOffset("x", 0);
+      setOverlayOffset("y", 0);
+      renderAll();
+    });
+
     applySizeBtn.addEventListener("click", () => {
       const w = parseInt(widthInput.value, 10);
       const h = parseInt(heightInput.value, 10);
@@ -1086,6 +1154,9 @@
     // Başlangıç
     defaultRhythms.forEach(ensureRhythmOption);
     setOverlayOpacity(overlayOpacity * 100);
+    setOverlayScale(overlayScale * 100);
+    setOverlayOffset("x", overlayOffsetX);
+    setOverlayOffset("y", overlayOffsetY);
     updateBpmUI(bpmTarget);
     refreshJsonArea();
     renderAll();
