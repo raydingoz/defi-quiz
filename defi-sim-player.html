@@ -100,38 +100,6 @@
       margin-top:2px;
     }
 
-    .cheat-card{
-      margin-top:8px;
-      padding:8px;
-      border-radius:14px;
-      border:1px dashed #374151;
-      background:rgba(15,23,42,0.92);
-    }
-    .cheat-title{
-      font-size:0.82rem;
-      color:var(--heading);
-      font-weight:700;
-      margin-bottom:6px;
-      letter-spacing:.04em;
-    }
-    .cheat-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(120px,1fr));
-      gap:6px;
-    }
-    .cheat-chip{
-      border-radius:var(--radius-pill);
-      border:1px solid #1f2937;
-      padding:6px 10px;
-      background:rgba(15,23,42,0.95);
-      font-size:0.82rem;
-      color:var(--muted);
-      display:flex;
-      justify-content:space-between;
-      gap:6px;
-    }
-    .cheat-chip strong{color:var(--heading);}
-
     .input-row{
       display:flex;
       gap:6px;
@@ -148,6 +116,38 @@
       outline:none;
     }
     input::placeholder{color:var(--muted);}
+
+    .flash-overlay{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background:radial-gradient(circle at center,rgba(250,204,21,0.35),rgba(250,204,21,0.05) 55%,transparent 70%);
+      opacity:0;
+      transform:scale(1);
+      z-index:2000;
+    }
+    .flash-overlay.show{animation:flash-pop .6s ease-out;}
+    @keyframes flash-pop{
+      0%{opacity:0.9;transform:scale(1);} 
+      45%{opacity:0.45;transform:scale(1.05);} 
+      100%{opacity:0;transform:scale(1.02);} 
+    }
+    .btn.shock,.btn.cardioversion{position:relative;overflow:hidden;}
+    .btn.shock::after,.btn.cardioversion::after{
+      content:"";
+      position:absolute;
+      inset:-30%;
+      background:radial-gradient(circle at center,rgba(250,204,21,0.4),transparent 60%);
+      opacity:0;
+      transition:opacity .2s ease-out;
+      pointer-events:none;
+    }
+    .btn.shock-hit::after{opacity:1;animation:shock-button .45s ease-out;}
+    @keyframes shock-button{
+      0%{transform:scale(0.95);box-shadow:0 0 0 0 rgba(250,204,21,0.55);} 
+      50%{transform:scale(1.03);box-shadow:0 0 22px 6px rgba(250,204,21,0.35);} 
+      100%{transform:scale(1);box-shadow:0 0 0 0 rgba(250,204,21,0);} 
+    }
     .btn-join{
       border-radius:var(--radius-pill);
       border:none;
@@ -352,6 +352,7 @@
   </style>
 </head>
 <body>
+  <div id="flashOverlay" class="flash-overlay"></div>
   <div class="app">
     <header class="top-bar">
       <div class="brand">Defi ALS Sim</div>
@@ -381,7 +382,7 @@
       <div class="card-inner">
         <div class="case-title" id="caseTitle">Olgu başlığı</div>
         <div class="case-body" id="caseNarrative">
-          Eğitmen olguyu ve ritmi başlattığında burada göreceksin.
+          Olgu ve ritim açıldığında burada göreceksin.
         </div>
 
         <div class="monitor">
@@ -415,19 +416,6 @@
           </div>
         </div>
 
-        <div class="cheat-card">
-          <div class="cheat-title">Hız kılavuzu (25 mm/sn, düzenli ritimler)</div>
-          <div class="cheat-grid">
-            <div class="cheat-chip"><strong>50 bpm</strong><span>≈30 k kare / 1.2 sn</span></div>
-            <div class="cheat-chip"><strong>60 bpm</strong><span>≈25 k kare / 1.0 sn</span></div>
-            <div class="cheat-chip"><strong>75 bpm</strong><span>≈20 k kare / 0.8 sn</span></div>
-            <div class="cheat-chip"><strong>100 bpm</strong><span>≈15 k kare / 0.6 sn</span></div>
-            <div class="cheat-chip"><strong>120 bpm</strong><span>≈12-13 k kare / 0.5 sn</span></div>
-            <div class="cheat-chip"><strong>150 bpm</strong><span>≈10 k kare / 0.4 sn</span></div>
-            <div class="cheat-chip"><strong>180 bpm</strong><span>≈8-9 k kare / 0.33 sn</span></div>
-          </div>
-        </div>
-
         <div class="btn-row">
   <button id="btnShock" class="btn shock">
     <span class="label">⚡ Defibrilasyon</span>
@@ -442,7 +430,7 @@
 
 
         <div id="answerStatus" class="feedback">
-          Eğitmen ritmi açtığında 5–10 sn içinde karar ver.
+          Ritim açıldığında 5–10 sn içinde karar ver.
         </div>
       </div>
     </section>
@@ -525,6 +513,7 @@
     const ekgPath2      = document.getElementById("ekgPath2");
     const ekgPath3      = document.getElementById("ekgPath3");
     const timerLabel    = document.getElementById("timerLabel");
+    const flashOverlay  = document.getElementById("flashOverlay");
 
     const btnShock      = document.getElementById("btnShock");
     const btnNoShock    = document.getElementById("btnNoShock");
@@ -633,7 +622,7 @@
         answerStatus.textContent = existingSummary.text;
         answerStatus.className   = existingSummary.className;
       }else if(!currentCaseId){
-        answerStatus.textContent = "Eğitmen olguyu ve ritmi başlattığında karar verebileceksin.";
+        answerStatus.textContent = "Olgu ve ritim açıldığında karar verebileceksin.";
       }else if(!currentRhythmActive && !currentReveal){
         answerStatus.textContent = "Ritim kapalı. Yeni olgu için eğitmeni bekle.";
       }else if(currentRhythmActive){
@@ -687,6 +676,21 @@
       if(e.target === exModal) closeExplanationModal();
     });
 
+    function triggerShockFlash(actionKey){
+      if(flashOverlay){
+        flashOverlay.classList.remove("show");
+        void flashOverlay.offsetWidth;
+        flashOverlay.classList.add("show");
+      }
+      const targetBtn = actionKey === "cardioversion" ? btnCardio : btnShock;
+      if(targetBtn){
+        targetBtn.classList.remove("shock-hit");
+        void targetBtn.offsetWidth;
+        targetBtn.classList.add("shock-hit");
+        setTimeout(()=>targetBtn.classList.remove("shock-hit"), 480);
+      }
+    }
+
     function sendAction(actionKey){
       if(!playerId || !configLoaded || currentCaseIndex==null || !currentCaseId) return;
       if(!currentRhythmActive || currentReveal) return;
@@ -702,6 +706,10 @@
       if(actionKey==="shock")        btnShock.classList.add("selected");
       else if(actionKey==="noShock") btnNoShock.classList.add("selected");
       else if(actionKey==="cardioversion") btnCardio.classList.add("selected");
+
+      if(actionKey==="shock" || actionKey==="cardioversion"){
+        triggerShockFlash(actionKey);
+      }
 
       const isCorrect = (actionKey === c.correctAction);
       const caseIdStr = String(currentCaseId);
@@ -784,7 +792,7 @@
       joinCard.style.display = "none";
       simCard.style.display  = "block";
       joinFeedback.textContent = "";
-      answerStatus.textContent = "Eğitmen ritmi açtığında karar verebileceksin.";
+      answerStatus.textContent = "Ritim açıldığında karar verebileceksin.";
 
       attachScoreListener();
       renderCase();
@@ -807,7 +815,7 @@
         nickname = storedNick;
         joinCard.style.display = "none";
         simCard.style.display  = "block";
-        answerStatus.textContent = "Eğitmen ritmi açtığında karar verebileceksin.";
+        answerStatus.textContent = "Ritim açıldığında karar verebileceksin.";
         attachScoreListener();
         renderCase();
         updateButtonsState();
@@ -892,7 +900,7 @@
         currentReveal = !!snap.val();
         updateButtonsState();
 
-        // Eğitmen "Doğru yaklaşımı göster"e bastığında,
+        // Sunucu "Doğru yaklaşımı göster"e bastığında,
         // açıklamayı henüz görmemiş olanlara popup aç
         if(currentReveal && !prev && configLoaded && currentCaseIndex!=null){
           const c = safeCase(currentCaseIndex);

@@ -33,8 +33,10 @@
       margin: 0 auto;
       display: grid;
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      gap: 10px;
+      gap: 12px;
+      align-items: start;
     }
+    .app > div { display:flex; flex-direction:column; gap:10px; }
 
     @media (max-width: 800px) {
       .app {
@@ -455,6 +457,11 @@
         </div>
       </div>
       <div class="card">
+        <div class="code-label">const EKG_SHAPES çıktısı:</div>
+        <textarea id="shapesOutput" spellcheck="false" placeholder='const EKG_SHAPES = { "sinus": "0,30 ..." };' style="min-height: 140px;"></textarea>
+        <div class="hint small">Ritim listesini <code>const EKG_SHAPES</code> olarak kopyalamak için bu alanı kullan.</div>
+      </div>
+      <div class="card">
         <div class="code-label">Sadece <code>&lt;polyline&gt;</code> kısmı:</div>
         <textarea id="polylineOutput" spellcheck="false"></textarea>
       </div>
@@ -472,6 +479,7 @@
     const previewArea = document.getElementById("previewArea");
     const svgOutput = document.getElementById("svgOutput");
     const polylineOutput = document.getElementById("polylineOutput");
+    const shapesOutput = document.getElementById("shapesOutput");
     const rhythmSelect = document.getElementById("rhythmSelect");
     const rhythmName = document.getElementById("rhythmName");
     const jsonArea = document.getElementById("jsonArea");
@@ -566,6 +574,18 @@
         points: data.points
       }));
       jsonArea.value = JSON.stringify(arr, null, 2);
+      refreshShapesOutput();
+    }
+
+    function refreshShapesOutput(){
+      if(!shapesOutput) return;
+      const lines = Object.entries(rhythmStore).map(([name,data])=>{
+        const pts = buildPointsFromData(data)
+          .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
+          .join(" ");
+        return `  "${name}": "${pts}"`;
+      });
+      shapesOutput.value = `const EKG_SHAPES = {\n${lines.join(",\n")}\n};`;
     }
 
     function loadRhythmIntoCanvas(name) {
@@ -610,6 +630,22 @@
       interior.forEach(p => pts.push(p));
       // Sağ kenar
       pts.push({ x: width, y: baseline });
+      return pts;
+    }
+
+    function buildPointsFromData(data){
+      if(!data) return [];
+      const w = Number(data.width) || width;
+      const h = Number(data.height) || height;
+      const b = clamp(Number(data.baseline ?? baseline), 0, h);
+
+      const pts = [{ x:0, y:b }];
+      const interior = Array.isArray(data.points) ? data.points
+        .map(p => ({ x: clamp(Number(p.x) || 0, 0, w), y: clamp(Number(p.y) || 0, 0, h) }))
+        .filter(p => p.x > 0 && p.x < w) : [];
+      interior.sort((a,b)=>a.x-b.x);
+      interior.forEach(p=>pts.push(p));
+      pts.push({ x:w, y:b });
       return pts;
     }
 
