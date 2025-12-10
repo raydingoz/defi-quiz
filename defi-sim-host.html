@@ -194,7 +194,7 @@
       left:0;
       transform:translate3d(0,-50%,0);
       width:1200px;
-      height:85px;
+      height:60px;
       display:flex;
     }
     .ekg-strip svg{
@@ -290,37 +290,26 @@
       white-space:pre-wrap;
     }
 
-    .cheat-card{
+    .reveal-box{
       margin-top:10px;
       padding:10px;
-      border-radius:16px;
+      border-radius:14px;
       border:1px dashed #374151;
-      background:rgba(15,23,42,0.92);
+      background:rgba(15,23,42,0.9);
     }
-    .cheat-title{
-      font-size:1rem;
+    .reveal-title{
+      font-weight:700;
       color:var(--heading);
-      font-weight:800;
-      margin-bottom:8px;
-      letter-spacing:.08em;
-    }
-    .cheat-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:10px;
-    }
-    .cheat-chip{
-      border-radius:var(--radius-pill);
-      border:1px solid #1f2937;
-      padding:10px 14px;
-      background:rgba(15,23,42,0.95);
-      font-size:1rem;
-      color:var(--muted);
+      margin-bottom:4px;
       display:flex;
-      justify-content:space-between;
-      gap:10px;
+      align-items:center;
+      gap:8px;
     }
-    .cheat-chip strong{color:var(--heading);}
+    .reveal-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+    }
 
     .score-list{
       margin-top:10px;

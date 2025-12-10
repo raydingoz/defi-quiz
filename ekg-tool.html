@@ -468,14 +468,6 @@
     let baseline = 30;
     let userPoints = []; // {x, y} kullanıcının eklediği ara noktalar
 
-    const EKG_SHAPES = {
-      "blank": "",
-      "af": "0,30 10,34 14,1 15,58 20,25 22,30 25,26 29,22 32,22 34,27 34,28 38,30 40,35 44,1 45,59 49,26 52,31 55,26 58,25 66,25 72,28 73,29 80,29 82,28 84,30 85,34 88,1 91,56 94,25 95,31 97,31 100,30 105,25 108,25 111,28 113,30 119,30 125,29 127,34 130,58 130,1 135,27 138,30 142,30 149,30 156,30 159,34 163,1 165,58 167,28 169,30 172,31 174,24 178,23 181,27 182,30 185,30 187,34 189,2 191,58 194,27 197,23 200,24 205,28 206,30 209,0 210,58 212,28 214,24 217,23 222,25 226,28 229,29 232,29 238,29 240,30",
-      "asystole": "0,30 3,29 12,28 24,28 36,29 44,31 50,31 57,31 67,30 77,28 87,28 99,30 111,33 116,33 128,30 143,28 153,26 165,25 178,27 188,30 201,31 216,31 228,30 240,30",
-      "sinus": "0,30 14,29 19,25 25,25 27,30 32,31 36,34 40,13 42,45 45,29 51,31 56,26 61,24 69,25 72,30 80,31 88,31 94,26 100,26 101,30 114,30 115,35 120,10 121,44 124,29 128,30 134,26 135,25 141,24 146,26 150,29 150,31 157,30 164,31 170,30 173,30 177,25 181,26 182,30 183,31 189,31 191,35 195,9 195,44 198,30 204,29 209,25 209,25 215,26 220,29 221,31 240,30",
-      "pea": "0,30 23,31 30,30 34,28 36,25 37,21 39,17 40,10 41,5 42,4 47,3 51,9 52,13 53,17 56,22 57,26 58,32 59,37 61,41 62,44 65,46 70,43 73,38 78,29 80,29 85,28 92,29 95,30 240,30",
-    };
-
     const drawArea = document.getElementById("drawArea");
     const previewArea = document.getElementById("previewArea");
     const svgOutput = document.getElementById("svgOutput");
@@ -524,26 +516,6 @@
 
     function clamp(val, min, max) {
       return Math.min(max, Math.max(min, val));
-    }
-
-    function shapeStringToPoints(str) {
-      if (!str) return [];
-      return str.split(/\s+/)
-        .map(pair => pair.split(",").map(Number))
-        .filter(arr => arr.length === 2 && arr.every(Number.isFinite))
-        .map(([x, y]) => ({ x, y }));
-    }
-
-    function seedDefaultsFromShapes() {
-      Object.entries(EKG_SHAPES).forEach(([name, polyline]) => {
-        rhythmStore[name] = {
-          width,
-          height,
-          baseline,
-          points: shapeStringToPoints(polyline)
-        };
-        ensureRhythmOption(name);
-      });
     }
 
     function ensureRhythmOption(name) {
@@ -963,7 +935,6 @@
     });
 
     // Başlangıç
-    seedDefaultsFromShapes();
     defaultRhythms.forEach(ensureRhythmOption);
     updateBpmUI(bpmTarget);
     refreshJsonArea();
