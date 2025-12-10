@@ -310,25 +310,25 @@
     }
 
     .qr-box{
-      margin-top:8px;
+      margin-top:12px;
       display:flex;
       justify-content:center;
       align-items:center;
     }
     .qr-frame{
-      width:180px;
-      height:180px;
+      width:260px;
+      height:260px;
       background:#ffffff;
       border-radius:18px;
       border:2px solid #0f172a;
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow:0 12px 26px rgba(15,23,42,0.18);
+      box-shadow:0 18px 40px rgba(15,23,42,0.18);
     }
     #qrcodeSim{
-      width:150px;
-      height:150px;
+      width:220px;
+      height:220px;
     }
     .qr-actions{
       display:flex;
@@ -348,14 +348,11 @@
       letter-spacing:0.01em;
     }
     .qr-actions button:hover{background:#111827;}
-    .qr-modal,.reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
-    .qr-modal.show,.reveal-modal.show{display:flex;}
-    .qr-modal .modal-card,.reveal-modal .modal-card{background:#ffffff;border-radius:18px;padding:18px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;max-width:760px;width:min(90vw,760px);}
+    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .qr-modal.show{display:flex;}
+    .qr-modal .modal-card{background:#ffffff;border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;}
     #qrcodeSimLarge{width:360px;height:360px;margin:0 auto;}
     .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;}
-    .reveal-modal h2{margin-top:0;margin-bottom:8px;font-size:1.35rem;color:var(--heading);}
-    .reveal-modal .modal-body{font-size:1.05rem;color:var(--text);white-space:pre-wrap;text-align:left;line-height:1.7;}
-    .reveal-modal .modal-actions{margin-top:12px;text-align:right;}
   </style>
 </head>
 <body>
@@ -467,6 +464,10 @@
             <button id="btnShowQr">QR'ı büyüt</button>
           </div>
 
+          <div class="meta-line" style="margin-top:10px;">
+            Toplam katılımcı: <span id="playerCount">0</span>
+          </div>
+
           <div class="btn-row" style="margin-top:10px;">
             <button id="btnResetSession" class="btn btn-danger small">
               🔁 Oturumu sıfırla
@@ -485,16 +486,6 @@
     <div class="modal-card">
       <div id="qrcodeSimLarge"></div>
       <button class="modal-close" id="qrModalClose">Kapat</button>
-    </div>
-  </div>
-
-  <div class="reveal-modal" id="revealModal">
-    <div class="modal-card">
-      <h2 id="revealModalTitle">Doğru yaklaşım</h2>
-      <div class="modal-body" id="revealModalBody">Açıklama yüklenecek.</div>
-      <div class="modal-actions">
-        <button class="modal-close" id="revealModalClose">Kapat</button>
-      </div>
     </div>
   </div>
 
@@ -636,7 +627,6 @@
     function showRevealModal(){
       const c = safeCase(currentIndex);
       if(!c || !currentReveal || !currentCaseId) return;
-      if(!revealModal) return;
       const pieces = [actionLabel(c.correctAction)];
       if(c.type) pieces.push(c.type);
       const heading = pieces.filter(Boolean).join(" • ");
@@ -652,7 +642,6 @@
     }
 
     function hideRevealModal(){
-      if(!revealModal) return;
       revealModal.classList.remove("show");
       revealModalDismissed = true;
     }
@@ -730,7 +719,7 @@
         const href = window.location.href;
         playerUrl = href.replace(/defi-sim-host(\.html)?/,"defi-sim-player.html");
         const box = document.getElementById("qrcodeSim");
-        renderQr(box, 150);
+        renderQr(box, 220);
         renderQr(qrLargeBox, 360);
         if(!qrModalShown){
           qrModalShown = true;
@@ -743,8 +732,6 @@
     qrTapArea.addEventListener("click", ()=>openQrModal(false));
     qrModalClose.addEventListener("click", closeQrModal);
     qrModal.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
-    revealModalClose.addEventListener("click", hideRevealModal);
-    revealModal.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(); });
 
     // Butonlar
     btnPrev.addEventListener("click",()=>{

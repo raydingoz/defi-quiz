@@ -121,27 +121,16 @@
       position:fixed;
       inset:0;
       pointer-events:none;
-      background:radial-gradient(circle at center,rgba(255,255,255,0.8) 0,rgba(250,204,21,0.55) 30%,rgba(250,204,21,0.08) 60%,transparent 75%);
+      background:radial-gradient(circle at center,rgba(250,204,21,0.35),rgba(250,204,21,0.05) 55%,transparent 70%);
       opacity:0;
       transform:scale(1);
       z-index:2000;
-      mix-blend-mode:screen;
     }
-    .flash-overlay.show{animation:flash-pop .85s ease-out;}
+    .flash-overlay.show{animation:flash-pop .6s ease-out;}
     @keyframes flash-pop{
-      0%{opacity:1;transform:scale(1);filter:brightness(1.4);}
-      35%{opacity:0.7;transform:scale(1.08);filter:brightness(1.15) contrast(1.05);}
-      70%{opacity:0.35;transform:scale(1.02);filter:brightness(1);}
-      100%{opacity:0;transform:scale(1.02);filter:brightness(1);}
-    }
-    body.shock-rumble{animation:shock-rumble .28s ease-in-out;}
-    @keyframes shock-rumble{
-      0%{transform:translate3d(0,0,0);}
-      20%{transform:translate3d(-3px,2px,0);}
-      40%{transform:translate3d(3px,-2px,0);}
-      60%{transform:translate3d(-2px,1px,0);}
-      80%{transform:translate3d(2px,-1px,0);}
-      100%{transform:translate3d(0,0,0);}
+      0%{opacity:0.9;transform:scale(1);} 
+      45%{opacity:0.45;transform:scale(1.05);} 
+      100%{opacity:0;transform:scale(1.02);} 
     }
     .btn.shock,.btn.cardioversion{position:relative;overflow:hidden;}
     .btn.shock::after,.btn.cardioversion::after{
@@ -693,10 +682,6 @@
         void flashOverlay.offsetWidth;
         flashOverlay.classList.add("show");
       }
-      document.body.classList.remove("shock-rumble");
-      void document.body.offsetWidth;
-      document.body.classList.add("shock-rumble");
-      setTimeout(()=>document.body.classList.remove("shock-rumble"), 320);
       const targetBtn = actionKey === "cardioversion" ? btnCardio : btnShock;
       if(targetBtn){
         targetBtn.classList.remove("shock-hit");
