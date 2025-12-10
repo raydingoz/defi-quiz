@@ -354,6 +354,7 @@
     let reveal            = false;
 
     let answeredQuestions = {};
+    let answerOutcomes    = {};
     let shownExplanation  = {};
     let selectedChoiceIdx = null;
 
@@ -458,8 +459,10 @@
       questionTitleEl.textContent = q.title || ("Soru " + (currentIndex+1));
       questionStemEl.textContent  = q.stem  || "";
 
-      // Yeni soru/oturumda açıklama ve highlight'ları sıfırla
-      exModal.classList.remove("show");
+      const questionChanged = currentQuestionId !== renderQuestion.lastQuestionId;
+      if(questionChanged){
+        exModal.classList.remove("show");
+      }
       optionsListEl.innerHTML = "";
 
       (q.options || []).forEach((opt,idx)=>{
@@ -495,7 +498,11 @@
         optionsListEl.appendChild(btn);
       });
 
-      if(!currentQuestionId){
+      const existingSummary = currentQuestionId ? answerOutcomes[currentQuestionId] : null;
+      if(existingSummary){
+        answerStatus.textContent = existingSummary.text;
+        answerStatus.className   = existingSummary.className;
+      }else if(!currentQuestionId){
         answerStatus.textContent = "Eğitmen soruyu başlattığında yanıt verebileceksin.";
         answerStatus.className   = "feedback";
       }else if(!questionActive && !reveal){
@@ -514,6 +521,7 @@
       }
 
       updateButtonsState();
+      renderQuestion.lastQuestionId = currentQuestionId;
     }
 
     function computePoints(orderPosition){
@@ -582,9 +590,14 @@
           points: 0,
           ts: Date.now()
         });
-        answerStatus.textContent = "Bu soruda yanıt ERC/rehber ile uyumlu değil.";
-        answerStatus.className   = "feedback bad";
-        openExplanationModal(false, q);
+        const summary = {
+          text: "Bu soruda yanıt ERC/rehber ile uyumlu değil.",
+          className: "feedback bad",
+          isCorrect: false
+        };
+        answerOutcomes[currentQuestionId] = summary;
+        answerStatus.textContent = summary.text;
+        answerStatus.className   = summary.className;
         return;
       }
 
@@ -606,9 +619,14 @@
         const scoreRef = rootRef.child("players").child(playerId).child("score");
         scoreRef.transaction(cur => (cur || 0) + pts);
 
-        answerStatus.textContent = "Doğru yanıt. Sıra: " + pos + " • Puan: " + pts;
-        answerStatus.className   = "feedback ok";
-        openExplanationModal(true, q);
+        const summary = {
+          text: "Doğru yanıt. Sıra: " + pos + " • Puan: " + pts,
+          className: "feedback ok",
+          isCorrect: true
+        };
+        answerOutcomes[currentQuestionId] = summary;
+        answerStatus.textContent = summary.text;
+        answerStatus.className   = summary.className;
       });
     }
 
@@ -678,6 +696,7 @@
         playerId = null;
         nickname = null;
         answeredQuestions = {};
+        answerOutcomes    = {};
         shownExplanation  = {};
         selectedChoiceIdx = null;
         stopTimer();
@@ -713,6 +732,7 @@
         const newId = snap.val();
         if(newId !== currentQuestionId){
           currentQuestionId = newId;
+          renderQuestion.lastQuestionId = null;
           stopTimer();
           timerLabel.textContent = currentQuestionId ? "Süre: –" : "Süre: –";
           selectedChoiceIdx = null;
@@ -748,7 +768,8 @@
 
         if(reveal && !prev && configLoaded && currentIndex!=null){
           const q = safeQuestion(currentIndex);
-          if(q) openExplanationModal(false, q);
+          const info = currentQuestionId ? answerOutcomes[currentQuestionId] : null;
+          if(q) openExplanationModal(!!(info && info.isCorrect), q);
         }
       });
     }

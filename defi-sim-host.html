@@ -267,6 +267,27 @@
       margin-top:4px;
     }
 
+    .reveal-box{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px dashed #374151;
+      background:rgba(15,23,42,0.9);
+    }
+    .reveal-title{
+      font-weight:700;
+      color:var(--heading);
+      margin-bottom:4px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .reveal-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+    }
+
     .score-list{
       margin-top:6px;
       font-size:0.86rem;
@@ -387,6 +408,11 @@
           <div class="meta-line" id="statusLine">
             Olguyu tanıt; hazır olduğunda “Ritim + süreyi başlat” ile hem sende hem katılımcılarda ritmi aç.
           </div>
+
+          <div class="reveal-box" id="revealBox" style="display:none;">
+            <div class="reveal-title" id="revealTitle">Doğru yaklaşım</div>
+            <div class="reveal-body" id="revealBody">Açıklama yüklenecek.</div>
+          </div>
         </div>
       </section>
 
@@ -468,6 +494,9 @@
     const caseTagsEl    = document.getElementById("caseTags");
     const timerLabel    = document.getElementById("timerLabel");
     const statusLine    = document.getElementById("statusLine");
+    const revealBox     = document.getElementById("revealBox");
+    const revealTitle   = document.getElementById("revealTitle");
+    const revealBody    = document.getElementById("revealBody");
 
     const btnPrev       = document.getElementById("btnPrev");
     const btnNext       = document.getElementById("btnNext");
@@ -545,6 +574,27 @@
       ekgStripEl.className = "ekg-strip " + k + (animate ? " anim" : "");
     }
 
+    function actionLabel(key){
+      if(key === "shock") return "⚡ Defibrilasyon";
+      if(key === "noShock") return "⏸ CPR devam / medikal";
+      if(key === "cardioversion") return "❤️ Kardiyoversiyon";
+      return "Doğru yaklaşım";
+    }
+
+    function renderRevealBox(){
+      const c = safeCase(currentIndex);
+      if(!c || !currentReveal || !currentCaseId){
+        revealBox.style.display = "none";
+        return;
+      }
+
+      const pieces = [actionLabel(c.correctAction)];
+      if(c.type) pieces.push(c.type);
+      revealTitle.textContent = pieces.filter(Boolean).join(" • ");
+      revealBody.textContent  = c.explanation || "Açıklama henüz eklenmemiş.";
+      revealBox.style.display = "block";
+    }
+
     function updateProgress(){
       if(!TOTAL_CASES || currentIndex==null){
         progressLabel.textContent = "Olgu – / –";
@@ -585,6 +635,7 @@
         statusLine.textContent = "Doğru yaklaşım gösterildi, olguyu tartışabilirsin.";
       }
 
+      renderRevealBox();
       updateProgress();
     }
 
