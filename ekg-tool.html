@@ -143,6 +143,104 @@
       margin-top: 4px;
     }
 
+    .hint strong { color: var(--heading); }
+
+    select,
+    .pill-input {
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: #020617;
+      color: var(--text);
+      padding: 5px 10px;
+      font-size: 0.82rem;
+      outline: none;
+    }
+
+    select {
+      min-width: 140px;
+    }
+
+    .toggle-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    .guide-box {
+      margin-top: 6px;
+      padding: 8px;
+      border-radius: 12px;
+      border: 1px dashed var(--border);
+      background: rgba(15,23,42,0.85);
+    }
+
+    .guide-title {
+      font-size: 0.82rem;
+      color: var(--heading);
+      font-weight: 700;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 6px;
+      margin-top: 4px;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .guide-chip {
+      border-radius: var(--radius-pill);
+      border: 1px solid #1f2937;
+      padding: 6px 8px;
+      background: rgba(15,23,42,0.9);
+      display: flex;
+      justify-content: space-between;
+      gap: 6px;
+      color: var(--muted);
+    }
+
+    .guide-chip strong { color: var(--heading); }
+
+    .bpm-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .bpm-row input[type="range"] {
+      flex: 1;
+      accent-color: #22c55e;
+    }
+
+    .preset-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+
+    .preset {
+      padding: 4px 10px;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border);
+      background: rgba(15,23,42,0.95);
+      color: var(--muted);
+      font-weight: 600;
+      cursor: pointer;
+      font-size: 0.82rem;
+    }
+
+    .preset:hover { color: var(--accent); border-color: var(--accent); }
+
     /* Çizim alanı */
     .draw-wrapper {
       border-radius: 12px;
@@ -213,6 +311,12 @@
       stroke-linecap: round;
       stroke-linejoin: round;
       filter: drop-shadow(0 0 4px rgba(34,197,94,0.8));
+    }
+
+    .guide-line {
+      stroke: rgba(148,163,184,0.35);
+      stroke-width: 1.2;
+      stroke-dasharray: 4 4;
     }
 
     .point {
@@ -293,6 +397,63 @@
           Örn. <code>background-image: url("data:image/svg+xml;utf8,&lt;svg ...");</code>
         </div>
       </div>
+
+      <div class="card">
+        <div class="code-label">Hız / R-R kılavuzu (25 mm/sn varsayımı):</div>
+        <div class="guide-box">
+          <div class="guide-title">Hedef nabız: <span id="bpmLabel">75</span> bpm</div>
+          <div class="bpm-row">
+            <input type="range" id="bpmInput" min="40" max="220" value="75" />
+            <input type="number" id="bpmNumber" class="pill-input" value="75" min="40" max="220" style="width:80px;" />
+          </div>
+          <div class="hint" id="bpmHint">
+            75 bpm ≈ 0.80 sn R–R ≈ 20 küçük kare (5 mm gridde ≈ 100px). <strong>Kılavuz çizgileri açık.</strong>
+          </div>
+          <div class="preset-row">
+            <button class="preset" data-bpm="60">60</button>
+            <button class="preset" data-bpm="75">75</button>
+            <button class="preset" data-bpm="100">100</button>
+            <button class="preset" data-bpm="120">120</button>
+            <button class="preset" data-bpm="150">150</button>
+            <button class="preset" data-bpm="180">180</button>
+          </div>
+          <div class="toggle-row">
+            <input type="checkbox" id="guideToggle" checked />
+            <label for="guideToggle">Seçili bpm'ye göre R–R düşey kılavuz çizgilerini göster</label>
+          </div>
+        </div>
+        <div class="guide-grid">
+          <div class="guide-chip"><strong>50 bpm</strong><span>≈30 k kare • 1.2 sn</span></div>
+          <div class="guide-chip"><strong>60 bpm</strong><span>≈25 k kare • 1.0 sn</span></div>
+          <div class="guide-chip"><strong>75 bpm</strong><span>≈20 k kare • 0.8 sn</span></div>
+          <div class="guide-chip"><strong>100 bpm</strong><span>≈15 k kare • 0.6 sn</span></div>
+          <div class="guide-chip"><strong>120 bpm</strong><span>≈12-13 k kare • 0.5 sn</span></div>
+          <div class="guide-chip"><strong>150 bpm</strong><span>≈10 k kare • 0.4 sn</span></div>
+          <div class="guide-chip"><strong>180 bpm</strong><span>≈8-9 k kare • 0.33 sn</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="code-label">Ritim listesi ve JSON:</div>
+        <div class="label-row" style="gap: 8px; align-items: center;">
+          <select id="rhythmSelect">
+            <option value="">Ritim seç</option>
+          </select>
+          <input id="rhythmName" class="pill-input" placeholder="İsim veya yeni ritim" />
+          <button id="loadJsonBtn" class="btn btn-sm">JSON'dan yükle</button>
+        </div>
+        <div class="btn-row" style="margin-top: 2px;">
+          <button id="saveRhythmBtn" class="btn btn-main btn-sm">Kaydet / Güncelle</button>
+          <button id="deleteRhythmBtn" class="btn btn-sm">Seçileni sil</button>
+          <button id="refreshJsonBtn" class="btn btn-sm">JSON'u güncelle</button>
+        </div>
+        <textarea id="jsonArea" spellcheck="false" placeholder='[ {"name":"sinus","width":240,"height":60,"baseline":30,"points":[{"x":10,"y":20}]} ]'></textarea>
+        <div class="hint small">
+          • Çizdiğin dalgayı <strong>Kaydet / Güncelle</strong> ile isimlendirip listeye ekle.<br />
+          • <strong>JSON'u güncelle</strong> mevcut veriyi textarea'ya yazar. <strong>JSON'dan yükle</strong> ise textarea'daki veriyi içeri aktarır.<br />
+          • Liste değiştirildiğinde isim alanı yenilenir ve noktalar otomatik temizlenir/yüklenir.
+        </div>
+      </div>
       <div class="card">
         <div class="code-label">Sadece <code>&lt;polyline&gt;</code> kısmı:</div>
         <textarea id="polylineOutput" spellcheck="false"></textarea>
@@ -311,6 +472,21 @@
     const previewArea = document.getElementById("previewArea");
     const svgOutput = document.getElementById("svgOutput");
     const polylineOutput = document.getElementById("polylineOutput");
+    const rhythmSelect = document.getElementById("rhythmSelect");
+    const rhythmName = document.getElementById("rhythmName");
+    const jsonArea = document.getElementById("jsonArea");
+    const saveRhythmBtn = document.getElementById("saveRhythmBtn");
+    const deleteRhythmBtn = document.getElementById("deleteRhythmBtn");
+    const refreshJsonBtn = document.getElementById("refreshJsonBtn");
+    const loadJsonBtn = document.getElementById("loadJsonBtn");
+
+    const bpmInput    = document.getElementById("bpmInput");
+    const bpmNumber   = document.getElementById("bpmNumber");
+    const bpmLabel    = document.getElementById("bpmLabel");
+    const bpmHint     = document.getElementById("bpmHint");
+    const guideToggle = document.getElementById("guideToggle");
+
+    const presetBtns  = Array.from(document.querySelectorAll(".preset"));
 
     const widthInput = document.getElementById("widthInput");
     const heightInput = document.getElementById("heightInput");
@@ -318,8 +494,105 @@
     const applySizeBtn = document.getElementById("applySizeBtn");
     const clearBtn = document.getElementById("clearBtn");
 
+    const defaultRhythms = [
+      "sinus",
+      "vf",
+      "vf_fine",
+      "vt",
+      "torsades",
+      "asystole",
+      "pea",
+      "svt",
+      "af",
+      "flutter",
+      "af_wpw",
+      "paced",
+      "artifact"
+    ];
+
+    let rhythmStore = {};
+    let bpmTarget   = 75;
+    let showGuide   = true;
+
     function clamp(val, min, max) {
       return Math.min(max, Math.max(min, val));
+    }
+
+    function ensureRhythmOption(name) {
+      if (!name) return;
+      if ([...rhythmSelect.options].some(o => o.value === name)) return;
+      const opt = document.createElement("option");
+      opt.value = name;
+      opt.textContent = name;
+      rhythmSelect.appendChild(opt);
+    }
+
+    function removeRhythmOption(name) {
+      [...rhythmSelect.options].forEach((o) => {
+        if (o.value === name) {
+          rhythmSelect.removeChild(o);
+        }
+      });
+    }
+
+    function bpmToInfo(bpmVal) {
+      const bpm = clamp(Number(bpmVal) || 0, 30, 260);
+      const rrSeconds = 60 / bpm;
+      const smallSquares = rrSeconds / 0.04; // 25mm/sn ve 1 mm=0.04 sn
+      const px = smallSquares * 5; // 1 küçük kare 5 px çizim ölçeğinde
+      return { bpm, rrSeconds, smallSquares, px };
+    }
+
+    function updateBpmUI(nextVal) {
+      const info = bpmToInfo(nextVal ?? bpmTarget);
+      bpmTarget = info.bpm;
+      bpmInput.value = bpmTarget;
+      bpmNumber.value = bpmTarget;
+      bpmLabel.textContent = bpmTarget;
+
+      const squares = info.smallSquares.toFixed(1).replace(/\.0$/, "");
+      const pxText = info.px.toFixed(0);
+      const guideText = showGuide ? "Kılavuz çizgileri açık." : "Kılavuz çizgileri kapalı.";
+      bpmHint.innerHTML = `${bpmTarget} bpm ≈ ${(info.rrSeconds).toFixed(2)} sn R–R ≈ ${squares} küçük kare (5 mm gridde ≈ ${pxText}px). <strong>${guideText}</strong>`;
+      renderAll();
+    }
+
+    function refreshJsonArea() {
+      const arr = Object.entries(rhythmStore).map(([name, data]) => ({
+        name,
+        width: data.width,
+        height: data.height,
+        baseline: data.baseline,
+        points: data.points
+      }));
+      jsonArea.value = JSON.stringify(arr, null, 2);
+    }
+
+    function loadRhythmIntoCanvas(name) {
+      if (!name) {
+        rhythmName.value = "";
+        userPoints = [];
+        renderAll();
+        return;
+      }
+
+      rhythmName.value = name;
+
+      const data = rhythmStore[name];
+      if (data) {
+        width = data.width ?? width;
+        height = data.height ?? height;
+        baseline = data.baseline ?? baseline;
+        userPoints = (data.points || []).map(p => ({ x: p.x, y: p.y }));
+
+        widthInput.value = width;
+        heightInput.value = height;
+        baselineInput.value = baseline;
+      } else {
+        userPoints = [];
+      }
+
+      renderAll();
     }
 
     function buildAllPoints() {
@@ -404,8 +677,25 @@
       return ns;
     }
 
+    function renderGuideLines(targetSvg, ns, w, h) {
+      if (!showGuide) return;
+      const { px } = bpmToInfo(bpmTarget);
+      if (!px || !Number.isFinite(px) || px <= 0) return;
+
+      for (let x = px; x < w; x += px) {
+        const line = document.createElementNS(ns, "line");
+        line.setAttribute("x1", x);
+        line.setAttribute("y1", 0);
+        line.setAttribute("x2", x);
+        line.setAttribute("y2", h);
+        line.setAttribute("class", "guide-line");
+        targetSvg.appendChild(line);
+      }
+    }
+
     function renderMain() {
       const ns = renderGrid(drawArea, width, height);
+      renderGuideLines(drawArea, ns, width, height);
 
       const pts = buildAllPoints();
       const pointsAttr = pts
@@ -431,6 +721,7 @@
 
     function renderPreview() {
       const ns = renderGrid(previewArea, width * 3, height);
+      renderGuideLines(previewArea, ns, width * 3, height);
       const pts = buildAllPoints();
       const pointsAttr = pts
         .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
@@ -524,6 +815,26 @@
       renderAll();
     });
 
+    bpmInput.addEventListener("input", (e) => {
+      updateBpmUI(e.target.value);
+    });
+
+    bpmNumber.addEventListener("input", (e) => {
+      updateBpmUI(e.target.value);
+    });
+
+    presetBtns.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const val = Number(btn.dataset.bpm);
+        updateBpmUI(val);
+      });
+    });
+
+    guideToggle.addEventListener("change", (e) => {
+      showGuide = e.target.checked;
+      updateBpmUI();
+    });
+
     applySizeBtn.addEventListener("click", () => {
       const w = parseInt(widthInput.value, 10);
       const h = parseInt(heightInput.value, 10);
@@ -553,7 +864,80 @@
       renderAll();
     });
 
+    rhythmSelect.addEventListener("change", (evt) => {
+      const selected = evt.target.value;
+      loadRhythmIntoCanvas(selected);
+    });
+
+    saveRhythmBtn.addEventListener("click", () => {
+      const name = rhythmName.value.trim();
+      if (!name) {
+        alert("Önce ritim ismi gir.");
+        return;
+      }
+
+      rhythmStore[name] = {
+        width,
+        height,
+        baseline,
+        points: userPoints.map(p => ({ x: p.x, y: p.y }))
+      };
+
+      ensureRhythmOption(name);
+      rhythmSelect.value = name;
+      refreshJsonArea();
+    });
+
+    deleteRhythmBtn.addEventListener("click", () => {
+      const name = rhythmSelect.value || rhythmName.value.trim();
+      if (!name) return;
+      delete rhythmStore[name];
+      removeRhythmOption(name);
+      rhythmSelect.value = "";
+      loadRhythmIntoCanvas("");
+      refreshJsonArea();
+    });
+
+    refreshJsonBtn.addEventListener("click", () => {
+      refreshJsonArea();
+    });
+
+    loadJsonBtn.addEventListener("click", () => {
+      let parsed = [];
+      try {
+        parsed = JSON.parse(jsonArea.value || "[]");
+        if (!Array.isArray(parsed)) throw new Error("Array olmalı");
+      } catch (e) {
+        alert("Geçersiz JSON: " + e.message);
+        return;
+      }
+
+      rhythmStore = {};
+      // İlk seçeneği koru
+      rhythmSelect.innerHTML = "<option value=\"\">Ritim seç</option>";
+
+      defaultRhythms.forEach(ensureRhythmOption);
+
+      parsed.forEach((item) => {
+        if (!item || !item.name) return;
+        rhythmStore[item.name] = {
+          width: Number(item.width) || width,
+          height: Number(item.height) || height,
+          baseline: Number(item.baseline) || baseline,
+          points: Array.isArray(item.points) ? item.points.map(p => ({ x: Number(p.x), y: Number(p.y) })) : []
+        };
+        ensureRhythmOption(item.name);
+      });
+
+      refreshJsonArea();
+      rhythmSelect.value = "";
+      loadRhythmIntoCanvas("");
+    });
+
     // Başlangıç
+    defaultRhythms.forEach(ensureRhythmOption);
+    updateBpmUI(bpmTarget);
+    refreshJsonArea();
     renderAll();
   </script>
 </body>
