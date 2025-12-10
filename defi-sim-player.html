@@ -387,7 +387,7 @@
     <span class="label">⚡ Defibrilasyon</span>
   </button>
   <button id="btnNoShock" class="btn noShock">
-    <span class="label">⏸ Şok Yok</span>
+    <span class="label">⏸ CPR devam / medikal</span>
   </button>
   <button id="btnCardio" class="btn cardioversion">
     <span class="label">❤️ Kardiyoversiyon</span>
@@ -457,6 +457,7 @@
     let currentReveal      = false;
 
     let answeredCases   = {};
+    let answerOutcomes  = {};
     let shownExplanation= {};
     let timerInterval   = null;
     let timerRemaining  = 0;
@@ -566,10 +567,12 @@
       const c = safeCase(currentCaseIndex);
       if(!c) return;
 
-      // Yeni olgu / yeni caseId geldiğinde modal ve highlight'ları sıfırla
-      exModal.classList.remove("show");
-      [btnShock, btnNoShock, btnCardio].forEach(b=>b.classList.remove("selected"));
-      answerStatus.className = "feedback";
+      const caseChanged = currentCaseId !== renderCase.lastCaseId;
+      if(caseChanged){
+        exModal.classList.remove("show");
+        [btnShock, btnNoShock, btnCardio].forEach(b=>b.classList.remove("selected"));
+        answerStatus.className = "feedback";
+      }
 
       caseTitleEl.textContent = c.title || ("Olgu " + (currentCaseIndex+1));
       caseNarrEl.textContent  = c.narrative || "";
@@ -577,7 +580,12 @@
       const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "asystole";
       applyRhythm(rhythmKey, !!currentRhythmActive);
 
-      if(!currentCaseId){
+      const existingSummary = currentCaseId ? answerOutcomes[currentCaseId] : null;
+
+      if(existingSummary){
+        answerStatus.textContent = existingSummary.text;
+        answerStatus.className   = existingSummary.className;
+      }else if(!currentCaseId){
         answerStatus.textContent = "Eğitmen olguyu ve ritmi başlattığında karar verebileceksin.";
       }else if(!currentRhythmActive && !currentReveal){
         answerStatus.textContent = "Ritim kapalı. Yeni olgu için eğitmeni bekle.";
@@ -591,6 +599,7 @@
         answerStatus.textContent = "Doğru yaklaşım gösterildi.";
       }
       updateButtonsState();
+      renderCase.lastCaseId = currentCaseId;
     }
 
     function computePoints(orderPosition){
@@ -615,7 +624,7 @@
       if(c.correctAction === "shock"){
   body += "Doğru yaklaşım: Defibrilasyon (VF/pVT algoritması)\n\n";
 }else if(c.correctAction === "noShock"){
-  body += "Doğru yaklaşım: Elektriksel tedavi yok (şoklanamaz ritim)\n\n";
+  body += "Doğru yaklaşım: CPR devam / medikal destek (şoklanamaz ritim)\n\n";
 }else if(c.correctAction === "cardioversion"){
   body += "Doğru yaklaşım: Kardiyoversiyon (senkronize)\n\n";
 }
@@ -663,9 +672,14 @@
           points: 0,
           ts: Date.now()
         });
-        answerStatus.textContent = "Bu olguda yaklaşım ERC ile uyumlu değil.";
-        answerStatus.className   = "feedback bad";
-        openExplanationModal(false, c);
+        const summary = {
+          text: "Bu olguda yaklaşım ERC ile uyumlu değil.",
+          className: "feedback bad",
+          isCorrect: false
+        };
+        answerOutcomes[currentCaseId] = summary;
+        answerStatus.textContent = summary.text;
+        answerStatus.className   = summary.className;
         return;
       }
 
@@ -687,9 +701,14 @@
         const scoreRef = rootRef.child("players").child(playerId).child("score");
         scoreRef.transaction(cur => (cur || 0) + pts);
 
-        answerStatus.textContent = "Doğru yaklaşım. Sıra: " + pos + " • Puan: " + pts;
-        answerStatus.className   = "feedback ok";
-        openExplanationModal(true, c);
+        const summary = {
+          text: "Doğru yaklaşım. Sıra: " + pos + " • Puan: " + pts,
+          className: "feedback ok",
+          isCorrect: true
+        };
+        answerOutcomes[currentCaseId] = summary;
+        answerStatus.textContent = summary.text;
+        answerStatus.className   = summary.className;
       });
     }
 
@@ -764,6 +783,7 @@
         playerId = null;
         nickname = null;
         answeredCases = {};
+        answerOutcomes = {};
         shownExplanation = {};
         stopTimer();
         timerLabel.textContent = "Süre: –";
@@ -798,6 +818,7 @@
         const newId = snap.val();
         if(newId !== currentCaseId){
           currentCaseId = newId;
+          renderCase.lastCaseId = null;
           stopTimer();
           timerLabel.textContent = currentCaseId ? "Süre: –" : "Süre: –";
           renderCase();
@@ -831,7 +852,8 @@
         // açıklamayı henüz görmemiş olanlara popup aç
         if(currentReveal && !prev && configLoaded && currentCaseIndex!=null){
           const c = safeCase(currentCaseIndex);
-          if(c) openExplanationModal(false, c);
+          const info = currentCaseId ? answerOutcomes[currentCaseId] : null;
+          if(c) openExplanationModal(!!(info && info.isCorrect), c);
         }
       });
     }
