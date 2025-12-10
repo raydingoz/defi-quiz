@@ -205,6 +205,27 @@
       color:var(--muted);
     }
 
+    .reveal-box{
+      margin-top:10px;
+      padding:10px;
+      border-radius:14px;
+      border:1px dashed #374151;
+      background:rgba(15,23,42,0.9);
+    }
+    .reveal-title{
+      font-weight:700;
+      color:var(--heading);
+      margin-bottom:4px;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    .reveal-body{
+      font-size:0.9rem;
+      color:var(--text);
+      white-space:pre-wrap;
+    }
+
     .btn-row{
       margin-top:8px;
       display:flex;
@@ -328,6 +349,11 @@
             <button id="btnStart" class="btn btn-main">▶ Soruyu başlat</button>
             <button id="btnReveal" class="btn">✅ Doğru yanıtı göster</button>
           </div>
+
+          <div class="reveal-box" id="revealBox" style="display:none;">
+            <div class="reveal-title" id="revealTitle">Doğru yanıt</div>
+            <div class="reveal-body" id="revealBody">Açıklama yüklenecek.</div>
+          </div>
         </div>
       </section>
 
@@ -423,6 +449,10 @@
     const progressLabel   = document.getElementById("progressLabel");
     const progressFill    = document.getElementById("progressFill");
 
+    const revealBox       = document.getElementById("revealBox");
+    const revealTitle     = document.getElementById("revealTitle");
+    const revealBody      = document.getElementById("revealBody");
+
     function safeQuestion(idx){
       if(!QUESTIONS.length) return null;
       if(idx<0) idx=0;
@@ -468,6 +498,27 @@
       progressLabel.textContent = "Soru " + idx + " / " + TOTAL_Q;
       const pct = Math.max(0, Math.min(1, idx / TOTAL_Q));
       progressFill.style.width = (pct * 100).toFixed(1) + "%";
+    }
+
+    function formatCorrectAnswer(q){
+      if(!q) return "Doğru yanıt";
+      if(typeof q.correctIndex === "number" && q.options && q.options[q.correctIndex]){
+        const letter = String.fromCharCode(65 + q.correctIndex);
+        return letter + ") " + q.options[q.correctIndex];
+      }
+      return "Doğru yanıt";
+    }
+
+    function renderRevealBox(){
+      const q = safeQuestion(currentIndex);
+      if(!q || !currentQuestionId || !reveal){
+        revealBox.style.display = "none";
+        return;
+      }
+
+      revealTitle.textContent = formatCorrectAnswer(q);
+      revealBody.textContent  = q.explanation || "Açıklama henüz eklenmemiş.";
+      revealBox.style.display = "block";
     }
 
     function renderQuestion(){
@@ -518,6 +569,7 @@
         statusLine.textContent = "Doğru yanıt gösterildi, tartışma modundasın.";
       }
 
+      renderRevealBox();
       updateProgress();
     }
 
