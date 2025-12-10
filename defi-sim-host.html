@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defi ALS Sim – Eğitmen</title>
+  <title>Defi ALS Sim</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Firebase -->
@@ -14,25 +14,25 @@
 
   <style>
     :root{
-      --bg:#020617;
-      --card:#020617;
-      --border:#1f2937;
-      --accent:#f97373;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --border:#e2e8f0;
+      --accent:#16a34a;
       --danger:#ef4444;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --heading:#fef2f2;
+      --text:#0f172a;
+      --muted:#334155;
+      --heading:#0f172a;
       --radius-lg:20px;
       --radius-pill:999px;
     }
     *{box-sizing:border-box;}
     body{
       margin:0;
-      padding:16px;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      padding:18px;
+      font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
       color:var(--text);
-      font-size:18px;
+      font-size:16px;
       line-height:1.6;
     }
     .app{max-width:1400px;margin:0 auto;}
@@ -42,13 +42,12 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      margin-bottom:14px;
+      margin-bottom:16px;
     }
     .brand{
-      font-size:1.3rem;
+      font-size:1.35rem;
       font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      letter-spacing:.04em;
       color:var(--heading);
     }
     .top-pill{
@@ -57,22 +56,22 @@
       gap:8px;
       border-radius:var(--radius-pill);
       border:1px solid var(--border);
-      padding:8px 14px;
+      padding:10px 16px;
       font-size:1rem;
       color:var(--muted);
-      background:rgba(15,23,42,0.97);
+      background:#eef2ff;
     }
     .dot-live{
       width:9px;height:9px;border-radius:999px;
       background:var(--danger);
       box-shadow:0 0 12px rgba(239,68,68,0.9);
     }
-    .small{font-size:0.78rem;}
+    .small{font-size:0.82rem;}
 
     .layout{
       display:grid;
       grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
-      gap:14px;
+      gap:16px;
     }
     @media(max-width:900px){
       .layout{grid-template-columns:minmax(0,1fr);}
@@ -82,18 +81,12 @@
       border-radius:var(--radius-lg);
       border:1px solid var(--border);
       background:var(--card);
-      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+      box-shadow:0 16px 34px rgba(15,23,42,0.12);
       padding:16px;
       position:relative;
       overflow:hidden;
     }
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
-      pointer-events:none;
-    }
+    .card::before{display:none;}
     .card-inner{position:relative;z-index:1;}
 
     .section-title{
@@ -273,8 +266,9 @@
       margin-top:14px;
       padding:14px;
       border-radius:18px;
-      border:1px dashed #374151;
-      background:rgba(15,23,42,0.9);
+      border:1px dashed #cbd5e1;
+      background:#f1f5f9;
+      box-shadow:0 12px 28px rgba(15,23,42,0.08);
     }
     .reveal-title{
       font-weight:800;
@@ -285,25 +279,9 @@
       gap:8px;
     }
     .reveal-body{
-      font-size:1.1rem;
+      font-size:1.05rem;
       color:var(--text);
       white-space:pre-wrap;
-    }
-
-    .reveal-box{
-      margin-top:10px;
-      padding:10px;
-      border-radius:14px;
-      border:1px dashed #374151;
-      background:rgba(15,23,42,0.9);
-    }
-    .reveal-title{
-      font-weight:700;
-      color:var(--heading);
-      margin-bottom:4px;
-      display:flex;
-      align-items:center;
-      gap:8px;
     }
     .reveal-body{
       font-size:0.9rem;
@@ -322,7 +300,7 @@
       justify-content:space-between;
       align-items:center;
       padding:6px 0;
-      border-bottom:1px dashed #1f2937;
+      border-bottom:1px dashed #cbd5e1;
     }
     .score-row span:first-child{
       max-width:160px;
@@ -332,39 +310,55 @@
     }
 
     .qr-box{
-      margin-top:10px;
+      margin-top:12px;
       display:flex;
-      flex-wrap:wrap;
-      gap:14px;
+      justify-content:center;
       align-items:center;
     }
     .qr-frame{
-      width:170px;
-      height:170px;
-      background:#f9fafb;
-      border-radius:16px;
-      border:2px solid #111827;
+      width:260px;
+      height:260px;
+      background:#ffffff;
+      border-radius:18px;
+      border:2px solid #0f172a;
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow:0 10px 24px rgba(15,23,42,0.9);
+      box-shadow:0 18px 40px rgba(15,23,42,0.18);
     }
     #qrcodeSim{
-      width:150px;
-      height:150px;
+      width:220px;
+      height:220px;
     }
-    .qr-text{
-      font-size:1rem;
-      color:var(--muted);
-      flex:1 1 120px;
-      word-wrap:break-word;
+    .qr-actions{
+      display:flex;
+      gap:10px;
+      justify-content:center;
+      margin-top:10px;
     }
+    .qr-actions button{
+      border:1px solid #cbd5e1;
+      background:#0f172a;
+      color:#e2e8f0;
+      border-radius:12px;
+      padding:10px 14px;
+      font-weight:800;
+      cursor:pointer;
+      box-shadow:0 12px 24px rgba(15,23,42,0.18);
+      letter-spacing:0.01em;
+    }
+    .qr-actions button:hover{background:#111827;}
+    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .qr-modal.show{display:flex;}
+    .qr-modal .modal-card{background:#ffffff;border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;}
+    #qrcodeSimLarge{width:360px;height:360px;margin:0 auto;}
+    .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;}
   </style>
 </head>
 <body>
   <div class="app">
     <header class="top-bar">
-      <div class="brand">Defi ALS Sim – Eğitmen</div>
+      <div class="brand">Defi ALS Sim</div>
       <div class="top-pill">
         <span class="dot-live"></span>
         <span>ALS ritim kararı</span>
@@ -432,19 +426,6 @@
             </div>
           </div>
 
-          <div class="cheat-card">
-            <div class="cheat-title">Hız kılavuzu (25 mm/sn, düzenli ritimler)</div>
-            <div class="cheat-grid">
-              <div class="cheat-chip"><strong>50 bpm</strong><span>≈30 k kare / 1.2 sn</span></div>
-              <div class="cheat-chip"><strong>60 bpm</strong><span>≈25 k kare / 1.0 sn</span></div>
-              <div class="cheat-chip"><strong>75 bpm</strong><span>≈20 k kare / 0.8 sn</span></div>
-              <div class="cheat-chip"><strong>100 bpm</strong><span>≈15 k kare / 0.6 sn</span></div>
-              <div class="cheat-chip"><strong>120 bpm</strong><span>≈12-13 k kare / 0.5 sn</span></div>
-              <div class="cheat-chip"><strong>150 bpm</strong><span>≈10 k kare / 0.4 sn</span></div>
-              <div class="cheat-chip"><strong>180 bpm</strong><span>≈8-9 k kare / 0.33 sn</span></div>
-            </div>
-          </div>
-
           <div class="btn-row">
             <button id="btnPrev" class="btn">⟵ Önceki olgu</button>
             <button id="btnNext" class="btn">Sonraki olgu ⟶</button>
@@ -468,18 +449,15 @@
           <div class="section-title">Katılımcılar & QR</div>
 
           <div class="qr-box">
-            <div class="qr-frame">
+            <div class="qr-frame" id="qrTapArea">
               <div id="qrcodeSim"></div>
             </div>
-            <div class="qr-text">
-              Katılımcılar bu QR’ı okutup <strong>ALS sim</strong> katılımcı sayfasına bağlanır.
-              <br/><br/>
-              Kısa URL:<br/>
-              <span id="playerUrlText" class="small"></span>
-            </div>
+          </div>
+          <div class="qr-actions">
+            <button id="btnShowQr">QR'ı büyüt</button>
           </div>
 
-          <div class="meta-line" style="margin-top:8px;">
+          <div class="meta-line" style="margin-top:10px;">
             Toplam katılımcı: <span id="playerCount">0</span>
           </div>
 
@@ -498,6 +476,13 @@
         </div>
       </aside>
     </main>
+  </div>
+
+  <div class="qr-modal" id="qrModal">
+    <div class="modal-card">
+      <div id="qrcodeSimLarge"></div>
+      <button class="modal-close" id="qrModalClose">Kapat</button>
+    </div>
   </div>
 
   <script>
@@ -533,6 +518,8 @@
 
     let timerInterval = null;
     let timerRemaining = 0;
+    let playerUrl = "";
+    let qrModalShown = false;
 
     // DOM
     const caseTitleEl   = document.getElementById("caseTitle");
@@ -556,7 +543,11 @@
     const sessionLabel  = document.getElementById("sessionLabel");
     const playerCountEl = document.getElementById("playerCount");
     const scoreListEl   = document.getElementById("scoreList");
-    const playerUrlText = document.getElementById("playerUrlText");
+    const qrTapArea     = document.getElementById("qrTapArea");
+    const btnShowQr     = document.getElementById("btnShowQr");
+    const qrModal       = document.getElementById("qrModal");
+    const qrModalClose  = document.getElementById("qrModalClose");
+    const qrLargeBox    = document.getElementById("qrcodeSimLarge");
 
     const progressLabel = document.getElementById("progressLabel");
     const progressFill  = document.getElementById("progressFill");
@@ -682,21 +673,41 @@
       updateProgress();
     }
 
+    function renderQr(targetEl, size){
+      if(!targetEl || !playerUrl) return;
+      targetEl.innerHTML = "";
+      new QRCode(targetEl,{ text: playerUrl, width:size, height:size });
+    }
+
+    function openQrModal(auto){
+      if(!playerUrl) return;
+      renderQr(qrLargeBox, 360);
+      qrModal.classList.add("show");
+      if(auto) qrModalShown = true;
+    }
+
+    function closeQrModal(){
+      qrModal.classList.remove("show");
+    }
+
     function initQR(){
       try{
-        let href = window.location.href;
-        const playerUrl = href.replace(/defi-sim-host(\.html)?/,"defi-sim-player.html");
-        playerUrlText.textContent = playerUrl;
+        const href = window.location.href;
+        playerUrl = href.replace(/defi-sim-host(\.html)?/,"defi-sim-player.html");
         const box = document.getElementById("qrcodeSim");
-        box.innerHTML = "";
-        new QRCode(box,{
-          text: playerUrl,
-          width:120,
-          height:120
-        });
+        renderQr(box, 220);
+        renderQr(qrLargeBox, 360);
+        if(!qrModalShown){
+          qrModalShown = true;
+          setTimeout(()=>openQrModal(true), 200);
+        }
       }catch(e){console.error(e);}
     }
     initQR();
+    btnShowQr.addEventListener("click", ()=>openQrModal(false));
+    qrTapArea.addEventListener("click", ()=>openQrModal(false));
+    qrModalClose.addEventListener("click", closeQrModal);
+    qrModal.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
 
     // Butonlar
     btnPrev.addEventListener("click",()=>{
