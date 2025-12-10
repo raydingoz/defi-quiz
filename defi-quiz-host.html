@@ -14,23 +14,23 @@
 
   <style>
     :root{
-      --bg:#020617;
-      --card:#020617;
-      --border:#1f2937;
-      --accent:#f97373;
-      --danger:#ef4444;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
-      --heading:#fef2f2;
+      --bg:#f8fafc;
+      --card:#ffffff;
+      --border:#e2e8f0;
+      --accent:#16a34a;
+      --danger:#dc2626;
+      --text:#0f172a;
+      --muted:#475569;
+      --heading:#0f172a;
       --radius-lg:20px;
       --radius-pill:999px;
     }
     *{box-sizing:border-box;}
     body{
       margin:0;
-      padding:16px;
-      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      padding:18px;
+      font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:var(--bg);
       color:var(--text);
       font-size:18px;
       line-height:1.6;
@@ -42,13 +42,12 @@
       justify-content:space-between;
       align-items:center;
       gap:12px;
-      margin-bottom:14px;
+      margin-bottom:16px;
     }
     .brand{
       font-size:1.3rem;
       font-weight:800;
-      letter-spacing:.08em;
-      text-transform:uppercase;
+      letter-spacing:.04em;
       color:var(--heading);
     }
     .top-pill{
@@ -57,10 +56,10 @@
       gap:8px;
       border-radius:var(--radius-pill);
       border:1px solid var(--border);
-      padding:8px 14px;
+      padding:10px 16px;
       font-size:1rem;
       color:var(--muted);
-      background:rgba(15,23,42,0.97);
+      background:#eef2ff;
     }
     .dot-live{
       width:9px;height:9px;border-radius:999px;
@@ -72,7 +71,7 @@
     .layout{
       display:grid;
       grid-template-columns:minmax(0,1.7fr) minmax(0,1fr);
-      gap:14px;
+      gap:16px;
     }
     @media(max-width:900px){
       .layout{grid-template-columns:minmax(0,1fr);}
@@ -82,26 +81,19 @@
       border-radius:var(--radius-lg);
       border:1px solid var(--border);
       background:var(--card);
-      box-shadow:0 18px 40px rgba(15,23,42,0.9);
+      box-shadow:0 16px 34px rgba(15,23,42,0.12);
       padding:16px;
       position:relative;
       overflow:hidden;
     }
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
-      pointer-events:none;
-    }
+    .card::before{display:none;}
     .card-inner{position:relative;z-index:1;}
 
     .section-title{
       font-size:1.05rem;
       color:var(--muted);
       margin-bottom:8px;
-      text-transform:uppercase;
-      letter-spacing:.1em;
+      letter-spacing:.06em;
     }
     .question-title{
       font-size:1.5rem;
@@ -129,16 +121,18 @@
     }
     .progress-track{
       flex:1;
-      height:6px;
+      height:8px;
       border-radius:999px;
-      background:#0f172a;
+      background:linear-gradient(90deg,#e5e7eb,#cbd5e1);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
       overflow:hidden;
     }
     .progress-fill{
       height:100%;
       width:0%;
-      background:linear-gradient(90deg,#f97373,#facc15);
+      background:linear-gradient(90deg,#f97373,#fbbf24);
       transition:width .3s ease-out;
+      box-shadow:0 0 14px rgba(251,191,36,0.5);
     }
 
     .option-list{
@@ -146,8 +140,8 @@
     }
     .option-row{
       border-radius:14px;
-      border:1px solid #1f2937;
-      background:rgba(15,23,42,0.96);
+      border:1px solid #e2e8f0;
+      background:#f8fafc;
       padding:10px 12px;
       display:flex;
       justify-content:space-between;
@@ -178,7 +172,7 @@
     }
     .option-row.correct{
       border-color:#22c55e;
-      box-shadow:0 0 0 1px rgba(34,197,94,0.6);
+      box-shadow:0 0 0 1px rgba(34,197,94,0.5);
     }
     .option-row.correct .option-badge{
       border-color:#22c55e;
@@ -194,11 +188,12 @@
     }
     .timer-pill{
       border-radius:var(--radius-pill);
-      border:1px solid #52525b;
+      border:1px solid #cbd5e1;
       font-size:1rem;
-      padding:6px 14px;
-      color:#fbbf24;
+      padding:8px 14px;
+      color:#0f172a;
       font-variant-numeric:tabular-nums;
+      background:#f1f5f9;
     }
 
     .meta-line{
@@ -208,10 +203,10 @@
 
     .reveal-box{
       margin-top:10px;
-      padding:10px;
+      padding:12px;
       border-radius:14px;
-      border:1px dashed #374151;
-      background:rgba(15,23,42,0.9);
+      border:1px dashed #cbd5e1;
+      background:#f8fafc;
     }
     .reveal-title{
       font-weight:700;
@@ -222,7 +217,7 @@
       gap:8px;
     }
     .reveal-body{
-      font-size:0.9rem;
+      font-size:0.92rem;
       color:var(--text);
       white-space:pre-wrap;
     }
@@ -234,27 +229,34 @@
       gap:10px;
     }
     .btn{
-      border-radius:var(--radius-pill);
-      border:1px solid #374151;
-      background:rgba(15,23,42,0.97);
+      border-radius:14px;
+      border:1px solid #e2e8f0;
+      background:#fff;
       color:var(--text);
-      font-size:1.02rem;
-      font-weight:700;
-      padding:10px 16px;
+      font-size:1rem;
+      font-weight:600;
+      padding:10px 14px;
       display:inline-flex;
-      gap:6px;
+      gap:8px;
       align-items:center;
       cursor:pointer;
       transition:all .15s ease-out;
+      box-shadow:0 8px 18px rgba(15,23,42,0.08);
     }
+    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 22px rgba(15,23,42,0.12);}
     .btn-main{
-      background:radial-gradient(circle at top left,#f97373,#b91c1c);
+      background:linear-gradient(90deg,#16a34a,#22c55e);
       border:none;
-      color:#fef2f2;
-      box-shadow:0 10px 24px rgba(239,68,68,0.7);
+      color:#f8fafc;
+      box-shadow:0 10px 24px rgba(22,163,74,0.35);
+    }
+    .btn-ghost{
+      background:#f8fafc;
+      color:#0f172a;
+      border-color:#e2e8f0;
     }
     .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
-    .btn-danger{color:var(--danger);border-color:#4b5563;}
+    .btn-danger{color:var(--danger);border-color:#e2e8f0;background:#fff;}
 
     .score-list{
       margin-top:10px;
@@ -267,7 +269,7 @@
       justify-content:space-between;
       align-items:center;
       padding:6px 0;
-      border-bottom:1px dashed #1f2937;
+      border-bottom:1px dashed #e2e8f0;
     }
     .score-row span:first-child{
       max-width:160px;
@@ -280,28 +282,28 @@
       margin-top:10px;
       display:flex;
       flex-wrap:wrap;
-      gap:14px;
+      gap:16px;
       align-items:center;
     }
     .qr-frame{
-      width:170px;
-      height:170px;
-      background:#f9fafb;
+      width:220px;
+      height:220px;
+      background:#fff;
       border-radius:16px;
-      border:2px solid #111827;
+      border:2px solid #0f172a;
       display:flex;
       align-items:center;
       justify-content:center;
-      box-shadow:0 10px 24px rgba(15,23,42,0.9);
+      box-shadow:0 14px 26px rgba(15,23,42,0.14);
     }
     #qrcodeQuiz{
-      width:150px;
-      height:150px;
+      width:190px;
+      height:190px;
     }
     .qr-text{
-      font-size:1rem;
+      font-size:0.96rem;
       color:var(--muted);
-      flex:1 1 120px;
+      flex:1 1 140px;
       word-wrap:break-word;
     }
   </style>
@@ -340,15 +342,15 @@
           <div class="timer-status-row">
             <span class="timer-pill" id="timerLabel">Süre: –</span>
             <span class="meta-line" id="statusLine">
-              Soruyu kısaca tanıt; hazır olduğunda "Soruyu başlat" ile süreyi aç.
+              Hazırsan süreyi başlat, odak ekranda kalsın.
             </span>
           </div>
 
           <div class="btn-row">
-            <button id="btnPrev" class="btn">⟵ Önceki soru</button>
-            <button id="btnNext" class="btn">Sonraki soru ⟶</button>
-            <button id="btnStart" class="btn btn-main">▶ Soruyu başlat</button>
-            <button id="btnReveal" class="btn">✅ Doğru yanıtı göster</button>
+            <button id="btnPrev" class="btn btn-ghost">⟵ Önceki</button>
+            <button id="btnNext" class="btn btn-ghost">Sonraki ⟶</button>
+            <button id="btnStart" class="btn btn-main">▶ Süreyi başlat</button>
+            <button id="btnReveal" class="btn btn-ghost">✅ Yanıtı göster</button>
           </div>
 
           <div class="reveal-box" id="revealBox" style="display:none;">
@@ -368,9 +370,8 @@
               <div id="qrcodeQuiz"></div>
             </div>
             <div class="qr-text">
-              Katılımcılar bu QR’ı okutup <strong>Defi Quiz</strong> katılımcı sayfasına bağlanır.
-              <br/><br/>
-              Kısa URL:<br/>
+              QR'ı okut ya da kısa URL'den katıl:
+              <br/>
               <span id="playerUrlText" class="small"></span>
             </div>
           </div>
@@ -388,8 +389,7 @@
             </button>
           </div>
           <div class="meta-line small">
-            Oturumu sıfırladığında: tüm skorlar, yanıtlar ve eski nickler silinir.
-            QR aynı kalır; herkes yeniden nickname girer.
+            Sıfırlayınca skorlar silinir, QR aynı kalır.
           </div>
         </div>
       </aside>
@@ -561,13 +561,13 @@
       });
 
       if(!currentQuestionId){
-        statusLine.textContent = "Soruyu tanıt; hazır olduğunda 'Soruyu başlat'.";
+        statusLine.textContent = "Hazır olunca süreyi aç.";
       }else if(!questionActive && !reveal){
-        statusLine.textContent = "Bu soru şu anda pasif. Yeni soru ya da aynı soruyu tekrar başlatabilirsin.";
+        statusLine.textContent = "Pasif. Aynı soruyu ya da yenisini başlat.";
       }else if(questionActive){
-        statusLine.textContent = "Soru aktif, katılımcılar yanıtlıyor.";
+        statusLine.textContent = "Soru açık, yanıtlar geliyor.";
       }else if(reveal){
-        statusLine.textContent = "Doğru yanıt gösterildi, tartışma modundasın.";
+        statusLine.textContent = "Doğru yanıt ekranda.";
       }
 
       renderRevealBox();
@@ -583,8 +583,8 @@
         box.innerHTML = "";
         new QRCode(box,{
           text: playerUrl,
-          width:120,
-          height:120
+          width:190,
+          height:190
         });
       }catch(e){console.error(e);}
     }

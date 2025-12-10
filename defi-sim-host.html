@@ -348,9 +348,11 @@
       letter-spacing:0.01em;
     }
     .qr-actions button:hover{background:#111827;}
-    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
-    .qr-modal.show{display:flex;}
-    .qr-modal .modal-card{background:#ffffff;border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;}
+    .qr-modal,.reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .qr-modal.show,.reveal-modal.show{display:flex;}
+    .qr-modal .modal-card,.reveal-modal .modal-card{background:#ffffff;border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;max-width:460px;}
+    .reveal-modal .modal-heading{font-size:1.05rem;font-weight:800;margin-bottom:10px;color:var(--heading);}
+    .reveal-modal .modal-body{color:var(--muted);white-space:pre-line;text-align:left;}
     #qrcodeSimLarge{width:360px;height:360px;margin:0 auto;}
     .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;}
   </style>
@@ -486,6 +488,14 @@
     <div class="modal-card">
       <div id="qrcodeSimLarge"></div>
       <button class="modal-close" id="qrModalClose">Kapat</button>
+    </div>
+  </div>
+
+  <div class="reveal-modal" id="revealModal">
+    <div class="modal-card">
+      <div class="modal-heading" id="revealModalTitle">Doğru yaklaşım</div>
+      <div class="modal-body" id="revealModalBody">Açıklama yüklenecek.</div>
+      <button class="modal-close" id="revealModalClose">Kapat</button>
     </div>
   </div>
 
@@ -645,6 +655,8 @@
       revealModal.classList.remove("show");
       revealModalDismissed = true;
     }
+
+    revealModalClose?.addEventListener("click", hideRevealModal);
 
     function renderRevealBox(){
       if(!revealBox || !revealModal) return;
