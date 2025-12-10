@@ -103,12 +103,7 @@
       color:var(--heading);
       margin-bottom:8px;
     }
-    .case-body{
-      font-size:1.08rem;
-      color:var(--text);
-      white-space:pre-wrap;
-      margin-bottom:10px;
-    }
+    .case-body{font-size:1.12rem;color:var(--text);white-space:pre-wrap;margin-bottom:10px;}
     .tag-row{display:none;}
 
     .progress-wrap{
@@ -208,30 +203,12 @@
       color:var(--muted);
     }
 
-    .timer-pill{
-      border-radius:var(--radius-pill);
-      border:1px solid #fcd34d;
-      font-size:1.2rem;
-      padding:10px 16px;
-      color:#92400e;
-      font-weight:800;
-      background:radial-gradient(circle at 30% 30%,#fffbe6,#fde68a 55%,#fcd34d);
-      box-shadow:0 0 0 3px rgba(252,211,77,0.18),0 12px 28px rgba(252,211,77,0.35);
-      font-variant-numeric:tabular-nums;
-      letter-spacing:0.04em;
-      transition:transform .2s ease, box-shadow .2s ease;
-    }
-    .timer-pill.live{
-      transform:translateY(-1px) scale(1.02);
-      box-shadow:0 0 0 4px rgba(252,211,77,0.28),0 16px 36px rgba(234,179,8,0.45);
-    }
+    .timer-pill{border-radius:var(--radius-pill);border:1px solid #cbd5e1;font-size:1.05rem;padding:8px 14px;color:#0f172a;font-weight:800;background:#f1f5f9;font-variant-numeric:tabular-nums;letter-spacing:0.02em;box-shadow:none;}
+    .timer-pill.live{background:#e0f2fe;border-color:#bae6fd;color:#0c4a6e;}
 
-    .btn-row{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
+    .btn-row{margin-top:12px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;}
+    .btn-row .btn{flex:1;justify-content:center;min-width:0;}
+    @media(max-width:1100px){.btn-row{flex-wrap:wrap;}}
     .btn{
       border-radius:var(--radius-pill);
       border:1px solid #cbd5e1;
@@ -262,99 +239,28 @@
       margin-top:6px;
     }
 
-    .reveal-box{
-      margin-top:14px;
-      padding:14px;
-      border-radius:18px;
-      border:1px dashed #cbd5e1;
-      background:#f1f5f9;
-      box-shadow:0 12px 28px rgba(15,23,42,0.08);
-    }
-    .reveal-title{
-      font-weight:800;
-      color:var(--heading);
-      margin-bottom:8px;
-      display:flex;
-      align-items:center;
-      gap:8px;
-    }
-    .reveal-body{
-      font-size:1.05rem;
-      color:var(--text);
-      white-space:pre-wrap;
-    }
-    .reveal-body{
-      font-size:0.9rem;
-      color:var(--text);
-      white-space:pre-wrap;
-    }
+    .reveal-box{margin-top:14px;padding:14px;border-radius:18px;border:1px dashed #cbd5e1;background:#f8fafc;box-shadow:0 12px 28px rgba(15,23,42,0.08);}
+    .reveal-title{font-weight:800;color:var(--heading);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+    .reveal-body{font-size:1.08rem;color:var(--text);white-space:pre-wrap;line-height:1.7;}
 
-    .score-list{
-      margin-top:10px;
-      font-size:1.02rem;
-      max-height:420px;
-      overflow-y:auto;
-    }
-    .score-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:6px 0;
-      border-bottom:1px dashed #cbd5e1;
-    }
-    .score-row span:first-child{
-      max-width:160px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
+    .score-list{margin-top:12px;font-size:1.02rem;max-height:460px;overflow-y:auto;}
+    .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #cbd5e1;gap:8px;}
+    .score-row .label{display:flex;align-items:center;gap:8px;max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .score-row .medal{font-size:1.15rem;}
+    .score-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;}
+    .score-row .score{font-weight:800;color:#0f172a;}
 
-    .qr-box{
-      margin-top:12px;
-      display:flex;
-      justify-content:center;
-      align-items:center;
-    }
-    .qr-frame{
-      width:260px;
-      height:260px;
-      background:#ffffff;
-      border-radius:18px;
-      border:2px solid #0f172a;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 18px 40px rgba(15,23,42,0.18);
-    }
-    #qrcodeSim{
-      width:220px;
-      height:220px;
-    }
-    .qr-actions{
-      display:flex;
-      gap:10px;
-      justify-content:center;
-      margin-top:10px;
-    }
-    .qr-actions button{
-      border:1px solid #cbd5e1;
-      background:#0f172a;
-      color:#e2e8f0;
-      border-radius:12px;
-      padding:10px 14px;
-      font-weight:800;
-      cursor:pointer;
-      box-shadow:0 12px 24px rgba(15,23,42,0.18);
-      letter-spacing:0.01em;
-    }
+    .qr-actions{display:flex;gap:10px;justify-content:center;margin-top:12px;}
+    .qr-actions button{border:1px solid #cbd5e1;background:#0f172a;color:#e2e8f0;border-radius:12px;padding:10px 14px;font-weight:800;cursor:pointer;box-shadow:0 12px 24px rgba(15,23,42,0.18);letter-spacing:0.01em;}
     .qr-actions button:hover{background:#111827;}
-    .qr-modal,.reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .qr-modal,.reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:9999;}
     .qr-modal.show,.reveal-modal.show{display:flex;}
-    .qr-modal .modal-card,.reveal-modal .modal-card{background:#ffffff;border-radius:18px;padding:16px;box-shadow:0 16px 40px rgba(0,0,0,0.25);text-align:center;max-width:460px;}
-    .reveal-modal .modal-heading{font-size:1.05rem;font-weight:800;margin-bottom:10px;color:var(--heading);}
-    .reveal-modal .modal-body{color:var(--muted);white-space:pre-line;text-align:left;}
-    #qrcodeSimLarge{width:360px;height:360px;margin:0 auto;}
-    .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:10px 14px;border-radius:12px;font-weight:800;cursor:pointer;}
+    .qr-modal .modal-card{background:#ffffff;border-radius:20px;padding:18px;box-shadow:0 18px 44px rgba(0,0,0,0.28);text-align:center;max-width:520px;}
+    #qrcodeSimLarge{width:420px;height:420px;margin:0 auto;}
+    .reveal-modal .modal-card{background:#ffffff;border-radius:20px;padding:20px;box-shadow:0 18px 44px rgba(0,0,0,0.28);max-width:900px;width:90%;}
+    .reveal-modal .modal-heading{font-size:1.25rem;font-weight:800;margin-bottom:12px;color:var(--heading);}
+    .reveal-modal .modal-body{color:var(--text);white-space:pre-line;text-align:left;font-size:1.12rem;line-height:1.8;}
+    .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer;}
   </style>
 </head>
 <body>
@@ -445,39 +351,24 @@
         </div>
       </section>
 
-      <!-- SAĞ: QR + skor -->
+      <!-- SAĞ: Skor & QR butonu -->
       <aside class="card">
         <div class="card-inner">
           <div class="section-title">Skor & Katılımcılar</div>
-
           <div class="meta-line" style="margin-bottom:6px;">
-            Toplam katılımcı: <span id="playerCount">0</span>
+            Katılımcı: <span id="playerCount">0</span>
           </div>
 
           <div id="scoreList" class="score-list"></div>
 
-          <div class="section-title" style="margin-top:10px;">QR – Katılım</div>
-          <div class="qr-box">
-            <div class="qr-frame" id="qrTapArea">
-              <div id="qrcodeSim"></div>
-            </div>
-          </div>
           <div class="qr-actions">
-            <button id="btnShowQr">QR'ı büyüt</button>
-          </div>
-
-          <div class="meta-line" style="margin-top:10px;">
-            Toplam katılımcı: <span id="playerCount">0</span>
-          </div>
-
-          <div class="btn-row" style="margin-top:10px;">
-            <button id="btnResetSession" class="btn btn-danger small">
-              🔁 Oturumu sıfırla
+            <button id="btnShowQr">📱 Katılım QR'ını Göster</button>
+            <button id="btnResetSession" class="btn btn-danger small" style="box-shadow:none;">
+              🔁 Sıfırla
             </button>
           </div>
-          <div class="meta-line small">
-            Oturumu sıfırladığında: tüm skorlar, yanıtlar ve eski nickler silinir.
-            QR aynı kalır; herkes yeniden nickname girer.
+          <div class="meta-line small" style="margin-top:6px;">
+            QR başta otomatik açılır; ihtiyaç olursa butondan tekrar gösterin.
           </div>
         </div>
       </aside>
@@ -562,7 +453,6 @@
     const sessionLabel  = document.getElementById("sessionLabel");
     const playerCountEl = document.getElementById("playerCount");
     const scoreListEl   = document.getElementById("scoreList");
-    const qrTapArea     = document.getElementById("qrTapArea");
     const btnShowQr     = document.getElementById("btnShowQr");
     const qrModal       = document.getElementById("qrModal");
     const qrModalClose  = document.getElementById("qrModalClose");
@@ -717,7 +607,7 @@
 
     function openQrModal(auto){
       if(!playerUrl) return;
-      renderQr(qrLargeBox, 360);
+      renderQr(qrLargeBox, 420);
       qrModal.classList.add("show");
       if(auto) qrModalShown = true;
     }
@@ -730,9 +620,7 @@
       try{
         const href = window.location.href;
         playerUrl = href.replace(/defi-sim-host(\.html)?/,"defi-sim-player.html");
-        const box = document.getElementById("qrcodeSim");
-        renderQr(box, 220);
-        renderQr(qrLargeBox, 360);
+        renderQr(qrLargeBox, 420);
         if(!qrModalShown){
           qrModalShown = true;
           setTimeout(()=>openQrModal(true), 200);
@@ -741,7 +629,6 @@
     }
     initQR();
     btnShowQr.addEventListener("click", ()=>openQrModal(false));
-    qrTapArea.addEventListener("click", ()=>openQrModal(false));
     qrModalClose.addEventListener("click", closeQrModal);
     qrModal.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
 
@@ -915,15 +802,26 @@
         arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
         playerCountEl.textContent = arr.length;
         scoreListEl.innerHTML = "";
+        const medals = ["🏆","🥈","🥉"];
         arr.forEach((p,idx)=>{
           const row  = document.createElement("div");
           row.className = "score-row";
-          const left  = document.createElement("span");
-          const right = document.createElement("span");
-          left.textContent  = (idx+1)+". "+p.nickname;
-          right.textContent = p.score+" p";
-          row.appendChild(left);
-          row.appendChild(right);
+          const label = document.createElement("div");
+          label.className = "label";
+          const medal = document.createElement("span");
+          medal.className = "medal";
+          medal.textContent = medals[idx] || "🎯";
+          const name  = document.createElement("span");
+          name.className = "name";
+          name.textContent  = p.nickname;
+          label.appendChild(medal);
+          label.appendChild(name);
+
+          const score = document.createElement("span");
+          score.className = "score";
+          score.textContent = p.score+" p";
+          row.appendChild(label);
+          row.appendChild(score);
           scoreListEl.appendChild(row);
         });
       });

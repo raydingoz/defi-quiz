@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>Defi Quiz – Eğitmen</title>
+  <title>Defi Quiz</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <!-- Firebase -->
@@ -44,12 +44,7 @@
       gap:12px;
       margin-bottom:16px;
     }
-    .brand{
-      font-size:1.3rem;
-      font-weight:800;
-      letter-spacing:.04em;
-      color:var(--heading);
-    }
+    .brand{font-size:1.3rem;font-weight:800;letter-spacing:.04em;color:var(--heading);}
     .top-pill{
       display:inline-flex;
       align-items:center;
@@ -101,12 +96,7 @@
       color:var(--heading);
       margin-bottom:8px;
     }
-    .question-body{
-      font-size:1.08rem;
-      color:var(--text);
-      white-space:pre-wrap;
-      margin-bottom:10px;
-    }
+    .question-body{font-size:1.1rem;color:var(--text);white-space:pre-wrap;margin-bottom:10px;}
 
     .progress-wrap{
       display:flex;
@@ -216,18 +206,11 @@
       align-items:center;
       gap:8px;
     }
-    .reveal-body{
-      font-size:0.92rem;
-      color:var(--text);
-      white-space:pre-wrap;
-    }
+    .reveal-body{font-size:1.1rem;color:var(--text);white-space:pre-wrap;}
 
-    .btn-row{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
-    }
+    .btn-row{margin-top:12px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;}
+    .btn-row .btn{flex:1;justify-content:center;min-width:0;}
+    @media(max-width:1100px){.btn-row{flex-wrap:wrap;}}
     .btn{
       border-radius:14px;
       border:1px solid #e2e8f0;
@@ -258,60 +241,33 @@
     .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
     .btn-danger{color:var(--danger);border-color:#e2e8f0;background:#fff;}
 
-    .score-list{
-      margin-top:10px;
-      font-size:1.02rem;
-      max-height:320px;
-      overflow-y:auto;
-    }
-    .score-row{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      padding:6px 0;
-      border-bottom:1px dashed #e2e8f0;
-    }
-    .score-row span:first-child{
-      max-width:160px;
-      overflow:hidden;
-      text-overflow:ellipsis;
-      white-space:nowrap;
-    }
+    .score-list{margin-top:12px;font-size:1.02rem;max-height:420px;overflow-y:auto;}
+    .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #e2e8f0;gap:8px;}
+    .score-row .label{display:flex;align-items:center;gap:8px;max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .score-row .medal{font-size:1.15rem;}
+    .score-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;}
+    .score-row .score{font-weight:700;color:#0f172a;}
 
-    .qr-box{
-      margin-top:10px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:16px;
-      align-items:center;
-    }
-    .qr-frame{
-      width:220px;
-      height:220px;
-      background:#fff;
-      border-radius:16px;
-      border:2px solid #0f172a;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 14px 26px rgba(15,23,42,0.14);
-    }
-    #qrcodeQuiz{
-      width:190px;
-      height:190px;
-    }
-    .qr-text{
-      font-size:0.96rem;
-      color:var(--muted);
-      flex:1 1 140px;
-      word-wrap:break-word;
-    }
+    .qr-cta{margin-top:10px;display:flex;gap:10px;align-items:center;}
+
+    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:9999;}
+    .qr-modal.show{display:flex;}
+    .qr-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 48px rgba(0,0,0,0.28);max-width:520px;text-align:center;}
+    #qrcodeQuizLarge{width:420px;height:420px;margin:0 auto;}
+    .qr-link{margin-top:8px;font-weight:700;color:#0f172a;word-break:break-all;}
+    .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer;}
+
+    .reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:9998;}
+    .reveal-modal.show{display:flex;}
+    .reveal-modal .modal-card{background:#ffffff;border-radius:20px;padding:20px;max-width:860px;width:90%;box-shadow:0 22px 50px rgba(0,0,0,0.28);}
+    .reveal-modal .modal-title{font-size:1.3rem;font-weight:800;margin-bottom:10px;color:var(--heading);}
+    .reveal-modal .modal-body{font-size:1.15rem;line-height:1.8;color:var(--text);white-space:pre-wrap;}
   </style>
 </head>
 <body>
   <div class="app">
     <header class="top-bar">
-      <div class="brand">Defi Quiz – Eğitmen</div>
+      <div class="brand">Defi Quiz</div>
       <div class="top-pill">
         <span class="dot-live"></span>
         <span>Defibrilasyon / KV Quiz</span>
@@ -360,40 +316,44 @@
         </div>
       </section>
 
-      <!-- SAĞ: QR + skor -->
+      <!-- SAĞ: Skor & QR butonu -->
       <aside class="card">
         <div class="card-inner">
-          <div class="section-title">Katılımcılar & QR</div>
-
-          <div class="qr-box">
-            <div class="qr-frame">
-              <div id="qrcodeQuiz"></div>
-            </div>
-            <div class="qr-text">
-              QR'ı okut ya da kısa URL'den katıl:
-              <br/>
-              <span id="playerUrlText" class="small"></span>
-            </div>
+          <div class="section-title">Skor Tablosu</div>
+          <div class="meta-line" style="margin-top:4px;">
+            Katılımcı: <span id="playerCount">0</span>
           </div>
-
-          <div class="meta-line" style="margin-top:8px;">
-            Toplam katılımcı: <span id="playerCount">0</span>
-          </div>
-
-          <div class="section-title" style="margin-top:8px;">Skor Tablosu</div>
           <div id="scoreList" class="score-list"></div>
 
-          <div class="btn-row" style="margin-top:8px;">
+          <div class="qr-cta">
+            <button id="btnShowQr" class="btn btn-ghost" style="flex:1;">
+              📱 Katılım QR'ını Göster
+            </button>
             <button id="btnResetSession" class="btn btn-danger small">
-              🔁 Oturumu sıfırla
+              🔁 Sıfırla
             </button>
           </div>
-          <div class="meta-line small">
-            Sıfırlayınca skorlar silinir, QR aynı kalır.
+          <div class="meta-line small" style="margin-top:6px;">
+            QR açılışı başta otomatik gösterilir; gerektiğinde butondan açabilirsiniz.
           </div>
         </div>
       </aside>
     </main>
+  </div>
+
+  <div class="qr-modal" id="qrModal">
+    <div class="qr-card">
+      <div id="qrcodeQuizLarge"></div>
+      <div class="qr-link" id="playerUrlText"></div>
+      <button class="modal-close" id="qrModalClose">Kapat</button>
+    </div>
+  </div>
+
+  <div class="reveal-modal" id="revealModal">
+    <div class="modal-card">
+      <div class="modal-title" id="revealModalTitle">Doğru yanıt</div>
+      <div class="modal-body" id="revealModalBody">Açıklama yüklenecek.</div>
+    </div>
   </div>
 
   <script>
@@ -446,6 +406,14 @@
     const playerCountEl   = document.getElementById("playerCount");
     const scoreListEl     = document.getElementById("scoreList");
     const playerUrlText   = document.getElementById("playerUrlText");
+    const btnShowQr       = document.getElementById("btnShowQr");
+    const qrModal         = document.getElementById("qrModal");
+    const qrModalClose    = document.getElementById("qrModalClose");
+    const qrLargeBox      = document.getElementById("qrcodeQuizLarge");
+
+    const revealModal     = document.getElementById("revealModal");
+    const revealModalTitle= document.getElementById("revealModalTitle");
+    const revealModalBody = document.getElementById("revealModalBody");
 
     const progressLabel   = document.getElementById("progressLabel");
     const progressFill    = document.getElementById("progressFill");
@@ -453,6 +421,10 @@
     const revealBox       = document.getElementById("revealBox");
     const revealTitle     = document.getElementById("revealTitle");
     const revealBody      = document.getElementById("revealBody");
+
+    let playerUrl         = "";
+    let qrModalShown      = false;
+    let revealModalDismissed = false;
 
     function safeQuestion(idx){
       if(!QUESTIONS.length) return null;
@@ -475,7 +447,7 @@
         timerLabel.textContent="Süre: –";
         return;
       }
-      timerRemaining = q.timeLimitSec || 10;
+      timerRemaining = q.timeLimitSec || 30;
       timerLabel.textContent = "Süre: "+timerRemaining+" sn";
       timerInterval = setInterval(()=>{
         timerRemaining -= 1;
@@ -514,12 +486,14 @@
       const q = safeQuestion(currentIndex);
       if(!q || !currentQuestionId || !reveal){
         revealBox.style.display = "none";
+        hideRevealModal(true);
         return;
       }
 
       revealTitle.textContent = formatCorrectAnswer(q);
       revealBody.textContent  = q.explanation || "Açıklama henüz eklenmemiş.";
       revealBox.style.display = "block";
+      showRevealModal();
     }
 
     function renderQuestion(){
@@ -561,7 +535,7 @@
       });
 
       if(!currentQuestionId){
-        statusLine.textContent = "Hazır olunca süreyi aç.";
+        statusLine.textContent = "Süre otomatik başlayacak (30 sn).";
       }else if(!questionActive && !reveal){
         statusLine.textContent = "Pasif. Aynı soruyu ya da yenisini başlat.";
       }else if(questionActive){
@@ -572,21 +546,20 @@
 
       renderRevealBox();
       updateProgress();
+      autoStartIfIdle();
     }
 
     function initQR(){
       try{
         let href = window.location.href;
-        const playerUrl = href.replace(/defi-quiz-host(\.html)?/,"defi-quiz-player.html");
+        playerUrl = href.replace(/defi-quiz-host(\.html)?/,"defi-quiz-player.html");
         playerUrlText.textContent = playerUrl;
-        const box = document.getElementById("qrcodeQuiz");
-        box.innerHTML = "";
-        new QRCode(box,{
-          text: playerUrl,
-          width:190,
-          height:190
-        });
-      }catch(e){console.error(e);}
+        renderQrModal();
+        if(!qrModalShown){
+          qrModalShown = true;
+          setTimeout(()=>openQrModal(true), 200);
+        }
+      }catch(e){console.error(e);}  
     }
     initQR();
 
@@ -627,7 +600,7 @@
       renderQuestion();
     });
 
-    function startQuestion(){
+    function startQuestion(auto=false){
       if(!configLoaded) return;
       const q = safeQuestion(currentIndex);
       if(!q) return;
@@ -649,9 +622,18 @@
       updates["answers/"+currentQuestionId]     = null;
       rootRef.update(updates);
 
+      if(auto){
+        statusLine.textContent = "Süre otomatik başladı.";
+      }
       renderQuestion();
     }
-    btnStart.addEventListener("click", startQuestion);
+    btnStart.addEventListener("click", ()=>startQuestion(false));
+
+    function autoStartIfIdle(){
+      if(!configLoaded) return;
+      if(questionActive || currentQuestionId || reveal) return;
+      startQuestion(true);
+    }
 
     btnReveal.addEventListener("click",()=>{
       if(!currentQuestionId) return;
@@ -737,6 +719,9 @@
 
       rootRef.child("reveal").on("value",snap=>{
         reveal = !!snap.val();
+        if(reveal){
+          revealModalDismissed = false;
+        }
         renderQuestion();
       });
 
@@ -750,15 +735,26 @@
         arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
         playerCountEl.textContent = arr.length;
         scoreListEl.innerHTML = "";
+        const medals = ["🥇","🥈","🥉"];
         arr.forEach((p,idx)=>{
           const row  = document.createElement("div");
           row.className = "score-row";
-          const left  = document.createElement("span");
-          const right = document.createElement("span");
-          left.textContent  = (idx+1)+". "+p.nickname;
-          right.textContent = p.score+" p";
-          row.appendChild(left);
-          row.appendChild(right);
+          const label = document.createElement("div");
+          label.className = "label";
+          const medal = document.createElement("span");
+          medal.className = "medal";
+          medal.textContent = medals[idx] || "🎯";
+          const name  = document.createElement("span");
+          name.className = "name";
+          name.textContent  = p.nickname;
+          label.appendChild(medal);
+          label.appendChild(name);
+
+          const score = document.createElement("span");
+          score.className = "score";
+          score.textContent = p.score+" p";
+          row.appendChild(label);
+          row.appendChild(score);
           scoreListEl.appendChild(row);
         });
       });
@@ -797,6 +793,37 @@
     }
 
     loadConfig();
+
+    function renderQrModal(){
+      if(!playerUrl || !qrLargeBox) return;
+      qrLargeBox.innerHTML = "";
+      new QRCode(qrLargeBox,{ text: playerUrl, width:420, height:420 });
+    }
+    function openQrModal(){
+      renderQrModal();
+      qrModal?.classList.add("show");
+    }
+    function closeQrModal(){ qrModal?.classList.remove("show"); }
+    btnShowQr?.addEventListener("click", openQrModal);
+    qrModalClose?.addEventListener("click", closeQrModal);
+    qrModal?.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
+
+    function showRevealModal(){
+      if(!reveal || !currentQuestionId) return;
+      revealModalTitle.textContent = revealTitle.textContent;
+      revealModalBody.textContent  = revealBody.textContent;
+      if(!revealModalDismissed){
+        revealModal.classList.add("show");
+      }
+    }
+    function hideRevealModal(fromState){
+      if(!fromState){
+        revealModalDismissed = true;
+      }
+      revealModal.classList.remove("show");
+    }
+    revealModal?.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(false); });
+
   </script>
 </body>
 </html>
