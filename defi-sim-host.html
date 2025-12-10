@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <title>Defi ALS Sim</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23fff'/%3E%3Cpath d='M20 18h24a2 2 0 0 1 2 2v24a2 2 0 0 1-2 2H20a2 2 0 0 1-2-2V20a2 2 0 0 1 2-2zm11 7h2a2 2 0 0 1 2 2v2h3a2 2 0 0 1 2 2v2a2 2 0 0 1-2 2h-3v2a2 2 0 0 1-2 2h-2a2 2 0 0 1-2-2v-2h-3a2 2 0 0 1-2-2v-2a2 2 0 0 1 2-2h3v-2a2 2 0 0 1 2-2z' fill='%23055'/%3E%3C/svg%3E" />
 
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
@@ -646,6 +647,7 @@
     }
 
     function renderRevealBox(){
+      if(!revealBox || !revealModal) return;
       const c = safeCase(currentIndex);
       if(!c || !currentReveal || !currentCaseId){
         revealBox.style.display = "none";
