@@ -173,10 +173,11 @@
       width:240px;
       height:60px;
     }
+    .ekg-strip path{stroke:#22c55e;}
     .ekg-strip.sinus path{stroke:#22c55e;}
     .ekg-strip.vf path{stroke:#f97373;}
     .ekg-strip.vt path{stroke:#facc15;}
-    .ekg-strip.asystole path{stroke:#4b5563;}
+    .ekg-strip.asystole path{stroke:#22c55e;opacity:0.6;}
     .ekg-strip.pea path{stroke:#38bdf8;}
     .ekg-strip.torsades path{stroke:#f97316;}
 
@@ -358,21 +359,21 @@
             <span>ALS Sim</span>
           </div>
           <div class="ekg-line">
-            <div class="ekg-strip asystole" id="ekgStrip">
+            <div class="ekg-strip blank" id="ekgStrip">
               <svg viewBox="0 0 240 60" preserveAspectRatio="none">
-                <polyline id="ekgPath1" fill="none" stroke="#4b5563" stroke-width="2"
+                <polyline id="ekgPath1" fill="none" stroke="#22c55e" stroke-width="2"
                   stroke-linejoin="round" stroke-linecap="round"
-                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                  points="" />
               </svg>
               <svg viewBox="0 0 240 60" preserveAspectRatio="none">
-                <polyline id="ekgPath2" fill="none" stroke="#4b5563" stroke-width="2"
+                <polyline id="ekgPath2" fill="none" stroke="#22c55e" stroke-width="2"
                   stroke-linejoin="round" stroke-linecap="round"
-                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                  points="" />
               </svg>
               <svg viewBox="0 0 240 60" preserveAspectRatio="none">
-                <polyline id="ekgPath3" fill="none" stroke="#4b5563" stroke-width="2"
+                <polyline id="ekgPath3" fill="none" stroke="#22c55e" stroke-width="2"
                   stroke-linejoin="round" stroke-linecap="round"
-                  points="0,30 40,30 80,30 120,30 160,30 200,30 240,30" />
+                  points="" />
               </svg>
             </div>
           </div>
@@ -490,6 +491,7 @@
     const exModalClose  = document.getElementById("exModalClose");
 
     const EKG_SHAPES = {
+  "blank": "",
   "af": "0,30 10,34 14,1 15,58 20,25 22,30 25,26 29,22 32,22 34,27 34,28 38,30 40,35 44,1 45,59 49,26 52,31 55,26 58,25 66,25 72,28 73,29 80,29 82,28 84,30 85,34 88,1 91,56 94,25 95,31 97,31 100,30 105,25 108,25 111,28 113,30 119,30 125,29 127,34 130,58 130,1 135,27 138,30 142,30 149,30 156,30 159,34 163,1 165,58 167,28 169,30 172,31 174,24 178,23 181,27 182,30 185,30 187,34 189,2 191,58 194,27 197,23 200,24 205,28 206,30 209,0 210,58 212,28 214,24 217,23 222,25 226,28 229,29 232,29 238,29 240,30",
   "asystole": "0,30 3,29 12,28 24,28 36,29 44,31 50,31 57,31 67,30 77,28 87,28 99,30 111,33 116,33 128,30 143,28 153,26 165,25 178,27 188,30 201,31 216,31 228,30 240,30",
   "sinus": "0,30 14,29 19,25 25,25 27,30 32,31 36,34 40,13 42,45 45,29 51,31 56,26 61,24 69,25 72,30 80,31 88,31 94,26 100,26 101,30 114,30 115,35 120,10 121,44 124,29 128,30 134,26 135,25 141,24 146,26 150,29 150,31 157,30 164,31 170,30 173,30 177,25 181,26 182,30 183,31 189,31 191,35 195,9 195,44 198,30 204,29 209,25 209,25 215,26 220,29 221,31 240,30",
@@ -554,8 +556,8 @@
     }
 
     function applyRhythm(key, animate){
-      const k = key || "sinus";
-      const shape = EKG_SHAPES[k] || EKG_SHAPES["sinus"];
+      const k = key || "blank";
+      const shape = EKG_SHAPES[k] || "";
       ekgPath1.setAttribute("points", shape);
       ekgPath2.setAttribute("points", shape);
       ekgPath3.setAttribute("points", shape);
@@ -577,7 +579,7 @@
       caseTitleEl.textContent = c.title || ("Olgu " + (currentCaseIndex+1));
       caseNarrEl.textContent  = c.narrative || "";
 
-      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "asystole";
+      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "blank";
       applyRhythm(rhythmKey, !!currentRhythmActive);
 
       const existingSummary = currentCaseId ? answerOutcomes[currentCaseId] : null;
@@ -614,9 +616,6 @@
 
     function openExplanationModal(isCorrect, c){
       if(!c) return;
-      const key = c.id || (currentCaseId || "");
-      if(shownExplanation[key]) return;
-      shownExplanation[key] = true;
 
       exModalTitle.textContent = isCorrect ? "Doğru yaklaşım" : "Olgunun açıklaması";
 

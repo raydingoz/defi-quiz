@@ -536,10 +536,6 @@
 
     function openExplanationModal(isCorrect, q){
       if(!q) return;
-      const key = q.id || (currentQuestionId || "");
-      if(shownExplanation[key]) return;
-      shownExplanation[key] = true;
-
       exModalTitle.textContent = isCorrect ? "Doğru yanıt" : "Soru açıklaması";
 
       let body = "";
