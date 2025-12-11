@@ -241,21 +241,15 @@
     .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
     .btn-danger{color:var(--danger);border-color:#e2e8f0;background:#fff;}
 
-    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:flex-end;margin-top:8px;}
-    .podium-card{position:relative;border-radius:16px;border:1px solid #e2e8f0;padding:12px 10px 16px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;text-align:center;background:#ffffff;box-shadow:0 12px 26px rgba(15,23,42,0.12);}
-    .podium-card::after{content:"";position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:72%;height:8px;border-radius:999px;background:#e2e8f0;opacity:0.9;}
-    .podium-card .place{font-weight:800;font-size:0.95rem;color:#16a34a;letter-spacing:.02em;}
-    .podium-card .name{font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-    .podium-card .score{font-weight:800;color:#0f172a;}
-    .podium-card.second{order:1;min-height:150px;}
-    .podium-card.first{order:2;min-height:190px;box-shadow:0 16px 32px rgba(22,163,74,0.18);} 
-    .podium-card.third{order:3;min-height:130px;}
-    .score-list{margin-top:10px;font-size:1rem;max-height:360px;overflow-y:auto;}
-    .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #e2e8f0;gap:8px;}
-    .score-row .label{display:flex;align-items:center;gap:8px;max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-    .score-row .medal{font-size:1.05rem;}
+    .score-list{margin-top:10px;font-size:1.15rem;max-height:360px;overflow-y:auto;}
+    .score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #e2e8f0;gap:10px;font-weight:800;}
+    .score-row .label{display:flex;align-items:center;gap:12px;max-width:240px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .score-row .medal{font-size:1.1rem;}
     .score-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;}
-    .score-row .score{font-weight:700;color:#0f172a;}
+    .score-row .score{font-weight:800;color:#0f172a;font-size:1.1rem;}
+    .score-row.rank-1 .medal,.score-row.rank-1 .name{color:#d4af37;}
+    .score-row.rank-2 .medal,.score-row.rank-2 .name{color:#c0c0c0;}
+    .score-row.rank-3 .medal,.score-row.rank-3 .name{color:#cd7f32;}
 
     .qr-cta{margin-top:10px;display:flex;gap:10px;align-items:center;}
 
@@ -332,7 +326,6 @@
           <div class="meta-line" style="margin-top:4px;">
             Katılımcı: <span id="playerCount">0</span>
           </div>
-          <div id="podium" class="podium"></div>
           <div id="scoreList" class="score-list"></div>
 
           <div class="qr-cta">
@@ -414,7 +407,6 @@
 
     const sessionLabel    = document.getElementById("sessionLabel");
     const playerCountEl   = document.getElementById("playerCount");
-    const podiumEl        = document.getElementById("podium");
     const scoreListEl     = document.getElementById("scoreList");
     const playerUrlText   = document.getElementById("playerUrlText");
     const btnShowQr       = document.getElementById("btnShowQr");
@@ -677,8 +669,6 @@
       reveal            = false;
       timerRemaining    = 0;
       timerLabel.textContent = "Süre: –";
-      podiumEl.style.display = "none";
-      podiumEl.innerHTML     = "";
       scoreListEl.innerHTML   = "";
       playerCountEl.textContent = "0";
       statusLine.textContent = "Yeni quiz oturumu başlatıldı.";
@@ -747,22 +737,18 @@
         }));
         arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
         playerCountEl.textContent = arr.length;
-        podiumEl.innerHTML = "";
         scoreListEl.innerHTML = "";
-
-        const positive = arr.filter(p=>p.score>0);
-        if(!positive.length){
-          podiumEl.style.display = "none";
+        if(!arr.length){
           const empty = document.createElement("div");
           empty.className = "meta-line small";
-          empty.textContent = "Henüz puanlı katılımcı yok.";
+          empty.textContent = "Henüz katılımcı yok.";
           scoreListEl.appendChild(empty);
           return;
         }
 
         let lastScore = null;
         let currentRank = 0;
-        const ranked = positive.map(p=>{
+        const ranked = arr.map(p=>{
           if(lastScore===null || p.score!==lastScore){
             currentRank += 1;
             lastScore = p.score;
@@ -775,38 +761,12 @@
           return acc;
         },{});
 
-        const topThree = ranked.slice(0,3);
-        const order = [1,0,2];
-        podiumEl.style.display = "grid";
-        order.forEach(idx=>{
-          const entry = topThree[idx];
-          if(!entry) return;
-          const card = document.createElement("div");
-          card.className = "podium-card " + (idx===1 ? "first" : idx===0 ? "second" : "third");
-
-          const place = document.createElement("div");
-          place.className = "place";
-          const tieMark = scoreCounts[entry.score]>1 ? "↔ " : "";
-          place.textContent = tieMark + entry.rank + ".";
-
-          const name = document.createElement("div");
-          name.className = "name";
-          name.textContent = entry.nickname;
-
-          const score = document.createElement("div");
-          score.className = "score";
-          score.textContent = entry.score + " p";
-
-          card.appendChild(place);
-          card.appendChild(name);
-          card.appendChild(score);
-          podiumEl.appendChild(card);
-        });
-
-        const rest = ranked.slice(3);
-        rest.forEach(p=>{
+        ranked.forEach(p=>{
           const row  = document.createElement("div");
           row.className = "score-row";
+          if(p.rank <= 3){
+            row.classList.add("rank-"+p.rank);
+          }
           const label = document.createElement("div");
           label.className = "label";
           const medal = document.createElement("span");
