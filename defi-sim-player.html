@@ -11,13 +11,13 @@
 
   <style>
     :root{
-      --bg:#020617;
-      --card:#020617;
-      --border:#1f2937;
+      --bg:#0b1224;
+      --card:#0f1b33;
+      --border:#1f2a44;
       --accent:#f97373;
       --danger:#ef4444;
-      --text:#e5e7eb;
-      --muted:#9ca3af;
+      --text:#e8edf5;
+      --muted:#cbd5f5;
       --heading:#fef2f2;
       --radius-lg:18px;
       --radius-pill:999px;
@@ -27,7 +27,7 @@
       margin:0;
       padding:8px;
       font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:radial-gradient(circle at top,#7f1d1d 0,#020617 40%,#000 100%);
+      background:radial-gradient(circle at top,#ef4444 0,#0b1224 38%,#0a0f1f 100%);
       color:var(--text);
       font-size:15px;
     }
@@ -66,8 +66,8 @@
     .card{
       border-radius:var(--radius-lg);
       border:1px solid var(--border);
-      background:var(--card);
-      box-shadow:0 16px 32px rgba(15,23,42,0.9);
+      background:linear-gradient(160deg,#0f1b33,#101828 55%,#0f172a);
+      box-shadow:0 16px 32px rgba(15,23,42,0.7);
       padding:10px;
       margin-top:8px;
       position:relative;
@@ -109,7 +109,7 @@
       flex:1;
       border-radius:var(--radius-pill);
       border:1px solid var(--border);
-      background:#020617;
+      background:#0f172a;
       color:var(--text);
       padding:8px 10px;
       font-size:0.9rem;
@@ -231,13 +231,15 @@
 
     .timer-pill{
       border-radius:var(--radius-pill);
-      border:1px solid #52525b;
+      border:1px solid #334155;
       padding:3px 9px;
       font-size:0.8rem;
       color:#fbbf24;
       font-variant-numeric:tabular-nums;
       display:inline-block;
       margin-top:4px;
+      background:rgba(248,113,113,0.12);
+      box-shadow:0 0 16px rgba(248,113,113,0.2);
     }
 
     .btn-row{
@@ -583,7 +585,7 @@
     }
 
     function updateButtonsState(){
-      const canAnswer = configLoaded && currentCaseId && currentRhythmActive && !currentReveal && playerId;
+      const canAnswer = configLoaded && currentCaseId && !currentReveal && playerId;
       const already   = currentCaseId && answeredCases[currentCaseId];
       const disabled  = !canAnswer || already;
       [btnShock, btnNoShock, btnCardio].forEach(btn => btn.disabled = disabled);
@@ -613,7 +615,7 @@
       caseTitleEl.textContent = c.title || ("Olgu " + (currentCaseIndex+1));
       caseNarrEl.textContent  = c.narrative || "";
 
-      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "blank";
+      const rhythmKey = (currentCaseId && c.rhythmKey) ? c.rhythmKey : "blank";
       applyRhythm(rhythmKey, !!currentRhythmActive);
 
       const existingSummary = currentCaseId ? answerOutcomes[currentCaseId] : null;
@@ -624,7 +626,7 @@
       }else if(!currentCaseId){
         answerStatus.textContent = "Olgu ve ritim açıldığında karar verebileceksin.";
       }else if(!currentRhythmActive && !currentReveal){
-        answerStatus.textContent = "Ritim kapalı. Yeni olgu için eğitmeni bekle.";
+        answerStatus.textContent = "Süre doldu; ritim ekranda. Cevap verirsen puan 0 olur.";
       }else if(currentRhythmActive){
         if(answeredCases[currentCaseId]){
           answerStatus.textContent = "Bu olguyu yanıtladın. Yeni olgu bekle.";
@@ -693,7 +695,7 @@
 
     function sendAction(actionKey){
       if(!playerId || !configLoaded || currentCaseIndex==null || !currentCaseId) return;
-      if(!currentRhythmActive || currentReveal) return;
+      if(currentReveal) return;
       if(answeredCases[currentCaseId]) return;
 
       const c = safeCase(currentCaseIndex);
@@ -712,23 +714,31 @@
       }
 
       const isCorrect = (actionKey === c.correctAction);
+      const timedOut  = !currentRhythmActive;
       const caseIdStr = String(currentCaseId);
       const answersRef   = rootRef.child("answers").child(caseIdStr);
       const playerAnsRef = answersRef.child(playerId);
 
-      if(!isCorrect){
+      if(!isCorrect || timedOut){
         playerAnsRef.set({
           nickname: nickname || "Anonim",
           action: actionKey,
-          correct: false,
+          correct: isCorrect,
           points: 0,
+          late: timedOut,
           ts: Date.now()
         });
-        const summary = {
-          text: "Bu olguda yaklaşım ERC ile uyumlu değil.",
-          className: "feedback bad",
-          isCorrect: false
-        };
+        const summary = timedOut
+          ? {
+              text: isCorrect ? "Süre doldu; doğru yaklaşım ama puan alamadın." : "Süre doldu; yaklaşım ERC ile uyumlu değil.",
+              className: isCorrect ? "feedback" : "feedback bad",
+              isCorrect: isCorrect
+            }
+          : {
+              text: "Bu olguda yaklaşım ERC ile uyumlu değil.",
+              className: "feedback bad",
+              isCorrect: false
+            };
         answerOutcomes[currentCaseId] = summary;
         answerStatus.textContent = summary.text;
         answerStatus.className   = summary.className;
