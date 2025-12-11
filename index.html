@@ -6,14 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --accent: #f97373;
-      --danger: #ef4444;
-      --text: #e5e7eb;
-      --muted: #9ca3af;
-      --heading: #fef2f2;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --accent: #16a34a;
+      --danger: #dc2626;
+      --text: #0f172a;
+      --muted: #475569;
+      --heading: #0f172a;
       --radius-lg: 22px;
       --radius-pill: 999px;
     }
@@ -21,8 +21,8 @@
     body {
       margin: 0;
       padding: 18px 10px 24px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
-      background: radial-gradient(circle at top, #7f1d1d 0, #020617 40%, #000 100%);
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
+      background: var(--bg);
       color: var(--text);
       font-size: 15px;
     }
@@ -32,19 +32,16 @@
     }
     .hero {
       border-radius: 28px;
-      border: 1px solid #27272f;
-      padding: 14px 16px 16px;
-      background:
-        radial-gradient(circle at top left, rgba(248,113,113,0.17),transparent 55%),
-        radial-gradient(circle at bottom right, rgba(15,23,42,0.95), #020617 70%);
-      box-shadow: 0 22px 50px rgba(15,23,42,0.9);
+      border: 1px solid var(--border);
+      padding: 16px 18px 18px;
+      background: linear-gradient(135deg, #ecfeff, #e0f2fe);
+      box-shadow: 0 22px 50px rgba(15,23,42,0.14);
       margin-bottom: 14px;
     }
     .hero-title {
       font-size: 1.15rem;
       font-weight: 800;
-      letter-spacing: .05em;
-      text-transform: uppercase;
+      letter-spacing: .04em;
       color: var(--heading);
       margin-bottom: 4px;
     }
@@ -52,6 +49,7 @@
       font-size: 0.9rem;
       color: var(--muted);
       max-width: 640px;
+      line-height: 1.6;
     }
     .hero-badges {
       margin-top: 8px;
@@ -63,9 +61,9 @@
     .badge {
       padding: 3px 9px;
       border-radius: 999px;
-      border: 1px solid #374151;
-      background: rgba(15,23,42,0.9);
-      color: var(--muted);
+      border: 1px solid var(--border);
+      background: #e2f3ec;
+      color: #0f172a;
     }
 
     .grid {
@@ -81,18 +79,12 @@
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       background: var(--card);
-      box-shadow: 0 16px 32px rgba(15,23,42,0.9);
-      padding: 12px;
+      box-shadow: 0 16px 32px rgba(15,23,42,0.08);
+      padding: 14px;
       position: relative;
       overflow: hidden;
     }
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at top left, rgba(248,113,113,0.14), transparent 55%);
-      pointer-events: none;
-    }
+    .card::before { display: none; }
     .card-inner { position: relative; z-index: 1; }
 
     .card-title {
@@ -116,8 +108,8 @@
       padding: 8px 12px;
       font-size: 0.84rem;
       font-weight: 600;
-      border: 1px solid #374151;
-      background: rgba(15,23,42,0.98);
+      border: 1px solid var(--border);
+      background: #e2f3ec;
       color: var(--text);
       cursor: pointer;
       text-decoration: none;
@@ -128,10 +120,10 @@
       color: var(--accent);
     }
     .btn-main {
-      background: radial-gradient(circle at top left, #f97373, #b91c1c);
+      background: linear-gradient(90deg,#16a34a,#22c55e);
       border: none;
       color: #fef2f2;
-      box-shadow: 0 12px 26px rgba(239,68,68,0.7);
+      box-shadow: 0 12px 26px rgba(22,163,74,0.28);
     }
 
     .links {
@@ -140,7 +132,7 @@
       color: var(--muted);
     }
     .links a {
-      color: #f97373;
+      color: #16a34a;
       text-decoration: none;
     }
     .links a:hover { text-decoration: underline; }

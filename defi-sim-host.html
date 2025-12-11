@@ -243,10 +243,19 @@
     .reveal-title{font-weight:800;color:var(--heading);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
     .reveal-body{font-size:1.08rem;color:var(--text);white-space:pre-wrap;line-height:1.7;}
 
-    .score-list{margin-top:12px;font-size:1.02rem;max-height:460px;overflow-y:auto;}
+    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:flex-end;margin-top:10px;}
+    .podium-card{border-radius:16px;border:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(180deg,#ecfeff,#e2f3ec);box-shadow:0 14px 26px rgba(15,23,42,0.12);}
+    .podium-card .place{font-weight:800;font-size:1.05rem;color:#0f172a;}
+    .podium-card .name{font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+    .podium-card .score{font-weight:800;color:#0f172a;}
+    .podium-card .step{width:100%;border-radius:12px;background:linear-gradient(90deg,#16a34a,#22c55e);}
+    .podium-card.second{transform:translateY(-2px);order:1;}
+    .podium-card.first{transform:translateY(-14px);order:2;box-shadow:0 16px 30px rgba(34,197,94,0.18);}
+    .podium-card.third{transform:translateY(10px);order:3;}
+    .score-list{margin-top:10px;font-size:1rem;max-height:360px;overflow-y:auto;}
     .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #cbd5e1;gap:8px;}
-    .score-row .label{display:flex;align-items:center;gap:8px;max-width:200px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-    .score-row .medal{font-size:1.15rem;}
+    .score-row .label{display:flex;align-items:center;gap:8px;max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+    .score-row .medal{font-size:1.05rem;}
     .score-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;}
     .score-row .score{font-weight:800;color:#0f172a;}
 
@@ -359,6 +368,7 @@
             Katılımcı: <span id="playerCount">0</span>
           </div>
 
+          <div id="podium" class="podium"></div>
           <div id="scoreList" class="score-list"></div>
 
           <div class="qr-actions">
@@ -452,6 +462,7 @@
 
     const sessionLabel  = document.getElementById("sessionLabel");
     const playerCountEl = document.getElementById("playerCount");
+    const podiumEl      = document.getElementById("podium");
     const scoreListEl   = document.getElementById("scoreList");
     const btnShowQr     = document.getElementById("btnShowQr");
     const qrModal       = document.getElementById("qrModal");
@@ -581,13 +592,13 @@
       caseNarrEl.textContent  = c.narrative || "";
       caseTagsEl.innerHTML = "";
 
-      const rhythmKey = (currentRhythmActive && currentCaseId && c.rhythmKey) ? c.rhythmKey : "blank";
+      const rhythmKey = (currentCaseId && c.rhythmKey) ? c.rhythmKey : "blank";
       applyRhythm(rhythmKey, !!currentRhythmActive);
 
       if(!currentCaseId){
         statusLine.textContent = "Olguyu tanıt, sonra 'Ritim + süreyi başlat' ile ritmi aç.";
-      }else if(!currentRhythmActive && !currentReveal){
-        statusLine.textContent = "Ritim kapalı. Aynı olguyu tekrar başlatabilir veya yeni olguya geçebilirsin.";
+      }else if(!currentReveal && !currentRhythmActive){
+        statusLine.textContent = "Süre doldu; ritim ekranda, yanıtlar puansız olarak toplanıyor.";
       }else if(currentRhythmActive){
         statusLine.textContent = "Ritim açık, katılımcılar karar veriyor.";
       }else if(currentReveal){
@@ -733,6 +744,8 @@
       currentReveal       = false;
       timerRemaining      = 0;
       timerLabel.textContent = "Süre: –";
+      podiumEl.style.display = "none";
+      podiumEl.innerHTML     = "";
       scoreListEl.innerHTML   = "";
       playerCountEl.textContent = "0";
       statusLine.textContent = "Yeni ALS sim oturumu başlatıldı.";
@@ -801,16 +814,70 @@
         }));
         arr.sort((a,b)=> b.score - a.score || (a.nickname > b.nickname ? 1 : -1));
         playerCountEl.textContent = arr.length;
+        podiumEl.innerHTML = "";
         scoreListEl.innerHTML = "";
-        const medals = ["🏆","🥈","🥉"];
-        arr.forEach((p,idx)=>{
+
+        const positive = arr.filter(p=>p.score>0);
+        if(!positive.length){
+          podiumEl.style.display = "none";
+          const empty = document.createElement("div");
+          empty.className = "meta-line small";
+          empty.textContent = "Henüz puanlı katılımcı yok.";
+          scoreListEl.appendChild(empty);
+          return;
+        }
+
+        let lastScore = null;
+        let currentRank = 0;
+        const ranked = positive.map(p=>{
+          if(lastScore===null || p.score!==lastScore){
+            currentRank += 1;
+            lastScore = p.score;
+          }
+          return { ...p, rank: currentRank };
+        });
+
+        const topThree = ranked.slice(0,3);
+        const order = [1,0,2];
+        podiumEl.style.display = "grid";
+        order.forEach(idx=>{
+          const entry = topThree[idx];
+          if(!entry) return;
+          const card = document.createElement("div");
+          card.className = "podium-card " + (idx===1 ? "first" : idx===0 ? "second" : "third");
+
+          const place = document.createElement("div");
+          place.className = "place";
+          place.textContent = entry.rank + ".";
+
+          const name = document.createElement("div");
+          name.className = "name";
+          name.textContent = entry.nickname;
+
+          const score = document.createElement("div");
+          score.className = "score";
+          score.textContent = entry.score + " p";
+
+          const step = document.createElement("div");
+          step.className = "step";
+          step.style.height = (entry.rank===1 ? 52 : entry.rank===2 ? 42 : 34) + "px";
+
+          card.appendChild(place);
+          card.appendChild(name);
+          card.appendChild(score);
+          card.appendChild(step);
+          podiumEl.appendChild(card);
+        });
+
+        const rest = ranked.slice(3);
+        rest.forEach(p=>{
           const row  = document.createElement("div");
           row.className = "score-row";
           const label = document.createElement("div");
           label.className = "label";
           const medal = document.createElement("span");
           medal.className = "medal";
-          medal.textContent = medals[idx] || "🎯";
+          medal.textContent = p.rank + ".";
           const name  = document.createElement("span");
           name.className = "name";
           name.textContent  = p.nickname;
