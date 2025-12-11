@@ -241,14 +241,15 @@
     .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
     .btn-danger{color:var(--danger);border-color:#e2e8f0;background:#fff;}
 
-    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:flex-end;margin-top:6px;}
-    .podium-card{border-radius:16px;border:1px solid #e2e8f0;padding:12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,#f8fafc,#e2e8f0);box-shadow:0 12px 26px rgba(15,23,42,0.08);}
-    .podium-card .place{font-weight:800;font-size:1.05rem;color:#b91c1c;}
+    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:flex-end;margin-top:8px;}
+    .podium-card{position:relative;border-radius:16px;border:1px solid #e2e8f0;padding:12px 10px 16px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;text-align:center;background:#ffffff;box-shadow:0 12px 26px rgba(15,23,42,0.12);}
+    .podium-card::after{content:"";position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:72%;height:8px;border-radius:999px;background:#e2e8f0;opacity:0.9;}
+    .podium-card .place{font-weight:800;font-size:0.95rem;color:#16a34a;letter-spacing:.02em;}
     .podium-card .name{font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .podium-card .score{font-weight:800;color:#0f172a;}
-    .podium-card.second{transform:translateY(6px);order:1;}
-    .podium-card.first{transform:translateY(-4px);order:2;box-shadow:0 16px 30px rgba(239,68,68,0.16);}
-    .podium-card.third{transform:translateY(12px);order:3;}
+    .podium-card.second{order:1;min-height:150px;}
+    .podium-card.first{order:2;min-height:190px;box-shadow:0 16px 32px rgba(22,163,74,0.18);} 
+    .podium-card.third{order:3;min-height:130px;}
     .score-list{margin-top:10px;font-size:1rem;max-height:360px;overflow-y:auto;}
     .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #e2e8f0;gap:8px;}
     .score-row .label{display:flex;align-items:center;gap:8px;max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
