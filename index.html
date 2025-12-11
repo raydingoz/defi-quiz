@@ -6,14 +6,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root {
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --border: #e2e8f0;
-      --accent: #16a34a;
-      --danger: #dc2626;
-      --text: #0f172a;
-      --muted: #475569;
-      --heading: #0f172a;
+      --bg: #0b1224;
+      --card: #0f172a;
+      --border: #1f2a44;
+      --accent: #f97373;
+      --danger: #ef4444;
+      --text: #e5e7eb;
+      --muted: #cbd5f5;
+      --heading: #fef2f2;
       --radius-lg: 22px;
       --radius-pill: 999px;
     }
@@ -21,8 +21,11 @@
     body {
       margin: 0;
       padding: 18px 10px 24px;
-      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
-      background: var(--bg);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont,"Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 14% 10%, rgba(239,68,68,0.35), transparent 35%),
+        radial-gradient(circle at 80% 0%, rgba(59,130,246,0.28), transparent 42%),
+        linear-gradient(135deg, #0b1224, #0f172a 52%, #0b1224 100%);
       color: var(--text);
       font-size: 15px;
     }
@@ -34,8 +37,10 @@
       border-radius: 28px;
       border: 1px solid var(--border);
       padding: 16px 18px 18px;
-      background: linear-gradient(135deg, #ecfeff, #e0f2fe);
-      box-shadow: 0 22px 50px rgba(15,23,42,0.14);
+      background: radial-gradient(circle at 20% 10%, rgba(248,113,113,0.28), transparent 55%),
+        radial-gradient(circle at 80% 10%, rgba(59,130,246,0.25), transparent 60%),
+        linear-gradient(150deg, #0f172a, #0b1224 60%, #0f172a);
+      box-shadow: 0 22px 50px rgba(15,23,42,0.75);
       margin-bottom: 14px;
     }
     .hero-title {
@@ -78,13 +83,19 @@
     .card {
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
-      background: var(--card);
-      box-shadow: 0 16px 32px rgba(15,23,42,0.08);
+      background: linear-gradient(160deg, rgba(15,23,42,0.9), rgba(15,23,42,0.8));
+      box-shadow: 0 16px 32px rgba(15,23,42,0.65);
       padding: 14px;
       position: relative;
       overflow: hidden;
     }
-    .card::before { display: none; }
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(248,113,113,0.2), transparent 60%);
+      pointer-events: none;
+    }
     .card-inner { position: relative; z-index: 1; }
 
     .card-title {
@@ -108,8 +119,8 @@
       padding: 8px 12px;
       font-size: 0.84rem;
       font-weight: 600;
-      border: 1px solid var(--border);
-      background: #e2f3ec;
+      border: 1px solid #1f2a44;
+      background: radial-gradient(circle at 20% 20%, rgba(239,68,68,0.32), rgba(15,23,42,0.95));
       color: var(--text);
       cursor: pointer;
       text-decoration: none;

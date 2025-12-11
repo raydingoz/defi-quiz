@@ -11,14 +11,14 @@
 
   <style>
     :root{
-      --bg:#f8fafc;
-      --card:#ffffff;
-      --border:#e2e8f0;
-      --accent:#16a34a;
-      --danger:#dc2626;
-      --text:#0f172a;
-      --muted:#475569;
-      --heading:#0f172a;
+      --bg:#0b1224;
+      --card:#0f1b33;
+      --border:#1f2a44;
+      --accent:#f97373;
+      --danger:#ef4444;
+      --text:#e8edf5;
+      --muted:#cbd5f5;
+      --heading:#fef2f2;
       --radius-lg:18px;
       --radius-pill:999px;
     }
@@ -26,8 +26,8 @@
     body{
       margin:0;
       padding:8px;
-      font-family:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
-      background:var(--bg);
+      font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+      background:radial-gradient(circle at top,#ef4444 0,#0b1224 38%,#0a0f1f 100%);
       color:var(--text);
       font-size:15px;
     }
@@ -50,8 +50,23 @@
     .pill{display:inline-flex;align-items:center;gap:6px;border-radius:var(--radius-pill);border:1px solid var(--border);padding:6px 10px;font-size:0.82rem;color:var(--muted);background:#eef2ff;}
     .pill-dot{width:7px;height:7px;border-radius:999px;background:#16a34a;box-shadow:0 0 10px rgba(34,197,94,0.6);}
 
-    .card{border-radius:var(--radius-lg);border:1px solid var(--border);background:var(--card);box-shadow:0 14px 26px rgba(15,23,42,0.12);padding:12px;margin-top:10px;position:relative;overflow:hidden;}
-    .card::before{display:none;}
+    .card{
+      border-radius:var(--radius-lg);
+      border:1px solid var(--border);
+      background:linear-gradient(160deg,#0f1b33,#101828 55%,#0f172a);
+      box-shadow:0 16px 32px rgba(15,23,42,0.7);
+      padding:10px;
+      margin-top:8px;
+      position:relative;
+      overflow:hidden;
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:radial-gradient(circle at top left,rgba(248,113,113,0.16),transparent 60%);
+      pointer-events:none;
+    }
     .card-inner{position:relative;z-index:1;}
 
     .case-title{
@@ -81,7 +96,7 @@
       flex:1;
       border-radius:var(--radius-pill);
       border:1px solid var(--border);
-      background:#fff;
+      background:#0f172a;
       color:var(--text);
       padding:10px 12px;
       font-size:0.9rem;

@@ -243,15 +243,14 @@
     .reveal-title{font-weight:800;color:var(--heading);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
     .reveal-body{font-size:1.08rem;color:var(--text);white-space:pre-wrap;line-height:1.7;}
 
-    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;align-items:flex-end;margin-top:10px;}
-    .podium-card{border-radius:16px;border:1px solid var(--border);padding:10px 12px;display:flex;flex-direction:column;align-items:center;gap:6px;background:linear-gradient(180deg,#ecfeff,#e2f3ec);box-shadow:0 14px 26px rgba(15,23,42,0.12);}
-    .podium-card .place{font-weight:800;font-size:1.05rem;color:#0f172a;}
-    .podium-card .name{font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-align:center;}
+    .podium{display:none;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;align-items:flex-end;margin-top:6px;}
+    .podium-card{border-radius:16px;border:1px solid #e2e8f0;padding:12px;display:flex;flex-direction:column;gap:6px;background:linear-gradient(180deg,#f8fafc,#e2e8f0);box-shadow:0 12px 26px rgba(15,23,42,0.08);}
+    .podium-card .place{font-weight:800;font-size:1.05rem;color:#b91c1c;}
+    .podium-card .name{font-weight:700;color:#0f172a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
     .podium-card .score{font-weight:800;color:#0f172a;}
-    .podium-card .step{width:100%;border-radius:12px;background:linear-gradient(90deg,#16a34a,#22c55e);}
-    .podium-card.second{transform:translateY(-2px);order:1;}
-    .podium-card.first{transform:translateY(-14px);order:2;box-shadow:0 16px 30px rgba(34,197,94,0.18);}
-    .podium-card.third{transform:translateY(10px);order:3;}
+    .podium-card.second{transform:translateY(6px);order:1;}
+    .podium-card.first{transform:translateY(-4px);order:2;box-shadow:0 16px 30px rgba(239,68,68,0.16);}
+    .podium-card.third{transform:translateY(12px);order:3;}
     .score-list{margin-top:10px;font-size:1rem;max-height:360px;overflow-y:auto;}
     .score-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px dashed #cbd5e1;gap:8px;}
     .score-row .label{display:flex;align-items:center;gap:8px;max-width:220px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
@@ -837,6 +836,11 @@
           return { ...p, rank: currentRank };
         });
 
+        const scoreCounts = ranked.reduce((acc,p)=>{
+          acc[p.score] = (acc[p.score] || 0) + 1;
+          return acc;
+        },{});
+
         const topThree = ranked.slice(0,3);
         const order = [1,0,2];
         podiumEl.style.display = "grid";
@@ -848,7 +852,8 @@
 
           const place = document.createElement("div");
           place.className = "place";
-          place.textContent = entry.rank + ".";
+          const tieMark = scoreCounts[entry.score]>1 ? "↔ " : "";
+          place.textContent = tieMark + entry.rank + ".";
 
           const name = document.createElement("div");
           name.className = "name";
@@ -858,14 +863,9 @@
           score.className = "score";
           score.textContent = entry.score + " p";
 
-          const step = document.createElement("div");
-          step.className = "step";
-          step.style.height = (entry.rank===1 ? 52 : entry.rank===2 ? 42 : 34) + "px";
-
           card.appendChild(place);
           card.appendChild(name);
           card.appendChild(score);
-          card.appendChild(step);
           podiumEl.appendChild(card);
         });
 
@@ -877,7 +877,8 @@
           label.className = "label";
           const medal = document.createElement("span");
           medal.className = "medal";
-          medal.textContent = p.rank + ".";
+          const tieMark = scoreCounts[p.score]>1 ? "↔ " : "";
+          medal.textContent = tieMark + p.rank + ".";
           const name  = document.createElement("span");
           name.className = "name";
           name.textContent  = p.nickname;
