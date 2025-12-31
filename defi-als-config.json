@@ -15,223 +15,223 @@
   "cases": [
     {
       "id": 1,
-      "title": "Olgu 1 – Poliklinikte Mavi Kod",
+      "title": "Olgu 1 – Poliklinikte Mavi Kod!",
       "narrative": "55 yaşında erkek hasta, göğüs ağrısı yakınmasıyla poliklinik bekleme alanında iken aniden yere yığılıyor. Uyarana yanıt yok. Normal solunum izlenmiyor; nabız alınamıyor. Ekip KPR’ye başlıyor. Sen hastaya monitör bağlayıp ilk ritim değerlendirmesini şimdi yapıyorsun.",
-      "tags": ["erişkin", "hastane içi", "kardiyak arrest"],
+      "tags": ["erişkin", "in-hospital", "arrest"],
       "rhythmKey": "vf",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "shock",
-      "explanation": "Nabızsız kardiyak arrestte ritim şoklanabilir gruptaysa defibrilasyon geciktirilmez. Şok verildikten sonra kompresyona hemen geri dönülür; ritim değerlendirmesi kısa bir kesintiyle, düzenli aralıklarla tekrarlanır. Bu sırada kompresyon kalitesi korunur, ventilasyon aşırıya kaçırılmaz ve geri döndürülebilir nedenler paralel olarak ele alınır."
+      "explanation": "Nabızsız arrestte şoklanabilir bir ritim görüldüğünde yapılacak iş nettir: defibrilasyonu geciktirme. Şok, mümkün olan en kısa sürede uygulanır; ardından kompresyona hemen geri dönülür. Ritim kontrolü kısa bir kesintiyle, düzenli aralıklarla tekrarlanır ve kompresyon kesintileri minimumda tutulur. Bu sırada oksijenasyon/ventilasyon makul düzeyde sürdürülür, damar yolu/IO erişim ve ilaç uygulamaları kompresyonu aksatmadan yürütülür; geri döndürülebilir nedenler paralel olarak hedeflenir."
     },
     {
       "id": 2,
-      "title": "Olgu 2 – Evde senkop sonrası getirilen hasta",
+      "title": "Olgu 2 – Evden senkop",
       "narrative": "68 yaşında, hipertansiyon öyküsü olan kadın hasta evde senkop sonrası 112 ile acile getiriliyor. Gelişte yanıtsız; solunumu yok, nabız alınamıyor. KPR devam ederken sen ilk ritim kontrolünü yapmak üzere monitöre bakıyorsun.",
-      "tags": ["erişkin", "hastane dışı", "kardiyak arrest"],
+      "tags": ["erişkin", "out-of-hospital", "arrest"],
       "rhythmKey": "vt",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "shock",
-      "explanation": "Nabızsız arrestte şoklanabilir ritim saptanırsa temel yaklaşım defibrilasyon ve kesintisiz KPR döngüsüdür. Şok sonrası kompresyonlara ara verilmez; iki dakikalık KPR sonrasında ritim yeniden kontrol edilir. Damar yolu/IO erişim ve uygun ilaç zamanlaması, kompresyonu aksatmadan yürütülür."
+      "explanation": "Nabızsız arrestte şoklanabilir ritim saptandığında yaklaşım defibrilasyon + yüksek kaliteli kompresyondur. Şok verilir, kompresyona derhal dönülür; iki dakikalık KPR sonrasında ritim tekrar değerlendirilir. Bu döngüde en kritik nokta “şok için kompresyonu gereksiz uzatma” ve “KPR’yi gereksiz bölme” hatalarından kaçınmaktır. Ekip, defibrilatör şarjı ve ventilasyon işlemlerini kompresyon kesintilerini artırmadan koordine etmelidir."
     },
     {
       "id": 3,
-      "title": "Olgu 3 – İlaç kullanımı öyküsü olan hastada ani arrest",
-      "narrative": "36 yaşında kadın hasta, son günlerde kullandığı ilaçlar sonrası baş dönmesi yakınmasıyla gözlem altında izlenirken aniden bilincini kaybediyor. Normal solunumu yok; nabız alınamıyor. KPR başlatılıyor ve sen ritim değerlendirmesini şimdi yapıyorsun.",
-      "tags": ["erişkin", "ilaç ilişkili", "kardiyak arrest"],
+      "title": "Olgu 3 – Gözlem yatağında bilinç kaybı",
+      "narrative": "36 yaşında kadın hasta, ilaç intoks sonrası baş dönmesi yakınmasıyla gözlem altında izlenirken aniden bilincini kaybediyor. Solunumu yok; nabız alınamıyor. CPR başlatılıyor ve sen ritim değerlendirmesini şimdi yapıyorsun.",
+      "tags": ["erişkin", "arrest", "ilaç"],
       "rhythmKey": "torsades",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "shock",
-      "explanation": "Nabızsız arrestte şoklanabilir ritim yönetimi uygulanır: defibrilasyon yapılır ve ardından kompresyonlara hemen dönülür. Eş zamanlı olarak geri döndürülebilir nedenler hedeflenir. Bu klinikte QT uzaması/ilaç etkisi ve elektrolit bozukluğu olasılığı yüksek olduğundan, resüsitasyon akışını bozmadan magnezyum replasmanı ve tetikleyici ilaçların kesilmesi planlanır."
+      "explanation": "Nabızsız ve şoklanabilir özellikteki taşiaritmilerde temel yaklaşım defibrilasyondur; şok sonrası kompresyona hemen dönülür ve döngü sürdürülür. Bu olguda tetikleyici olarak ilaç etkisi ve buna bağlı repolarizasyon bozukluğu/elektrolit dengesizliği olasılığı güçlüdür. Resüsitasyon sürerken tetikleyici ilaçlar kesilir, elektrolitler hedeflenir ve magnezyum replasmanı planlanır. Burada amaç, bir yandan standart defibrilasyon-KPR döngüsünü aksatmadan yürütmek, diğer yandan altta yatan nedeni hızlıca düzeltmektir."
     },
     {
       "id": 4,
-      "title": "Olgu 4 – Septik şok hastasında yoğun bakımda kardiyak arrest",
+      "title": "Olgu 4 – Yoğun bakım alarmı",
       "narrative": "Yoğun bakımda septik şok nedeniyle vazopresör tedavisi alan 72 yaşında kadın hasta için alarm çalıyor. Odaya girdiğinde yanıtsız; solunumu yok, nabız alınamıyor. Ekip KPR’ye başlamış durumda. Sen ritmi ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "sepsis", "yoğun bakım", "kardiyak arrest"],
+      "tags": ["erişkin", "icu", "arrest"],
       "rhythmKey": "pea",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Şoklanamayan ritimlerde defibrilasyon uygulanmaz. Öncelik yüksek kaliteli KPR’dir. En kısa sürede adrenalin verilir ve düzenli aralıklarla tekrarlanır; ritim/puls kontrolü kısa kesintilerle yapılır. Aynı anda geri döndürülebilir nedenler sistematik şekilde düşünülür (hipoksi, hipovolemi, asidoz, elektrolit bozukluğu; tamponad, tansiyon pnömotoraks, tromboz, toksinler) ve klinik önceliğe göre hızla müdahale edilir."
+      "explanation": "Şoklanamayan ritimde defibrilasyon uygulanmaz. Bu tabloda resüsitasyonun omurgası yüksek kaliteli KPR’dir; en kısa sürede adrenalin verilir ve uygun aralıklarla tekrarlanır. Ritim/puls kontrolü kısa kesintilerle yapılır. Aynı anda geri döndürülebilir nedenler sistematik düşünülür ve klinik önceliğe göre hızla müdahale edilir: hipoksi/ventilasyon problemi, hipovolemi, asidoz, elektrolit bozuklukları; ayrıca tamponad, tansiyon pnömotoraks, tromboz ve toksik nedenler. Yoğun bakım hastasında altta yatan süreçler hızlı değiştiği için “neden avı” KPR’nin içine entegre yürütülmelidir."
     },
     {
       "id": 5,
-      "title": "Olgu 5 – Göğüs darbesi sonrası ani kollaps",
-      "narrative": "16 yaşında erkek hasta, okul spor etkinliğinde göğüs ön duvarına sert darbe aldıktan birkaç saniye sonra sendeleyip yere yığılıyor. Uyarana yanıt yok, normal solunum izlenmiyor. Nabız alınamıyor ve temel yaşam desteği başlatılıyor. Olay yerinde defibrilatör hazır; sen hastayı monitörize edip ritim değerlendirmesini şimdi yapıyorsun.",
-      "tags": ["ergen", "travma", "künt toraks travması", "saha", "kardiyak arrest"],
+      "title": "Olgu 5 – Etkinlikte acil durum",
+      "narrative": "16 yaşında erkek hasta, okulda spor etkinliği sırasında göğüs ön duvarına sert bir darbe alıyor ve birkaç saniye içinde yere yığılıyor. Uyarana yanıt yok, normal solunum izlenmiyor. Nabız alınamıyor ve temel yaşam desteği başlatılıyor. Sen hastayı monitörize edip ritim değerlendirmesini şimdi yapıyorsun.",
+      "tags": ["ergen", "travma", "saha", "arrest"],
       "rhythmKey": "vf",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "shock",
-      "explanation": "Künt toraks travması sonrası gelişen nabızsız arrestte ritim şoklanabilir özellik taşıyorsa defibrilasyon geciktirilmez. Şok sonrası kompresyonlara hemen dönülür; kompresyon kesintileri minimumda tutulur. Travma bağlamı nedeniyle resüsitasyon sürerken tansiyon pnömotoraks, tamponad ve masif kanama gibi hızla düzeltilebilir nedenler özellikle akılda tutulur; klinik şüphe varsa girişimler bekletilmez."
+      "explanation": "Nabızsız arrestte şoklanabilir ritim varsa gecikmeden defibrilasyon uygulanır; şok sonrası kompresyona anında dönülür ve ritim düzenli aralıklarla yeniden değerlendirilir. Burada travma öyküsü ek bir sorumluluk getirir: resüsitasyon sürerken tansiyon pnömotoraks, tamponad ve masif kanama gibi hızla düzeltilebilir travmatik nedenler akılda tutulur. Ekip, bir yandan standardize defibrilasyon-KPR döngüsünü bozmadan yürütürken, diğer yandan travmaya özgü bu nedenler için hızla klinik değerlendirme yapıp şüphe varsa girişimleri geciktirmemelidir."
     },
     {
       "id": 6,
-      "title": "Olgu 6 – Girişim sonrası hemodinamik bozulma ile başvuran hasta",
-      "narrative": "Koroner girişim sonrası izlemde olan 65 yaşında erkek hasta, aniden çarpıntı ve baş dönmesi tarif ediyor. Kısa sürede belirgin hipotansiyon gelişiyor; cildi soluk-soğuk, bilinç dalgalı. Nabız alınıyor. Monitördeki ritmi ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "post-MI", "hemodinamik instabil", "peri-arrest"],
+      "title": "Olgu 6 – Koroner yoğun bakımda yer yok",
+      "narrative": "Koroner girişim sonrası acile geri gelen 65 yaşında erkek hasta, aniden çarpıntı ve baş dönmesi tarif ediyor. Kısa sürede belirgin hipotansiyon gelişiyor; cildi soluk-soğuk, bilinç dalgalı. Nabız alınıyor. Monitördeki ritmi ilk kez şimdi değerlendiriyorsun.",
+      "tags": ["erişkin", "in-hospital", "peri-arrest"],
       "rhythmKey": "af",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "cardioversion",
-      "explanation": "Nabız varlığına rağmen şok bulguları/hipotansiyon, iskemik göğüs ağrısı veya bilinç bozukluğu varsa bu tablo acil elektriksel düzeltme gerektiren instabil taşiaritmi kabul edilir. Senkronize kardiyoversiyon geciktirilmez; sedasyon-analjezi mümkünse hızlıca ve gecikme yaratmadan planlanır. İşlem sonrası ritim ve hemodinami yeniden değerlendirilir; tetikleyici nedenler (iskemi, elektrolit bozukluğu, ilaç etkisi) eş zamanlı düzeltilir."
+      "explanation": "Nabız var ama hasta hipotansif/şok bulgulu, göğüs ağrılı veya bilinç bozuksa bu tablo acil elektriksel düzeltme gerektirir. Senkronize kardiyoversiyon geciktirilmez; mümkünse hızlı sedasyon-analjezi planlanır ama işlem ertelenmez. Kardiyoversiyon sonrası hemodinami ve ritim yeniden değerlendirilir; tetikleyici nedenler (iskemi, elektrolit bozukluğu, ilaç etkisi, kateter ilişkili sorunlar) eş zamanlı ele alınır."
     },
     {
       "id": 7,
-      "title": "Olgu 7 – Doğum sonrası dönemde hipotansiyon ve çarpıntı",
+      "title": "Olgu 7 – Doğum sonrası acil başvuru",
       "narrative": "28 yaşında kadın hasta, doğumdan birkaç saat sonra artan vajinal kanama ve baş dönmesi ile acile getiriliyor. TA 80/40 mmHg; cilt soluk-soğuk, belirgin çarpıntı mevcut. Nabız alınıyor. Monitörizasyonu ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "postpartum", "kanama", "hemodinamik instabil"],
+      "tags": ["erişkin", "obstetri", "peri-arrest"],
       "rhythmKey": "svt",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "cardioversion",
-      "explanation": "Hemodinamik instabilite varlığında ritim tipini “uzun uzun tartışmak” yerine dolaşımı hızla toparlamak esastır. Nabız var ve hasta instabil ise senkronize kardiyoversiyon öncelikli yaklaşımdır. Aynı anda kanama/hipovolemi yönetimi geciktirilmez: büyük damar yolu, hızlı sıvı-kan ürünleri ve kanama kontrolü paralel yürütülür."
+      "explanation": "Hemodinamik bozulma varsa hedef, dolaşımı hızlıca toparlamaktır. Nabız var ve hasta instabil ise senkronize kardiyoversiyon önceliklidir; ‘önce birkaç manevra/ilaç deneyelim’ yaklaşımı çoğu zaman zaman kaybettirir. Bu olguda ayrıca kanama/hipovolemi olasılığı nedeniyle resüsitasyon ve kanama kontrolü eş zamanlı yürütülür: geniş damar yolu, hızlı sıvı/kan ürünleri ve obstetrik değerlendirme paralel ilerler."
     },
     {
       "id": 8,
-      "title": "Olgu 8 – Genç erişkinde tekrarlayan çarpıntı öyküsü ile instabil başvuru",
+      "title": "Olgu 8 – Genç hastada çarpıntı ile başvuru",
       "narrative": "24 yaşında erkek hasta, daha önce kendiliğinden geçen çarpıntı atakları yaşadığını söylüyor. Bu kez çarpıntı ile birlikte baş dönmesi belirgin; gelişte ajite, hipotansif ve periferik perfüzyonu zayıf. Nabız alınıyor. Monitörü bağladığında ritmi ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "genç", "hemodinamik instabil", "borderline"],
+      "tags": ["erişkin", "genç", "peri-arrest", "borderline"],
       "rhythmKey": "wpw",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "cardioversion",
-      "explanation": "Nabız var ama hasta instabil ise senkronize kardiyoversiyon tercih edilir. Bu grupta bazı hastalarda AV düğüm üzerinden iletimi yavaşlatan ilaçlar klinik olarak sakıncalı olabileceği için, ‘ilaçla oyalamak’ yerine hızlı ve kontrollü elektriksel düzeltme daha güvenli bir yol sunar. Kardiyoversiyon sonrası ritim stabilizasyonu ve altta yatan tetikleyiciler değerlendirilir."
+      "explanation": "İnstabil taşiaritmide güvenli ve hızlı yol, senkronize kardiyoversiyondur. Bu yaş grubunda bazı taşiaritmilerde AV düğüm üzerinden iletimi yavaşlatan ilaçlar istenmeyen sonuçlara yol açabileceğinden, ‘ilaçla oyalanmak’ yerine kontrollü elektriksel düzeltme daha doğru bir tercihtir. Kardiyoversiyon sonrası ritim stabilizasyonu yapılır; tetikleyiciler, elektrolitler ve olası altta yatan ileti özellikleri değerlendirilmeye alınır."
     },
     {
       "id": 9,
-      "title": "Olgu 9 – Ateş ve sıvı kaybı ile başvuran hasta",
+      "title": "Olgu 9 – Ateşli ishal ile başvuru",
       "narrative": "30 yaşında erkek hasta, yüksek ateş ve ishal ile birlikte çarpıntı hissi nedeniyle başvuruyor. Bilinci açık, TA 110/70 mmHg, satürasyon normal; periferik perfüzyon iyi. Monitörde ritmi ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "ateş", "dehidratasyon", "stabil"],
+      "tags": ["erişkin", "stabil"],
       "rhythmKey": "sinus",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Hemodinamik olarak stabil hastada öncelik, elektriksel işlem değil altta yatan nedenin düzeltilmesidir. Ateş, ağrı ve hipovolemi gibi durumlar taşikardiye yol açabilir; bu tabloda sıvı replasmanı, ateş kontrolü ve nedenin tedavisi planlanır. Elektriksel tedavi, instabilite veya spesifik endikasyonlar olmadıkça ilk seçenek değildir."
+      "explanation": "Hemodinamik olarak stabil hastada ilk seçenek elektriksel işlem değildir. Öncelik; altta yatan nedenin düzeltilmesidir: sıvı kaybının yerine konması, ateş kontrolü ve enfeksiyon/gastrointestinal nedenin yönetimi. Elektriksel tedaviler, instabilite gelişmesi veya spesifik endikasyonlar oluşması halinde gündeme gelir."
     },
     {
       "id": 10,
-      "title": "Olgu 10 – İleri yaşta tekrarlayan bayılma öyküsü",
+      "title": "Olgu 10 – Tekrarlayan bayılma",
       "narrative": "82 yaşında erkek hasta, son haftalarda eforla baş dönmesi ve kısa süreli bayılma atakları tarifliyor. Bugün evde kısa süreli bilinç kaybı sonrası getiriliyor; gelişte uykulu, sınırda hipotansif ve periferik perfüzyonu zayıf. Nabız alınıyor. Monitörizasyonu ilk kez şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "ileri yaş", "bradikardi", "peri-arrest"],
+      "tags": ["erişkin", "peri-arrest"],
       "rhythmKey": "sinus",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Semptomatik bradikardi/peri-arrest tablosunda yaklaşım elektriksel şok değil, bradikardi yönetimidir. Oksijenasyon sağlanır, geri döndürülebilir nedenler düzeltilir; uygun hastada atropin verilir. Yanıt yetersizse transkütan pacing ve/veya vazopresör infüzyonu düşünülür. Bu süreçte hasta yakın izlenir ve dolaşım bozulursa ileri resüsitasyon basamaklarına hızla geçilir."
+      "explanation": "Semptomatik bradikardi/peri-arrest tablosunda doğru yaklaşım şok vermek değildir. Oksijenasyon sağlanır, geri döndürülebilir nedenler düzeltilir; uygun hastada atropin verilir. Yanıt yetersizse transkütan pacing ve/veya vazopresör infüzyonu planlanır. Amaç, dolaşımı hızla güvenli sınıra çekmek ve altta yatan ileti problemi/iskemi/ilaç etkisini eş zamanlı değerlendirmektir."
     },
     {
       "id": 11,
-      "title": "Olgu 11 – İnce çizgi: ritim net değil",
-      "narrative": "Yoğun bakımda izlenen 70 yaşında erkek hasta, ani şekilde yanıtsız bulunuyor. Normal solunum yok; nabız alınamıyor ve KPR başlatılıyor. Monitördeki görüntü belirgin değil; ekip arasında ‘şoklanır mı, şoklanmaz mı?’ tartışması var. Sen ritim değerlendirmesini şimdi yapıyorsun.",
-      "tags": ["erişkin", "yoğun bakım", "kardiyak arrest", "ters köşe", "borderline"],
+      "title": "Olgu 11 – YBÜ Viziti",
+      "narrative": "Yoğun bakımda izlenen 70 yaşında erkek hasta, ani şekilde yanıtsız bulunuyor. Normal solunum yok; nabız alınamıyor ve KPR başlatılıyor. Monitörde yorumlaması güç, düşük genlikli bir kayıt görülüyor. Sen ritim değerlendirmesini şimdi yapıyorsun.",
+      "tags": ["erişkin", "icu", "arrest", "borderline"],
       "rhythmKey": "vf_fine",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "shock",
-      "explanation": "Nabızsız arrestte ‘şoklanamaz’ kararı verilmeden önce teknik ve yorum hataları hızla dışlanmalıdır. Elektrot teması ve kablolar kontrol edilir, farklı derivasyonlara bakılır, gerekiyorsa kazanç ayarıyla kayıt netleştirilir. Şoklanabilir ritim doğrulanırsa defibrilasyon geciktirilmez; şok sonrası kompresyona hemen dönülür ve döngü sürdürülür."
+      "explanation": "Nabızsız arrestte ‘şoklanamaz’ kararı verilmeden önce teknik ve yorum hataları hızla dışlanmalıdır. Elektrot teması ve kablolar kontrol edilir, farklı derivasyonlara bakılır, gerekiyorsa kazanç ayarıyla kayıt netleştirilir. Şoklanabilir ritim doğrulanırsa defibrilasyon geciktirilmez; şok sonrası kompresyona hemen dönülür ve döngü sürdürülür. Bu yaklaşım, “yanlışlıkla asistoli varsayma” riskini azaltır."
     },
     {
       "id": 12,
-      "title": "Olgu 12 – Monitör alarmı: hastaya bak",
-      "narrative": "75 yaşında erkek hasta, değerlendirme sırasında belirgin tremor/hareket ile yatakta kıpırdanıyor. Bilinci açık, seninle konuşabiliyor. Nabzı dolgun, TA 130/80 mmHg. Hemşire monitörde ‘çok kaotik’ bir görüntü gördüğünü söyleyip seni çağırıyor. Sen hastayı değerlendirip aynı anda monitöre bakıyorsun.",
-      "tags": ["erişkin", "monitörizasyon", "artefakt olasılığı", "ters köşe", "nabız var"],
+      "title": "Olgu 12 – Monitörde kaotik görünüm",
+      "narrative": "75 yaşında erkek hasta değerlendirme sırasında belirgin tremor/hareket ile yatakta kıpırdanıyor. Bilinci açık, seninle konuşabiliyor. Nabzı dolgun, TA 130/80 mmHg. Hemşire monitörde ‘çok bozuk’ bir kayıt gördüğünü söyleyip seni çağırıyor. Sen hastayı değerlendirip aynı anda monitöre bakıyorsun.",
+      "tags": ["erişkin", "stabil", "borderline"],
       "rhythmKey": "artifact",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Elektriksel tedavi kararı monitöre değil hastaya dayanır. Nabzı olan, bilinci açık ve hemodinamik olarak stabil hastada görülen ‘kaotik’ kayıt çoğu zaman artefakttır. Önce elektrotlar ve derivasyonlar kontrol edilir, hareket azaltılır ve kayıt doğrulanır. Bu tabloda defibrilasyon/kardiyoversiyon endikasyonu yoktur; gereksiz şok hem risk hem de gereksiz gecikme doğurur."
+      "explanation": "Elektriksel tedavi kararı monitörden önce klinik tabloya dayanır. Nabzı olan, bilinci açık ve hemodinamik olarak stabil hastada görülen ‘kaotik’ kayıt çoğu zaman artefakttır. Önce elektrotlar ve derivasyonlar kontrol edilir, hareket azaltılır ve kayıt doğrulanır. Gereksiz şok, hastaya zarar verebileceği gibi ekibin odağını da dağıtır; bu yüzden ‘önce hastaya bak’ prensibi burada hayat kurtarır."
     },
     {
       "id": 13,
-      "title": "Olgu 13 – Ciddi hipotermide resüsitasyon",
-      "narrative": "27 yaşında erkek hasta, soğukta kalma öyküsüyle getiriliyor. Çekirdek ısı 27 °C ölçülüyor. Gelişte yanıtsız; normal solunum yok, nabız alınamıyor ve KPR sürüyor. Ekip, daha önce üç kez şok uygulandığını ve aktif ısıtmanın yeni başlatıldığını belirtiyor. Sen ritim kontrolü için monitöre şimdi bakıyorsun.",
-      "tags": ["erişkin", "hipotermi", "kardiyak arrest", "ters köşe", "3 şok sonrası"],
+      "title": "Olgu 13 – Soğuk maruziyeti sonrası acil durum",
+      "narrative": "27 yaşında erkek hasta, soğukta kalma öyküsüyle getiriliyor. Çekirdek ısı 27 °C ölçülüyor. Gelişte yanıtsız; normal solunum yok, nabız alınamıyor ve KPR sürüyor. Ekip, resüsitasyon sırasında daha önce üç kez şok uygulandığını ve aktif ısıtmanın yeni başlatıldığını belirtiyor. Sen ritim kontrolü için monitöre şimdi bakıyorsun.",
+      "tags": ["erişkin", "arrest", "borderline"],
       "rhythmKey": "vf",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Ciddi hipotermide aritmilere yanıt azalır; bu nedenle belirli sayıda defibrilasyon denemesinden sonra çekirdek ısı yükselene kadar ek şokların ertelenmesi önerilir. Bu aşamada öncelik kesintisiz KPR, etkin ventilasyon/oksijenasyon ve agresif yeniden ısıtmadır. Uygun koşullarda ileri ısıtma yöntemleri ve mümkünse ekstrakorporeal yaşam desteği seçenekleri erken değerlendirilir."
+      "explanation": "Ciddi hipotermide kalp, defibrilasyon ve ilaçlara daha az yanıt verir. Bu nedenle belirli sayıda defibrilasyon denemesinden sonra çekirdek ısı yükselene kadar ek şokların ertelenmesi önerilir. Bu aşamada öncelik kesintisiz KPR, etkin ventilasyon/oksijenasyon ve agresif yeniden ısıtmadır; ilaçlar da ısıya bağlı olarak daha temkinli aralıklarla planlanır. Uygun koşullarda ileri ısıtma yöntemleri ve mümkünse ekstrakorporeal yaşam desteği seçenekleri erken değerlendirilmelidir."
     },
     {
       "id": 14,
-      "title": "Olgu 14 – Acilde hipotansiyonla birlikte çarpıntı",
-      "narrative": "70 yaşında erkek hasta, ani başlayan çarpıntı ve baş dönmesi ile acile getiriliyor. TA 80/45 mmHg; cilt soluk-soğuk, bilinç bulanık ve göğüs ağrısı mevcut. Nabız alınıyor. Ekip kısa sürede karar vermeni bekliyor; monitörü bağlayıp ritmi şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "hemodinamik instabil", "borderline"],
+      "title": "Olgu 14 – Acilde hipotansiyon ve çarpıntı",
+      "narrative": "70 yaşında erkek hasta, ani başlayan çarpıntı ve baş dönmesi ile acile getiriliyor. TA 80/45 mmHg; cilt soluk-soğuk, bilinç bulanık ve göğüs ağrısı mevcut. Nabız alınıyor. Ekip hızlı karar vermeni bekliyor; monitörü bağlayıp ritmi şimdi değerlendiriyorsun.",
+      "tags": ["erişkin", "peri-arrest"],
       "rhythmKey": "vt",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "cardioversion",
-      "explanation": "Nabız var ama hasta instabil ise öncelik dolaşımı hızla düzeltmektir. Bu tabloda senkronize kardiyoversiyon geciktirilmez; işlem öncesi kısa değerlendirme ve mümkünse hızlı sedasyon yapılır. Kardiyoversiyon sonrası hemodinami yeniden gözden geçirilir ve altta yatan nedenler (iskemi, elektrolit bozukluğu, ilaç etkileri) eş zamanlı yönetilir."
+      "explanation": "Nabız var ama hasta belirgin şekilde instabilse öncelik dolaşımı hızla düzeltmektir. Bu tabloda senkronize kardiyoversiyon geciktirilmez; mümkünse kısa hazırlık ve hızlı sedasyon yapılır. Kardiyoversiyon sonrası hemodinami yeniden değerlendirilir; gerekirse tekrar uygulama planlanır ve eş zamanlı olarak iskemik süreç/elektrolit bozukluğu/ilaç etkileri gibi tetikleyiciler hızla ele alınır."
     },
     {
       "id": 15,
-      "title": "Olgu 15 – Kalp pili olan hastada monitör bulgusu",
+      "title": "Olgu 15 – Kalp pili olan hastada değerlendirme",
       "narrative": "78 yaşında, kalp pili bulunan erkek hasta baş dönmesi ve halsizlik yakınmasıyla başvuruyor. Bilinci açık, TA 110/70 mmHg; nabız düzenli. Monitörizasyonu yapıp ritmi değerlendiriyorsun; klinik olarak hasta stabil görünüyor.",
-      "tags": ["erişkin", "kalp pili", "stabil", "borderline"],
+      "tags": ["erişkin", "stabil", "borderline"],
       "rhythmKey": "paced",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Nabzı olan ve hemodinamik olarak stabil hastada defibrilasyon/kardiyoversiyon endike değildir. Bu tabloda öncelik; cihazın çalışmasının değerlendirilmesi, elektrolit bozuklukları ve ilaç etkilerinin gözden geçirilmesi, gerekirse cihaz interrogasyonu planlanmasıdır. Elektriksel şok tedavisi, yalnızca uygun endikasyonlarda ve doğru klinik bağlamda uygulanır."
+      "explanation": "Nabzı olan ve hemodinamik olarak stabil hastada defibrilasyon/kardiyoversiyon endike değildir. Bu tabloda yapılacak iş; oksijenasyon ve hemodinami takibi, elektrolit/ilaç etkilerinin gözden geçirilmesi ve cihaz fonksiyonunun değerlendirilmesidir (gerekiyorsa cihaz kontrolü). Elektriksel şok tedavisi, ancak uygun endikasyon varsa ve doğru klinik bağlamda uygulanır."
     },
     {
       "id": 16,
-      "title": "Olgu 16 – Trafik kazası sonrası dolaşımı bozulan hasta",
+      "title": "Olgu 16 – Trafik kazası sonrası acil değerlendirme",
       "narrative": "45 yaşında erkek hasta, araç içi trafik kazası sonrası getiriliyor. Emniyet kemeri izi mevcut; göğüs ağrısı ve çarpıntı tarif ediyor. Değerlendirme sırasında rengi bozuyor; TA 80/45 mmHg, bilinç dalgalı, periferik perfüzyonu kötü. Nabız alınıyor. Monitörü bağladığında ritmi ilk kez şimdi görüyorsun.",
-      "tags": ["erişkin", "travma", "künt toraks travması", "hemodinamik instabil", "peri-arrest"],
+      "tags": ["erişkin", "travma", "peri-arrest"],
       "rhythmKey": "vt",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "cardioversion",
-      "explanation": "Nabız var ama hipotansiyon/şok bulguları ve göğüs ağrısı eşlik ediyorsa bu tablo instabil taşiaritmi kabul edilir; senkronize kardiyoversiyon geciktirilmez. Travma zemininde eş zamanlı olarak miyokard kontüzyonu, tamponad, tansiyon pnömotoraks ve kanama gibi nedenler hızla değerlendirilir. Kardiyoversiyon, dolaşımı toparlamak için yapılır; asıl iş, aynı anda travmaya bağlı geri döndürülebilir nedenleri hızla saptayıp düzeltmektir."
+      "explanation": "Nabız var ama hasta hipotansif/şok bulguluysa elektriksel düzeltme geciktirilmez; senkronize kardiyoversiyon önceliklidir. Travma zemini, aynı anda hedeflenmesi gereken ek nedenler anlamına gelir: miyokard kontüzyonu, tamponad, tansiyon pnömotoraks ve kanama olasılığı hızlıca değerlendirilir. Kardiyoversiyon dolaşımı toparlamak için yapılır; asıl kazanım, eş zamanlı yürütülen travma değerlendirmesi ve müdahalelerle sağlanır."
     },
     {
       "id": 17,
-      "title": "Olgu 17 – Toraks penetran yaralanma sonrası arrest",
+      "title": "Olgu 17 – Toraks yaralanması ile başvuru",
       "narrative": "28 yaşında erkek hasta, toraksa delici-kesici alet yaralanması sonrası acile getiriliyor. Gelişte belirgin solukluk var; kısa süre içinde yanıtsız hale geliyor. Normal solunum yok, nabız alınamıyor ve KPR başlatılıyor. Sen monitörizasyonu yapıp ilk ritim değerlendirmesini şimdi yapıyorsun.",
-      "tags": ["erişkin", "travma", "penetran toraks yaralanması", "kardiyak arrest", "acil servis"],
+      "tags": ["erişkin", "travma", "arrest"],
       "rhythmKey": "pea",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Travmatik arrestte şok uygulamak, yalnızca şoklanabilir bir ritim varsa anlamlıdır; şoklanamayan ritimde defibrilasyon yapılmaz. Bu tabloda odak, birkaç dakika içinde düzeltilebilecek nedenlere yönelir: masif hemoraji kontrolü ve hızlı kan replasmanı, tansiyon pnömotoraks için acil dekompresyon, hemotoraks için drenaj, tamponad şüphesinde uygun girişim ve hızlı yatak başı USG ile karar destek. KPR sürerken bu girişimlerin gecikmemesi kritik fark yaratır."
+      "explanation": "Travmatik arrestte şok uygulamak, yalnızca şoklanabilir bir ritim varsa anlamlıdır; şoklanamayan ritimde defibrilasyon yapılmaz. Bu tabloda farkı yaratan, birkaç dakika içinde düzeltilebilecek nedenlere odaklanmaktır: masif hemoraji kontrolü ve hızlı kan replasmanı, tansiyon pnömotoraks için acil dekompresyon, hemotoraks için drenaj, tamponad şüphesinde uygun girişim ve yatak başı USG ile hızlı karar desteği. KPR sürerken bu girişimler geciktirilmemelidir."
     },
     {
       "id": 18,
-      "title": "Olgu 18 – Sedasyon sonrası beklenmedik kötüleşme",
+      "title": "Olgu 18 – İşlem sonrası beklenmedik kötüleşme",
       "narrative": "62 yaşında erkek hasta, işlem için sedasyon uygulanmasının ardından kısa sürede yanıtsız hale geliyor. Normal solunum yok; nabız alınamıyor. Ekip KPR’ye başlıyor. Sen monitörü bağlayıp ritmi şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "prosedür", "kardiyak arrest", "hipoksi olasılığı"],
+      "tags": ["erişkin", "prosedür", "arrest"],
       "rhythmKey": "asystole",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Şoklanamayan ritimde defibrilasyon uygulanmaz; temel yaklaşım yüksek kaliteli KPR ve adrenalin tedavisidir. Bu olguda tetikleyici olarak hipoventilasyon/hipoksi olasılığı belirgin olduğundan, KPR sürerken havayolu ve ventilasyon hızla optimize edilir (balon-maske, ileri havayolu gereksinimi, oksijenasyonun takibi). Aynı anda geri döndürülebilir nedenler sistematik şekilde gözden geçirilir ve önceliklendirilir."
+      "explanation": "Şoklanamayan ritimde defibrilasyon uygulanmaz; yüksek kaliteli KPR ve adrenalin temel tedavilerdir. Bu olguda tetikleyici olarak hipoventilasyon/hipoksi olasılığı belirgin olduğundan, KPR sürerken havayolu ve ventilasyon hızla optimize edilir (balon-maske, gerekirse ileri havayolu). Aynı anda geri döndürülebilir nedenler sistematik şekilde gözden geçirilir; amaç ‘KPR yaparken nedeni düzeltmek’ yaklaşımını sahaya indirmektir."
     },
     {
       "id": 19,
-      "title": "Olgu 19 – Diyaliz hastasında belirgin güçsüzlük ve dolaşım bozukluğu",
-      "narrative": "58 yaşında erkek hasta, kronik böbrek yetmezliği nedeniyle diyaliz öyküsü var. Acile yaygın halsizlik ve nefes darlığı ile geliyor. Kısa sürede bilinç bulanıklığı gelişiyor; TA düşüyor, periferik perfüzyon zayıflıyor. Nabız alınıyor. Monitörü bağlayıp ritmi şimdi değerlendiriyorsun.",
-      "tags": ["erişkin", "metabolik", "peri-arrest", "hiperkalemi olasılığı"],
+      "title": "Olgu 19 – Diyaliz öyküsü olan hastada kötüleşme",
+      "narrative": "58 yaşında erkek hasta, kronik böbrek yetmezliği nedeniyle diyaliz öyküsüyle acile yaygın halsizlik ve nefes darlığı ile geliyor. Kısa sürede bilinç bulanıklığı gelişiyor; TA düşüyor, periferik perfüzyon zayıflıyor. Nabız alınıyor. Monitörü bağlayıp ritmi şimdi değerlendiriyorsun.",
+      "tags": ["erişkin", "metabolik", "peri-arrest"],
       "rhythmKey": "sinus",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Nabız var ve tablo bradikardi/peri-arrest spektrumundaysa elektriksel şok değil, bradikardi yaklaşımı ve neden tedavisi esastır. Oksijenasyon sağlanır, hemodinami desteklenir; uygun hastada atropin düşünülür ve yanıt yetersizse pacing/vazopresör desteği planlanır. Diyaliz öyküsü nedeniyle elektrolit bozukluğu olasılığı yüksek olduğundan, eş zamanlı olarak hiperkalemiye yönelik acil tedavi (kalsiyum, insülin-glukoz, beta-agonist, bikarbonat seçilmiş olguda) ve diyaliz hazırlığı geciktirilmez."
+      "explanation": "Nabız var ve tablo peri-arrest bradikardi/ileti bozukluğu eksenine kayıyorsa şok değil, bradikardi yaklaşımı ve neden tedavisi esastır. Oksijenasyon ve hemodinamik destek sağlanır; uygun hastada atropin düşünülür ve yanıt yetersizse pacing/vazopresör desteği planlanır. Diyaliz öyküsü, potansiyel elektrolit bozukluğunu (özellikle hiperkalemi) öne çıkarır; kalsiyum ile membran stabilizasyonu ve potasyumu hücre içine kaydıran tedaviler geciktirilmeden başlatılır, kesin tedavi için diyaliz hazırlığı yapılır."
     },
     {
       "id": 20,
-      "title": "Olgu 20 – Stabil hastada hızlı ritim saptanması",
+      "title": "Olgu 20 – Stabil çarpıntı başvurusu",
       "narrative": "67 yaşında erkek hasta, çarpıntı yakınmasıyla başvuruyor. Bilinci açık, TA 125/75 mmHg; göğüs ağrısı yok, periferik perfüzyonu iyi. Monitörde ritmi değerlendiriyorsun.",
-      "tags": ["erişkin", "stabil", "taşikardi"],
+      "tags": ["erişkin", "stabil"],
       "rhythmKey": "af",
       "timeLimitSec": 5,
       "type": "Ritim/işlem kararı",
       "correctAction": "noShock",
-      "explanation": "Hemodinamik olarak stabil hastada acil elektriksel işlem ilk basamak değildir. Öncelik; vital bulguların yakın takibi, altta yatan tetikleyicilerin (enfeksiyon, hipovolemi, hipertiroidi, elektrolit bozukluğu, iskemik süreç) değerlendirilmesi ve uygun medikal hız kontrolüdür. Elektriksel kardiyoversiyon, instabilite gelişmesi veya seçilmiş klinik endikasyonlar varlığında gündeme gelir."
+      "explanation": "Hemodinamik olarak stabil hastada acil elektriksel işlem genellikle ilk basamak değildir. Öncelik; vital bulguların yakın takibi, altta yatan tetikleyicilerin araştırılması (enfeksiyon, hipovolemi, tiroid, elektrolit bozukluğu, iskemik süreç) ve uygun medikal hız kontrolüdür. Elektriksel kardiyoversiyon, instabilite gelişmesi veya seçilmiş klinik durumlarda gündeme gelir; stabil hastada aceleyle şoka gitmek doğru bir refleks değildir."
     }
   ]
 }
