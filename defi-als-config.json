@@ -59,14 +59,14 @@
     },
     {
   "id": 5,
-  "title": "Olgu 5 – Bisiklet kazası sonrası toraks travması ve kardiyak arrest",
-  "narrative": "12 yaşında erkek çocuk, bisiklet kazası sonrası acile getiriliyor. Yakınları, düşme sırasında gidonun göğüs ön duvarına sert şekilde çarptığını söylüyor. Triyaj sırasında belirgin ağrı ve nefes darlığından yakınıyor; kısa süre içinde rengi bozularak yanıtı azalıyor. Normal solunum kayboluyor, nabız alınamıyor ve ekip KPR’ye başlıyor. Sen ilk ritim değerlendirmesi için monitöre şimdi bakıyorsun.",
-  "tags": ["çocuk", "travma", "bisiklet", "künt toraks travması", "kardiyak arrest"],
-  "rhythmKey": "asystole",
+  "title": "Olgu 16 – Göğüs darbesi sonrası ani kollaps (kardiyak yaralanma şüphesi)",
+  "narrative": "16 yaşında erkek hasta, okul spor etkinliğinde göğüs ön duvarına sert darbe aldıktan birkaç saniye sonra sendeleyip yere yığılıyor. Çevredekiler hastanın yanıt vermediğini, normal solunumunun olmadığını fark ediyor. Nabız alınamıyor ve temel yaşam desteği başlatılıyor. Olay yerinde defibrilatör hazır; sen ekibe katılıp hastayı monitörize ederek ritim değerlendirmesini şimdi yapıyorsun.",
+  "tags": ["çocuk/ergen", "travma", "künt toraks travması", "kardiyak yaralanma", "saha", "kardiyak arrest"],
+  "rhythmKey": "vf",
   "timeLimitSec": 5,
   "type": "ALS ritim kararı",
-  "correctAction": "noShock",
-  "explanation": "Travmatik kardiyak arrestte öncelik, şok uygulamaktan çok geri döndürülebilir nedenlerin hızla düzeltilmesidir. Monitörde şoklanabilir bir ritim yoksa defibrilasyon yapılmaz; KPR sürerken oksijenasyon/ventilasyon hızla optimize edilir, masif kanama ve hipovolemi açısından değerlendirme ve resüsitasyon eş zamanlı yürütülür. Künt toraks travmasında özellikle tansiyon pnömotoraks ve kardiyak tamponad olasılığı akılda tutulur; klinik şüphe varsa gecikmeden göğüs dekompresyonu ve uygun girişimler planlanır. Bu yaklaşım, ritimden bağımsız olarak travmaya özgü geri döndürülebilir nedenlere odaklanmayı gerektirir."
+  "correctAction": "shock",
+  "explanation": "Künt toraks travması sonrası ani gelişen nabızsız arrestte, ritim şoklanabilir gruptaysa yaklaşımın omurgası gecikmeden defibrilasyondur. Şoktan hemen sonra kompresyona geri dönülür; ritim kontrolü ve şok kararı, kısa kesintilerle ve belirli aralıklarla tekrarlanır. Eş zamanlı olarak travmaya özgü geri döndürülebilir nedenler gözden kaçırılmaz: özellikle tansiyon pnömotoraks, kardiyak tamponad ve masif kanama açısından hızlı klinik değerlendirme yapılır ve şüphe varsa girişimler geciktirilmez. Bu tip olgularda sonuçları belirleyen kritik nokta, ilk dakikalarda şokun gecikmemesi ve KPR kalitesinin korunmasıdır."
 }
 ,
     {
