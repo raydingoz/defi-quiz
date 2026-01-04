@@ -1,385 +1,514 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="tr">
 <head>
   <meta charset="UTF-8" />
-  <title>EKG SVG Tile Aracı</title>
+  <title>EKG Tile Editor + ALS Monitor Sim Preview</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --bg: #020617;
-      --card: #020617;
-      --border: #1f2937;
-      --accent: #22c55e;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --heading: #f9fafb;
-      --radius-lg: 14px;
-      --radius-pill: 999px;
+    :root{
+      --bg:#020617;
+      --card:#020617;
+      --border:#1f2937;
+      --accent:#22c55e;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --heading:#f9fafb;
+      --radius-lg:14px;
+      --radius-pill:999px;
+
+      /* İnceltilmiş varsayılanlar */
+      --waveStroke: 1.1;      /* polyline kalınlığı */
+      --pointRadius: 1.9;     /* edit noktası yarıçapı */
+      --gridThin: 0.55;       /* küçük grid kalınlığı */
+      --gridThick: 0.85;      /* kalın grid kalınlığı */
+      --baselineStroke: 0.75; /* baseline kalınlığı */
+
+      /* Monitör animasyon */
+      --tileWpx: 240px;
+      --animDur: 1.2s;
+      --phasePx: 0px;
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
-      padding: 8px;
+    *{box-sizing:border-box;}
+    body{
+      margin:0;
+      padding:10px;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       background: radial-gradient(circle at top, #0f172a 0, #020617 45%, #000 100%);
       color: var(--text);
       font-size: 14px;
     }
 
-    .app {
-      max-width: 960px;
+    .app{
+      max-width: 1100px;
       margin: 0 auto;
       display: grid;
       grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
       gap: 12px;
       align-items: start;
     }
-
-    .overlay-panel {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      align-items: center;
-      background: rgba(15,23,42,0.85);
-      border: 1px dashed var(--border);
-      border-radius: 10px;
-      padding: 8px;
-      margin-top: 6px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .overlay-panel .btn { font-size: 0.78rem; }
-
-    .overlay-slider {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .overlay-slider input[type="range"] {
-      width: 140px;
-      accent-color: #22c55e;
-    }
     .app > div { display:flex; flex-direction:column; gap:10px; }
-
-    @media (max-width: 800px) {
-      .app {
-        grid-template-columns: minmax(0, 1fr);
-      }
+    @media (max-width: 900px){
+      .app{ grid-template-columns: 1fr; }
     }
 
-    .card {
+    .card{
       background: var(--card);
       border-radius: var(--radius-lg);
       border: 1px solid var(--border);
       padding: 10px;
       box-shadow: 0 10px 20px rgba(15,23,42,0.9);
-      margin-top: 6px;
     }
 
-    .title-bar {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 6px;
+    .title-bar{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:8px;
+      margin-bottom:6px;
     }
-
-    .brand {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--heading);
+    .brand{
+      font-size:0.95rem;
+      font-weight:650;
+      color:var(--heading);
+      display:flex;
+      gap:8px;
+      align-items:center;
     }
-
-    .pill {
+    .pill{
       border-radius: var(--radius-pill);
       border: 1px solid var(--border);
       padding: 2px 8px;
       font-size: 0.75rem;
       color: var(--muted);
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
       background: rgba(15,23,42,0.95);
     }
-
-    .pill-dot {
-      width: 7px;
-      height: 7px;
-      border-radius: 999px;
-      background: var(--accent);
-      box-shadow: 0 0 10px rgba(34,197,94,0.9);
+    .pill-dot{
+      width:7px;height:7px;border-radius:999px;background:var(--accent);
+      box-shadow:0 0 10px rgba(34,197,94,0.9);
     }
 
-    .label-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      margin-bottom: 6px;
-      font-size: 0.8rem;
-      color: var(--muted);
+    .label-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+      margin-bottom:6px;
+      font-size:0.8rem;
+      color:var(--muted);
     }
 
-    .label-row input {
-      width: 70px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: #020617;
-      color: var(--text);
-      padding: 3px 8px;
-      font-size: 0.8rem;
-      outline: none;
-    }
-
-    .label-row input[type="number"]::-webkit-inner-spin-button {
-      opacity: 0.3;
-    }
-
-    .btn {
-      border: none;
-      border-radius: var(--radius-pill);
-      padding: 6px 10px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      background: rgba(15,23,42,0.96);
-      border: 1px solid var(--border);
-      color: var(--muted);
-      transition: all 0.1s ease-out;
-    }
-    .btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
-
-    .btn-main {
-      background: radial-gradient(circle at top left, #22c55e, #15803d);
-      color: #0b1120;
-      border: none;
-      box-shadow: 0 8px 18px rgba(34,197,94,0.5);
-    }
-
-    .hint {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 4px;
-    }
-
-    .hint.small {
-      font-size: 0.74rem;
-    }
-
-    .hint strong { color: var(--heading); }
-
-    select,
-    .pill-input {
+    input[type="number"], input[type="text"], select, .pill-input{
       border-radius: var(--radius-pill);
       border: 1px solid var(--border);
       background: #020617;
       color: var(--text);
       padding: 5px 10px;
       font-size: 0.82rem;
-      outline: none;
+      outline:none;
     }
+    select{ min-width: 160px; }
 
-    select {
-      min-width: 140px;
-    }
-
-    .toggle-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    .guide-box {
-      margin-top: 6px;
-      padding: 8px;
-      border-radius: 12px;
-      border: 1px dashed var(--border);
-      background: rgba(15,23,42,0.85);
-    }
-
-    .guide-title {
-      font-size: 0.82rem;
-      color: var(--heading);
-      font-weight: 700;
-      margin-bottom: 6px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .guide-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-      gap: 6px;
-      margin-top: 4px;
-      font-size: 0.82rem;
-      color: var(--muted);
-    }
-
-    .guide-chip {
+    .btn{
+      border:none;
       border-radius: var(--radius-pill);
-      border: 1px solid #1f2937;
-      padding: 6px 8px;
-      background: rgba(15,23,42,0.9);
-      display: flex;
-      justify-content: space-between;
-      gap: 6px;
+      padding: 6px 10px;
+      font-size: 0.8rem;
+      font-weight: 650;
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background: rgba(15,23,42,0.96);
+      border: 1px solid var(--border);
       color: var(--muted);
+      transition: all 0.1s ease-out;
+      user-select:none;
+    }
+    .btn:hover{
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .btn-main{
+      background: radial-gradient(circle at top left, #22c55e, #15803d);
+      color:#0b1120;
+      border:none;
+      box-shadow:0 8px 18px rgba(34,197,94,0.5);
+    }
+    .btn-danger{
+      background: radial-gradient(circle at top left, #fb7185, #be123c);
+      color:#0b1120;
+      border:none;
+      box-shadow:0 8px 18px rgba(251,113,133,0.35);
     }
 
-    .guide-chip strong { color: var(--heading); }
+    textarea{
+      width:100%;
+      min-height: 120px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#020617;
+      color:var(--text);
+      font-size:0.8rem;
+      padding: 8px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    }
 
-    .bpm-row {
-      display: flex;
-      align-items: center;
+    .hint{
+      font-size:0.78rem;
+      color:var(--muted);
+      margin-top:4px;
+      line-height:1.35;
+    }
+    .hint strong{ color: var(--heading); }
+    .code-label{
+      font-size:0.8rem;
+      color:var(--muted);
+      margin-bottom: 4px;
+    }
+
+    /* Monitor preview */
+    .monitor{
+      margin-top:6px;
+      border-radius:16px;
+      border:1px solid #0f172a;
+      background:#000;
+      padding:10px;
+      position:relative;
+      overflow:hidden;
+    }
+    .monitor-grid{
+      position:absolute;
+      inset:0;
+      opacity:0.22;
+      background-image:
+        linear-gradient(to right,#1f2937 1px,transparent 1px),
+        linear-gradient(to bottom,#1f2937 1px,transparent 1px);
+      background-size: 16px 10px;
+      pointer-events:none;
+    }
+    .monitor-header{
+      display:flex;
+      justify-content:space-between;
+      font-size:0.8rem;
+      color:rgba(148,163,184,0.85);
+      margin-bottom:6px;
+    }
+
+    .ekg-line{
+      position:relative;
+      height:90px;
+      overflow:hidden;
+      border-radius: 12px;
+      border: 1px solid rgba(15,23,42,0.65);
+      background: radial-gradient(circle at top, #020617 0, #000 85%);
+    }
+    .seam-guides{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      opacity: 0;
+      transition: opacity .12s ease-out;
+    }
+    .seam-guides.show{ opacity: 1; }
+    .seam-guides .vline{
+      position:absolute;
+      top:0; bottom:0;
+      width:1px;
+      background: rgba(251,191,36,0.6);
+      box-shadow: 0 0 10px rgba(251,191,36,0.12);
+    }
+
+    .ekg-strip-wrap{
+      position:absolute;
+      top:50%;
+      left:0;
+      transform: translate3d(var(--phasePx), -50%, 0);
+      will-change: transform;
+    }
+    .ekg-strip-inner{
+      width: calc(var(--tileWpx) * 3);
+      height: 60px;
+      display:flex;
+      will-change: transform;
+      animation: ekg-move var(--animDur) linear infinite;
+      animation-play-state: running;
+    }
+    .ekg-strip-inner.paused{
+      animation-play-state: paused;
+    }
+    @keyframes ekg-move{
+      from{ transform: translate3d(0, 0, 0); }
+      to{ transform: translate3d(calc(-1 * var(--tileWpx)), 0, 0); }
+    }
+    .ekg-strip-inner svg{
+      width: var(--tileWpx);
+      height: 60px;
+      flex: 0 0 auto;
+    }
+    .ekg-strip-inner polyline{
+      fill:none;
+      stroke: #22c55e;
+      stroke-width: var(--waveStroke);
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      filter: drop-shadow(0 0 4px rgba(34,197,94,0.55));
+    }
+    /* Ritimlere göre stroke (katılımcı sayfanızdaki renk mantığına benzer) */
+    .rhythm-sinus polyline{ stroke:#22c55e; }
+    .rhythm-vf polyline{ stroke:#f97373; }
+    .rhythm-vt polyline{ stroke:#facc15; }
+    .rhythm-asystole polyline{ stroke:#22c55e; opacity:0.65; }
+    .rhythm-pea polyline{ stroke:#38bdf8; }
+    .rhythm-torsades polyline{ stroke:#f97316; }
+    .rhythm-af polyline{ stroke:#a78bfa; }
+    .rhythm-flutter polyline{ stroke:#60a5fa; }
+    .rhythm-vf_fine polyline{ stroke:#fb7185; }
+    .rhythm-paced polyline{ stroke:#34d399; }
+    .rhythm-artifact polyline{ stroke:#e5e7eb; opacity:0.8; }
+    .rhythm-af_wpw polyline,
+    .rhythm-wpw polyline{ stroke:#fbbf24; }
+
+    .monitor-footer{
+      margin-top:6px;
+      font-size:0.8rem;
+      color:rgba(148,163,184,0.85);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .mini-kv{
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+      background: rgba(15,23,42,0.65);
+      border: 1px solid rgba(31,41,55,0.9);
+      padding: 4px 9px;
+      border-radius: var(--radius-pill);
+      color: rgba(226,232,240,0.85);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .controls-grid{
+      display:grid;
+      grid-template-columns: 1fr;
       gap: 8px;
-      flex-wrap: wrap;
+      margin-top: 8px;
     }
-
-    .bpm-row input[type="range"] {
+    .control{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+    .control label{ min-width: 130px; }
+    input[type="range"]{
       flex: 1;
       accent-color: #22c55e;
+      min-width: 180px;
+    }
+    .val{
+      min-width: 70px;
+      text-align:right;
+      color: rgba(226,232,240,0.9);
+      font-variant-numeric: tabular-nums;
     }
 
-    .preset-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 6px;
-    }
-
-    .preset {
-      padding: 4px 10px;
-      border-radius: var(--radius-pill);
-      border: 1px solid var(--border);
-      background: rgba(15,23,42,0.95);
-      color: var(--muted);
-      font-weight: 600;
-      cursor: pointer;
-      font-size: 0.82rem;
-    }
-
-    .preset:hover { color: var(--accent); border-color: var(--accent); }
-
-    /* Çizim alanı */
-    .draw-wrapper {
+    /* Editor draw area */
+    .draw-wrapper{
       border-radius: 12px;
       border: 1px solid var(--border);
       background: radial-gradient(circle at top, #020617 0, #000 90%);
       padding: 6px;
     }
-
-    .draw-inner {
-      background: #000;
+    .draw-inner{
+      background:#000;
       border-radius: 10px;
       border: 1px solid #0f172a;
-      overflow: hidden;
+      overflow:hidden;
     }
-
-    .preview-wrapper {
+    .preview-wrapper{
       border-radius: 12px;
       border: 1px solid var(--border);
-      background: #020617;
+      background:#020617;
       padding: 6px;
     }
 
-    textarea {
-      width: 100%;
-      min-height: 120px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      background: #020617;
-      color: var(--text);
-      font-size: 0.8rem;
-      padding: 6px 8px;
-      resize: vertical;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+    /* SVG styles */
+    .grid-lines{
+      stroke: rgba(15,23,42,0.85);
+      stroke-width: var(--gridThin);
     }
-
-    .code-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 4px;
+    .grid-lines-thick{
+      stroke: rgba(30,64,175,0.55);
+      stroke-width: var(--gridThick);
     }
-
-    .small {
-      font-size: 0.75rem;
-    }
-
-    /* SVG grid & waveform */
-
-    .grid-lines {
-      stroke: rgba(15,23,42,0.8);
-      stroke-width: 1;
-    }
-
-    .grid-lines-thick {
-      stroke: rgba(30,64,175,0.5);
-      stroke-width: 1.2;
-    }
-
-    .baseline {
-      stroke: rgba(148,163,184,0.7);
-      stroke-width: 1;
+    .baseline{
+      stroke: rgba(148,163,184,0.65);
+      stroke-width: var(--baselineStroke);
       stroke-dasharray: 3 3;
     }
-
-    .wave {
-      fill: none;
-      stroke: #22c55e;
-      stroke-width: 2;
+    .wave{
+      fill:none;
+      stroke:#22c55e;
+      stroke-width: var(--waveStroke);
       stroke-linecap: round;
       stroke-linejoin: round;
-      filter: drop-shadow(0 0 4px rgba(34,197,94,0.8));
+      filter: drop-shadow(0 0 4px rgba(34,197,94,0.55));
     }
-
-    .guide-line {
-      stroke: rgba(148,163,184,0.35);
-      stroke-width: 1.2;
+    .guide-line{
+      stroke: rgba(148,163,184,0.28);
+      stroke-width: 0.9;
       stroke-dasharray: 4 4;
     }
-
-    .point {
-      fill: #22c55e;
-      stroke: #0f172a;
-      stroke-width: 1;
-      cursor: pointer;
+    .point{
+      fill:#22c55e;
+      stroke:#0f172a;
+      stroke-width: 0.8;
+      cursor:pointer;
+      r: var(--pointRadius);
     }
+    .point:hover{ fill:#a3e635; }
 
-    .point:hover {
-      fill: #a3e635;
-    }
-
-    @media (max-width: 500px) {
-      textarea {
-        min-height: 140px;
-      }
+    .hr{
+      height:1px;
+      background: rgba(31,41,55,0.9);
+      margin: 10px 0;
+      border:none;
     }
   </style>
 </head>
+
 <body>
   <div class="app">
-    <!-- SOL: Çizim ve preview -->
+    <!-- SOL -->
     <div>
+      <!-- ALS Monitor sim preview -->
       <div class="card">
         <div class="title-bar">
-          <div class="brand">EKG SVG Tile Aracı</div>
+          <div class="brand">
+            <span class="pill-dot"></span>
+            ALS Monitör Sim Önizleme
+          </div>
           <div class="pill">
             <span class="pill-dot"></span>
-            240×60 • seamless
+            3× tile • aynı animasyon mantığı
+          </div>
+        </div>
+
+        <div class="label-row">
+          <span>Ritim:</span>
+          <select id="monitorRhythmSelect">
+            <option value="sinus">sinus</option>
+            <option value="vf">vf</option>
+            <option value="vf_fine">vf_fine</option>
+            <option value="vt">vt</option>
+            <option value="torsades">torsades</option>
+            <option value="asystole">asystole</option>
+            <option value="pea">pea</option>
+            <option value="svt">svt</option>
+            <option value="af">af</option>
+            <option value="flutter">flutter</option>
+            <option value="af_wpw">af_wpw</option>
+            <option value="paced">paced</option>
+            <option value="artifact">artifact</option>
+          </select>
+
+          <button id="btnMonitorPlay" class="btn btn-main">Play</button>
+          <button id="btnMonitorPause" class="btn">Pause</button>
+
+          <label class="pill" style="gap:8px;">
+            <input type="checkbox" id="toggleSeams" />
+            Seam çizgilerini göster
+          </label>
+        </div>
+
+        <div class="monitor">
+          <div class="monitor-grid"></div>
+
+          <div class="monitor-header">
+            <span>Lead II</span>
+            <span>tileWidth: <span id="tileWLabel">240</span>px • dur: <span id="durLabel">1.2</span>s</span>
+          </div>
+
+          <div class="ekg-line" id="monitorLine">
+            <div class="seam-guides" id="seamGuides">
+              <div class="vline" id="seam1"></div>
+              <div class="vline" id="seam2"></div>
+            </div>
+
+            <div class="ekg-strip-wrap" id="monitorWrap">
+              <div class="ekg-strip-inner rhythm-sinus" id="monitorInner">
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="mPoly1" points="0,30 240,30"></polyline>
+                </svg>
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="mPoly2" points="0,30 240,30"></polyline>
+                </svg>
+                <svg viewBox="0 0 240 60" preserveAspectRatio="none">
+                  <polyline id="mPoly3" points="0,30 240,30"></polyline>
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="monitor-footer">
+            <span class="mini-kv">Phase: <span id="phaseLabel">0</span>px</span>
+            <span class="mini-kv">Seam Δy: <span id="seamDy">0</span> • Δslope: <span id="seamDs">0</span></span>
+          </div>
+        </div>
+
+        <div class="controls-grid">
+          <div class="control">
+            <label>Animasyon süresi</label>
+            <input type="range" id="durRange" min="0.5" max="3.0" step="0.05" value="1.2" />
+            <span class="val" id="durVal">1.20s</span>
+            <button id="btnPreset12" class="btn">1.2s</button>
+            <button id="btnPreset25" class="btn">25mm/sn</button>
+          </div>
+
+          <div class="control">
+            <label>Phase (seam kaydır)</label>
+            <input type="range" id="phaseRange" min="0" max="240" step="1" value="0" />
+            <span class="val" id="phaseVal">0px</span>
+          </div>
+
+          <div class="control">
+            <label>Wave stroke</label>
+            <input type="range" id="strokeRange" min="0.6" max="2.5" step="0.05" value="1.1" />
+            <span class="val" id="strokeVal">1.10</span>
+          </div>
+
+          <div class="control">
+            <label>Nokta radius</label>
+            <input type="range" id="pointRange" min="0.9" max="3.2" step="0.1" value="1.9" />
+            <span class="val" id="pointVal">1.9</span>
+
+            <button id="btnSeamSlopeMatch" class="btn">Seam slope match</button>
+          </div>
+        </div>
+
+        <div class="hint">
+          • Bu önizleme, katılımcı sayfanızdaki gibi <strong>3 tile</strong> yan yana koyup <strong>-tileWidth</strong> kadar kaydırır.<br>
+          • “Phase” ile seam çizgilerini dalganın üstüne getirip ek yerini inceleyin. “Pause” ile donup bakabilirsiniz.<br>
+          • Seam’de sadece <strong>konum</strong> değil <strong>eğim</strong> de önemlidir; Δslope yüksekse seam’de kırılma görürsünüz.
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <div class="card">
+        <div class="title-bar">
+          <div class="brand">EKG SVG Tile Editor</div>
+          <div class="pill">
+            <span class="pill-dot"></span>
+            <span id="sizePill">240×60</span> • baseline: <span id="basePill">30</span>
           </div>
         </div>
 
@@ -391,514 +520,392 @@
           <span>Baseline (y):</span>
           <input type="number" id="baselineInput" value="30" min="0" max="400" />
           <button id="applySizeBtn" class="btn btn-main">Uygula</button>
-          <button id="clearBtn" class="btn">Noktaları temizle</button>
+          <button id="clearBtn" class="btn btn-danger">Noktaları temizle</button>
         </div>
 
         <div class="draw-wrapper">
           <div class="draw-inner">
-            <!-- Ana çizim SVG -->
-            <svg id="drawArea" width="100%" viewBox="0 0 240 60" preserveAspectRatio="none">
-              <!-- Grid ve baseline JS ile çizilecek -->
-            </svg>
+            <svg id="drawArea" width="100%" viewBox="0 0 240 60" preserveAspectRatio="none"></svg>
           </div>
-        </div>
-
-        <div class="overlay-panel">
-          <strong style="color: var(--heading);">Overlay PNG:</strong>
-          <button id="overlayUploadBtn" class="btn">PNG yükle</button>
-          <input type="file" id="overlayFile" accept="image/*" style="display:none;" />
-          <button id="overlayClearBtn" class="btn">Temizle</button>
-          <label style="display:flex; align-items:center; gap:6px;">
-            <input type="checkbox" id="overlayToggle" checked />
-            Görünür
-          </label>
-          <div class="overlay-slider">
-            <span>Opaklık</span>
-            <input type="range" id="overlayOpacity" min="0" max="100" value="45" />
-            <span id="overlayOpacityLabel">45%</span>
-          </div>
-          <div class="overlay-slider">
-            <span>Ölçek</span>
-            <input type="range" id="overlayScale" min="50" max="220" value="100" />
-            <span id="overlayScaleLabel">100%</span>
-          </div>
-          <div class="overlay-slider" style="flex-wrap:wrap;">
-            <span>Taşı (px)</span>
-            <label style="display:flex; align-items:center; gap:4px;">X <input type="number" id="overlayOffsetX" value="0" style="width:70px;"></label>
-            <label style="display:flex; align-items:center; gap:4px;">Y <input type="number" id="overlayOffsetY" value="0" style="width:70px;"></label>
-            <button id="overlayResetBtn" class="btn">Sıfırla</button>
-          </div>
-          <span id="overlayName" style="color: var(--heading); font-size:0.78rem;"></span>
-          <div class="hint small" style="margin:0;">Kendi EKG görselini rehber olarak ekleyip izleyerek çizebilirsin.</div>
         </div>
 
         <div class="hint">
-          • Alan içine <strong>tıklayarak</strong> nokta ekle (X’e göre sıralanır).<br />
-          • Kenarlar otomatik: <strong>(0, baseline)</strong> ve <strong>(width, baseline)</strong> → sorunsuz tile olur.<br />
-          • Bir noktayı <strong>Ctrl+click</strong ile silebilirsin.
+          • Alan içine tıklayarak nokta ekle. Noktalar X’e göre otomatik sıralanır.<br>
+          • Ctrl/Cmd + tıklama: en yakın noktayı siler.<br>
+          • Kenarlar otomatik: (0,baseline) ve (width,baseline) — tile mantığı korunur.
         </div>
       </div>
 
       <div class="card">
-        <div class="code-label">Tile önizleme (3× yan yana):</div>
+        <div class="code-label">Tile önizleme (3× yan yana, statik):</div>
         <div class="preview-wrapper">
-          <svg id="previewArea" width="100%" viewBox="0 0 720 60" preserveAspectRatio="none">
-            <!-- JS ile doldurulacak -->
-          </svg>
+          <svg id="previewArea" width="100%" viewBox="0 0 720 60" preserveAspectRatio="none"></svg>
         </div>
       </div>
     </div>
 
-    <!-- SAĞ: Kod çıktısı -->
+    <!-- SAĞ -->
     <div>
       <div class="card">
         <div class="code-label">Üretilen SVG kodu:</div>
         <textarea id="svgOutput" spellcheck="false"></textarea>
-        <div class="hint small">
-          Bu kodu direkt CSS background ya da inline SVG içinde kullanabilirsin.<br />
-          Örn. <code>background-image: url("data:image/svg+xml;utf8,&lt;svg ...");</code>
+        <div class="hint">
+          Bu kodu inline SVG veya data-URL olarak kullanabilirsiniz. Polyline stroke kalınlığını isterseniz sim sayfasında CSS ile override edin.
         </div>
       </div>
 
       <div class="card">
-        <div class="code-label">Hız / R-R kılavuzu (25 mm/sn varsayımı):</div>
-        <div class="guide-box">
-          <div class="guide-title">Hedef nabız: <span id="bpmLabel">75</span> bpm</div>
-          <div class="bpm-row">
-            <input type="range" id="bpmInput" min="40" max="220" value="75" />
-            <input type="number" id="bpmNumber" class="pill-input" value="75" min="40" max="220" style="width:80px;" />
-          </div>
-          <div class="hint" id="bpmHint">
-            75 bpm ≈ 0.80 sn R–R ≈ 20 küçük kare (5 mm gridde ≈ 100px). <strong>Kılavuz çizgileri açık.</strong>
-          </div>
-          <div class="preset-row">
-            <button class="preset" data-bpm="60">60</button>
-            <button class="preset" data-bpm="75">75</button>
-            <button class="preset" data-bpm="100">100</button>
-            <button class="preset" data-bpm="120">120</button>
-            <button class="preset" data-bpm="150">150</button>
-            <button class="preset" data-bpm="180">180</button>
-          </div>
-          <div class="toggle-row">
-            <input type="checkbox" id="guideToggle" checked />
-            <label for="guideToggle">Seçili bpm'ye göre R–R düşey kılavuz çizgilerini göster</label>
-          </div>
+        <div class="code-label">Sadece &lt;polyline&gt; kısmı:</div>
+        <textarea id="polylineOutput" spellcheck="false"></textarea>
+      </div>
+
+      <div class="card">
+        <div class="code-label">const EKG_SHAPES alanı (yapıştır → yükle / export):</div>
+
+        <div class="label-row">
+          <button id="btnLoadShapes" class="btn btn-main">EKG_SHAPES'ten içeri al</button>
+          <button id="btnExportShapes" class="btn">EKG_SHAPES'i üret</button>
         </div>
-        <div class="guide-grid">
-          <div class="guide-chip"><strong>50 bpm</strong><span>≈30 k kare • 1.2 sn</span></div>
-          <div class="guide-chip"><strong>60 bpm</strong><span>≈25 k kare • 1.0 sn</span></div>
-          <div class="guide-chip"><strong>75 bpm</strong><span>≈20 k kare • 0.8 sn</span></div>
-          <div class="guide-chip"><strong>100 bpm</strong><span>≈15 k kare • 0.6 sn</span></div>
-          <div class="guide-chip"><strong>120 bpm</strong><span>≈12-13 k kare • 0.5 sn</span></div>
-          <div class="guide-chip"><strong>150 bpm</strong><span>≈10 k kare • 0.4 sn</span></div>
-          <div class="guide-chip"><strong>180 bpm</strong><span>≈8-9 k kare • 0.33 sn</span></div>
+
+        <textarea id="shapesArea" spellcheck="false" style="min-height:210px;"></textarea>
+
+        <div class="hint">
+          • Buraya <code>const EKG_SHAPES = { ... };</code> yapıştırıp içeri alabilirsiniz.<br>
+          • Export, editor’deki ritimleri (varsa) EKG_SHAPES formatında üretir.
         </div>
       </div>
 
       <div class="card">
-        <div class="code-label">Ritim listesi ve JSON:</div>
-        <div class="label-row" style="gap: 8px; align-items: center;">
+        <div class="code-label">Ritim seç / kaydet:</div>
+        <div class="label-row">
           <select id="rhythmSelect">
             <option value="">Ritim seç</option>
           </select>
           <input id="rhythmName" class="pill-input" placeholder="İsim veya yeni ritim" />
-          <button id="loadJsonBtn" class="btn btn-sm">JSON'dan yükle</button>
+          <button id="saveRhythmBtn" class="btn btn-main">Kaydet/Güncelle</button>
+          <button id="deleteRhythmBtn" class="btn">Sil</button>
         </div>
-        <div class="btn-row" style="margin-top: 2px;">
-          <button id="saveRhythmBtn" class="btn btn-main btn-sm">Kaydet / Güncelle</button>
-          <button id="deleteRhythmBtn" class="btn btn-sm">Seçileni sil</button>
-          <button id="refreshJsonBtn" class="btn btn-sm">JSON'u güncelle</button>
+
+        <textarea id="jsonArea" spellcheck="false" placeholder='[{"name":"sinus","width":240,"height":60,"baseline":30,"points":[{"x":10,"y":20}]}]'></textarea>
+
+        <div class="label-row" style="margin-top:8px;">
+          <button id="refreshJsonBtn" class="btn">JSON'u güncelle</button>
+          <button id="loadJsonBtn" class="btn">JSON'dan yükle</button>
         </div>
-        <textarea id="jsonArea" spellcheck="false" placeholder='[ {"name":"sinus","width":240,"height":60,"baseline":30,"points":[{"x":10,"y":20}]} ]'></textarea>
-        <div class="hint small">
-          • Çizdiğin dalgayı <strong>Kaydet / Güncelle</strong> ile isimlendirip listeye ekle.<br />
-          • <strong>JSON'u güncelle</strong> mevcut veriyi textarea'ya yazar. <strong>JSON'dan yükle</strong> ise textarea'daki veriyi içeri aktarır.<br />
-          • Liste değiştirildiğinde isim alanı yenilenir ve noktalar otomatik temizlenir/yüklenir.
+
+        <div class="hint">
+          • Ritim store: width/height/baseline + interior noktalar.<br>
+          • Monitor önizleme ritmini isterseniz store’dan da seçebilirsiniz (şimdilik EKG_SHAPES anahtarları ile).
         </div>
-      </div>
-      <div class="card">
-        <div class="code-label">const EKG_SHAPES çıktısı:</div>
-        <textarea id="shapesOutput" spellcheck="false" placeholder='const EKG_SHAPES = { "sinus": "0,30 ..." };' style="min-height: 140px;"></textarea>
-        <div class="hint small">Ritim listesini <code>const EKG_SHAPES</code> olarak kopyalamak için bu alanı kullan.</div>
-      </div>
-      <div class="card">
-        <div class="code-label">Sadece <code>&lt;polyline&gt;</code> kısmı:</div>
-        <textarea id="polylineOutput" spellcheck="false"></textarea>
       </div>
     </div>
   </div>
 
   <script>
-    // Config
+    // ---------------------------
+    // 0) Default shapes (sizdeki liste)
+    // ---------------------------
+    const EKG_SHAPES_DEFAULT = {
+      "sinus": "0,30 3,30 6,27 9,30 14,29 14,32 17,1 18,33 21,29 25,29 28,24 32,29 36,31 41,31 48,31 56,30 64,30 74,30 82,30 86,27 89,30 93,30 94,32 97,0 98,33 101,30 105,29 108,24 110,27 113,31 119,31 128,31 136,29 144,30 154,30 158,30 165,30 167,28 170,31 174,31 175,32 177,2 179,35 183,31 185,30 188,25 190,26 192,31 198,31 207,31 216,31 225,30 235,30 240,30",
+      "vf": "0,30 3,25 5,32 8,33 9,30 10,26 11,24 14,25 15,29 17,32 19,33 22,29 23,24 25,24 29,28 30,32 32,32 36,26 37,21 38,19 42,36 46,38 48,30 48,23 49,18 52,16 53,24 54,30 58,37 59,36 60,27 62,22 66,21 70,32 72,31 77,26 81,23 84,29 84,31 87,28 91,22 92,21 96,27 97,31 99,31 101,29 101,25 105,24 109,28 112,30 114,27 117,22 120,26 122,33 125,34 131,28 134,24 136,29 137,32 142,30 144,25 145,24 150,28 152,32 154,33 156,29 156,26 159,25 165,30 168,31 169,25 170,23 176,30 179,32 183,26 184,22 186,20 189,23 194,26 196,31 197,30 201,18 204,19 209,26 210,29 211,30 213,25 218,30 220,32 224,30 226,25 228,27 231,35 231,35 233,32 234,30 238,36 240,30",
+      "vf_fine": "0,30 3,32 7,28 13,31 18,33 24,32 28,29 32,27 37,28 41,30 45,30 50,29 54,28 59,28 67,30 71,32 75,31 79,30 84,28 88,27 91,28 95,30 99,30 103,29 105,27 105,27 108,27 112,32 116,32 117,29 120,27 123,30 125,30 128,28 133,28 137,30 142,28 147,25 148,28 154,29 158,29 161,30 164,28 166,25 170,28 174,30 175,30 177,30 187,29 193,27 196,27 205,28 209,30 216,30 219,30 229,29 235,28 240,30",
+      "vt": "0,30 3,12 5,36 7,39 10,42 14,32 16,13 19,34 23,42 27,32 30,12 32,36 36,42 40,34 43,12 45,35 50,42 54,33 57,12 59,35 64,42 67,34 70,12 73,36 77,42 81,33 83,13 86,37 90,43 94,33 97,13 101,38 104,44 108,34 110,13 113,36 117,43 121,34 123,13 126,36 130,43 133,35 136,14 139,35 143,43 148,34 150,14 153,35 158,44 161,34 163,13 166,36 169,44 174,35 177,15 179,37 183,43 187,32 189,13 192,37 196,44 200,34 202,12 206,37 209,44 213,32 216,13 219,37 223,43 226,33 229,14 232,37 236,44 240,30",
+      "torsades": "0,30 4,34 7,29 10,30 15,35 17,28 19,39 22,25 24,42 28,16 30,42 33,18 35,42 38,17 40,41 42,21 44,40 48,15 50,42 53,14 55,44 58,15 60,45 62,15 65,41 67,18 70,40 73,17 75,41 77,23 79,33 81,27 84,37 87,28 89,36 90,30 93,33 95,30 97,28 97,31 101,27 104,32 106,26 109,34 112,24 114,37 118,20 120,35 122,28 125,35 128,19 130,36 134,20 136,40 140,19 142,36 145,24 147,37 150,25 152,32 156,30 157,27 158,33 160,31 162,25 164,30 166,32 168,28 169,33 172,27 175,33 178,24 180,33 183,27 185,33 188,25 190,29 191,38 193,23 196,38 198,23 201,40 203,24 206,22 207,39 209,25 211,22 213,38 216,26 219,32 222,27 225,34 227,32 228,24 231,36 232,29 235,27 236,30 239,28 240,30",
+      "asystole": "0,30 3,31 17,30 30,30 41,27 51,28 61,30 75,31 85,31 96,30 107,28 119,28 128,30 139,32 154,31 171,29 178,28 189,27 201,27 221,29 229,29 240,30",
+      "pea": "0,30 42,33 57,33 75,33 82,30 85,4 92,1 94,31 96,37 99,42 102,42 106,34 109,31 113,31 117,33 133,34 152,34 165,34 182,34 199,33 212,33 231,31 240,30",
+      "svt": "0,30 0,30 5,41 10,41 11,1 13,55 15,47 19,42 23,30 28,41 32,40 35,2 35,55 38,48 43,45 46,31 50,40 54,42 56,40 58,1 59,56 61,50 65,45 70,32 73,40 76,42 79,42 82,1 83,57 84,50 90,44 93,31 96,42 102,43 105,0 107,57 110,47 113,45 117,33 121,42 127,44 129,1 130,58 132,51 135,49 136,44 140,35 143,38 144,45 148,45 151,46 153,0 154,59 155,53 156,47 161,46 164,37 165,31 168,34 170,40 176,40 178,0 180,54 182,47 186,44 189,31 191,31 194,40 198,41 200,41 201,0 204,55 206,47 211,44 215,31 219,40 220,41 226,42 227,0 229,56 230,50 237,43 238,34 240,30",
+      "af": "0,30 2,32 5,1 6,41 13,26 15,36 21,33 23,4 26,42 29,34 33,32 35,42 38,40 40,9 41,42 43,36 47,32 50,43 54,41 57,8 59,42 62,33 69,36 69,42 75,37 77,42 81,35 83,37 85,3 87,44 90,35 95,29 99,40 102,6 104,43 106,34 109,37 111,31 113,37 118,35 121,40 122,3 124,38 128,28 129,30 132,26 133,36 138,32 140,35 142,6 142,41 145,36 149,26 150,35 153,37 153,44 158,38 160,42 162,37 165,39 167,5 168,42 172,39 174,31 176,35 180,39 183,42 185,7 188,42 190,33 193,35 194,30 196,41 200,40 201,37 204,42 206,37 210,36 210,34 213,39 215,8 217,45 220,37 222,31 225,39 228,40 228,45 231,7 233,46 236,42 237,35 238,37 240,30",
+      "flutter": "0,30 1,31 5,35 7,30 12,29 20,34 23,33 24,28 27,28 34,34 37,33 38,28 40,28 46,35 48,30 49,6 50,29 54,33 59,27 62,27 70,32 72,32 73,26 76,26 84,32 87,32 87,26 90,26 94,32 98,30 99,7 101,30 104,35 108,35 112,31 116,32 121,35 124,34 125,29 128,30 136,36 139,35 140,30 144,31 146,35 148,30 150,7 151,30 154,34 156,35 160,28 163,29 170,34 173,34 174,28 177,28 184,34 188,34 188,29 190,29 195,33 198,29 200,4 202,30 204,33 206,33 210,27 213,27 219,32 223,32 225,26 227,26 233,32 238,30 239,6 240,30",
+      "wpw": "0,30 2,52 6,20 8,14 13,11 14,17 15,23 16,31 19,40 22,59 27,29 28,16 33,7 35,15 38,29 43,59 46,30 54,9 58,29 62,59 65,30 72,15 77,31 79,59 83,31 90,11 94,21 97,29 105,30 107,34 111,33 112,59 118,25 122,12 125,8 130,23 134,28 139,28 143,33 147,36 149,58 151,43 154,28 160,8 164,16 167,26 171,31 173,36 177,53 178,36 181,30 186,13 190,27 196,34 198,38 199,58 203,59 205,30 210,12 213,8 215,13 219,24 221,32 226,33 231,32 238,34 240,30",
+      "af_wpw": "0,30 2,52 6,20 8,14 13,11 14,17 15,23 16,31 19,40 22,59 27,29 28,16 33,7 35,15 38,29 43,59 46,30 54,9 58,29 62,59 65,30 72,15 77,31 79,59 83,31 90,11 94,21 97,29 105,30 107,34 111,33 112,59 118,25 122,12 125,8 130,23 134,28 139,28 143,33 147,36 149,58 151,43 154,28 160,8 164,16 167,26 171,31 173,36 177,53 178,36 181,30 186,13 190,27 196,34 198,38 199,58 203,59 205,30 210,12 213,8 215,13 219,24 221,32 226,33 231,32 238,34 240,30",
+      "paced": "0,30 1,22 8,22 11,29 24,29 25,38 26,28 28,45 30,40 32,22 36,22 40,29 47,28 47,38 49,28 50,29 51,46 53,41 54,23 62,22 66,29 79,29 79,39 80,28 82,28 83,47 86,41 87,24 89,22 93,21 97,29 111,29 112,40 113,28 115,30 115,46 118,39 119,23 127,21 130,29 141,29 144,29 145,40 146,29 148,29 148,47 150,39 151,23 154,23 159,23 163,29 174,29 175,39 176,29 178,30 179,46 181,41 182,23 186,21 190,22 194,29 200,29 207,29 208,39 209,28 211,31 212,46 213,38 215,24 217,22 222,22 226,29 230,28 233,29 234,37 235,29 237,29 237,46 239,41 240,30",
+      "artifact": "0,30 1,36 1,26 3,28 4,34 5,18 7,39 8,19 10,32 11,17 12,40 15,33 15,42 18,33 19,15 19,42 22,32 24,31 25,15 27,38 28,28 29,38 31,31 32,7 33,26 34,39 35,33 35,40 37,34 38,36 41,18 42,46 45,33 48,30 49,20 50,38 51,30 53,32 55,10 57,36 60,33 62,34 63,22 64,41 68,33 71,31 71,24 74,33 75,30 77,33 79,18 81,38 82,32 84,37 85,32 87,39 88,32 89,37 94,28 96,36 97,27 101,34 103,13 104,34 106,32 107,38 109,33 113,37 116,31 118,33 119,27 122,32 125,33 125,10 129,34 132,31 133,37 135,31 137,39 138,32 140,27 141,32 142,27 144,34 145,29 146,32 148,29 149,7 152,36 155,33 156,21 158,42 159,36 162,31 164,18 164,40 167,29 170,20 172,42 172,19 175,34 176,24 178,39 179,34 183,34 184,24 185,38 187,31 190,31 191,20 193,37 195,32 196,14 199,36 202,32 203,29 204,37 208,27 209,33 210,32 213,24 215,36 216,30 217,33 220,17 223,33 223,41 225,31 226,36 228,34 230,37 232,32 234,26 235,32 237,31 238,28 240,30"
+    };
+
+    // ---------------------------
+    // 1) App state
+    // ---------------------------
     let width = 240;
     let height = 60;
     let baseline = 30;
-    let userPoints = []; // {x, y} kullanıcının eklediği ara noktalar
-    let overlayDataUrl = "";
-    let overlayOpacity = 0.45;
-    let overlayVisible = true;
-    let overlayFileName = "";
-    let overlayScale = 1;
-    let overlayOffsetX = 0;
-    let overlayOffsetY = 0;
+    let userPoints = []; // only interior points
 
-    const drawArea = document.getElementById("drawArea");
-    const previewArea = document.getElementById("previewArea");
-    const svgOutput = document.getElementById("svgOutput");
-    const polylineOutput = document.getElementById("polylineOutput");
-    const shapesOutput = document.getElementById("shapesOutput");
-    const rhythmSelect = document.getElementById("rhythmSelect");
-    const rhythmName = document.getElementById("rhythmName");
-    const jsonArea = document.getElementById("jsonArea");
-    const saveRhythmBtn = document.getElementById("saveRhythmBtn");
-    const deleteRhythmBtn = document.getElementById("deleteRhythmBtn");
-    const refreshJsonBtn = document.getElementById("refreshJsonBtn");
-    const loadJsonBtn = document.getElementById("loadJsonBtn");
+    // rhythmStore: { name: {width,height,baseline,points:[{x,y}]} }
+    let rhythmStore = {};
 
-    const bpmInput    = document.getElementById("bpmInput");
-    const bpmNumber   = document.getElementById("bpmNumber");
-    const bpmLabel    = document.getElementById("bpmLabel");
-    const bpmHint     = document.getElementById("bpmHint");
-    const guideToggle = document.getElementById("guideToggle");
-
-    const presetBtns  = Array.from(document.querySelectorAll(".preset"));
-
-    const overlayUploadBtn  = document.getElementById("overlayUploadBtn");
-    const overlayFile       = document.getElementById("overlayFile");
-    const overlayClearBtn   = document.getElementById("overlayClearBtn");
-    const overlayOpacityInp = document.getElementById("overlayOpacity");
-    const overlayOpacityLbl = document.getElementById("overlayOpacityLabel");
-    const overlayToggle     = document.getElementById("overlayToggle");
-    const overlayNameLbl    = document.getElementById("overlayName");
-    const overlayScaleInp   = document.getElementById("overlayScale");
-    const overlayScaleLbl   = document.getElementById("overlayScaleLabel");
-    const overlayOffsetXInp = document.getElementById("overlayOffsetX");
-    const overlayOffsetYInp = document.getElementById("overlayOffsetY");
-    const overlayResetBtn   = document.getElementById("overlayResetBtn");
-
+    // ---------------------------
+    // 2) DOM
+    // ---------------------------
     const widthInput = document.getElementById("widthInput");
     const heightInput = document.getElementById("heightInput");
     const baselineInput = document.getElementById("baselineInput");
     const applySizeBtn = document.getElementById("applySizeBtn");
     const clearBtn = document.getElementById("clearBtn");
 
-    const defaultRhythms = [
-      "sinus",
-      "vf",
-      "vf_fine",
-      "vt",
-      "torsades",
-      "asystole",
-      "pea",
-      "svt",
-      "af",
-      "flutter",
-      "af_wpw",
-      "paced",
-      "artifact"
-    ];
+    const drawArea = document.getElementById("drawArea");
+    const previewArea = document.getElementById("previewArea");
 
-    let rhythmStore = {};
-    let bpmTarget   = 75;
-    let showGuide   = true;
+    const svgOutput = document.getElementById("svgOutput");
+    const polylineOutput = document.getElementById("polylineOutput");
 
-    function clamp(val, min, max) {
-      return Math.min(max, Math.max(min, val));
-    }
+    const rhythmSelect = document.getElementById("rhythmSelect");
+    const rhythmName = document.getElementById("rhythmName");
+    const saveRhythmBtn = document.getElementById("saveRhythmBtn");
+    const deleteRhythmBtn = document.getElementById("deleteRhythmBtn");
+    const jsonArea = document.getElementById("jsonArea");
+    const refreshJsonBtn = document.getElementById("refreshJsonBtn");
+    const loadJsonBtn = document.getElementById("loadJsonBtn");
 
-    function setOverlayOpacity(percent) {
-      const pct = clamp(Number(percent) || 0, 0, 100);
-      overlayOpacity = pct / 100;
-      overlayOpacityInp.value = pct;
-      overlayOpacityLbl.textContent = `${pct}%`;
-    }
+    const shapesArea = document.getElementById("shapesArea");
+    const btnLoadShapes = document.getElementById("btnLoadShapes");
+    const btnExportShapes = document.getElementById("btnExportShapes");
 
-    function setOverlayScale(percent) {
-      const min = Number(overlayScaleInp?.min) || 50;
-      const max = Number(overlayScaleInp?.max) || 220;
-      const pct = clamp(Number(percent) || 100, min, max);
-      overlayScale = pct / 100;
-      overlayScaleInp.value = pct;
-      overlayScaleLbl.textContent = `${pct}%`;
-    }
+    const sizePill = document.getElementById("sizePill");
+    const basePill = document.getElementById("basePill");
 
-    function setOverlayOffset(axis, value) {
-      const limit = axis === "x" ? width * 2 : height * 2;
-      const v = clamp(Number(value) || 0, -limit, limit);
-      if (axis === "x") {
-        overlayOffsetX = v;
-        overlayOffsetXInp.value = v;
-      } else {
-        overlayOffsetY = v;
-        overlayOffsetYInp.value = v;
-      }
-    }
+    // Monitor preview DOM
+    const monitorRhythmSelect = document.getElementById("monitorRhythmSelect");
+    const monitorInner = document.getElementById("monitorInner");
+    const mPoly1 = document.getElementById("mPoly1");
+    const mPoly2 = document.getElementById("mPoly2");
+    const mPoly3 = document.getElementById("mPoly3");
+    const btnMonitorPlay = document.getElementById("btnMonitorPlay");
+    const btnMonitorPause = document.getElementById("btnMonitorPause");
 
-    function ensureRhythmOption(name) {
-      if (!name) return;
-      if ([...rhythmSelect.options].some(o => o.value === name)) return;
+    const durRange = document.getElementById("durRange");
+    const durVal = document.getElementById("durVal");
+    const durLabel = document.getElementById("durLabel");
+    const tileWLabel = document.getElementById("tileWLabel");
+    const btnPreset12 = document.getElementById("btnPreset12");
+    const btnPreset25 = document.getElementById("btnPreset25");
+
+    const phaseRange = document.getElementById("phaseRange");
+    const phaseVal = document.getElementById("phaseVal");
+    const phaseLabel = document.getElementById("phaseLabel");
+
+    const toggleSeams = document.getElementById("toggleSeams");
+    const seamGuides = document.getElementById("seamGuides");
+    const seam1 = document.getElementById("seam1");
+    const seam2 = document.getElementById("seam2");
+
+    const strokeRange = document.getElementById("strokeRange");
+    const strokeVal = document.getElementById("strokeVal");
+
+    const pointRange = document.getElementById("pointRange");
+    const pointVal = document.getElementById("pointVal");
+
+    const seamDyEl = document.getElementById("seamDy");
+    const seamDsEl = document.getElementById("seamDs");
+
+    const btnSeamSlopeMatch = document.getElementById("btnSeamSlopeMatch");
+
+    // ---------------------------
+    // 3) Helpers
+    // ---------------------------
+    function clamp(v,min,max){ return Math.min(max, Math.max(min,v)); }
+
+    function ensureRhythmOption(name){
+      if(!name) return;
+      if([...rhythmSelect.options].some(o=>o.value===name)) return;
       const opt = document.createElement("option");
       opt.value = name;
       opt.textContent = name;
       rhythmSelect.appendChild(opt);
     }
 
-    function removeRhythmOption(name) {
-      [...rhythmSelect.options].forEach((o) => {
-        if (o.value === name) {
-          rhythmSelect.removeChild(o);
-        }
+    function removeRhythmOption(name){
+      [...rhythmSelect.options].forEach(o=>{
+        if(o.value===name) rhythmSelect.removeChild(o);
       });
     }
 
-    function bpmToInfo(bpmVal) {
-      const bpm = clamp(Number(bpmVal) || 0, 30, 260);
-      const rrSeconds = 60 / bpm;
-      const smallSquares = rrSeconds / 0.04; // 25mm/sn ve 1 mm=0.04 sn
-      const px = smallSquares * 5; // 1 küçük kare 5 px çizim ölçeğinde
-      return { bpm, rrSeconds, smallSquares, px };
+    function parsePointsString(pointsStr){
+      return String(pointsStr||"").trim().split(/\s+/).map(tok=>{
+        const [xs,ys] = tok.split(",");
+        const x = Number(xs), y = Number(ys);
+        return (Number.isFinite(x)&&Number.isFinite(y)) ? {x,y} : null;
+      }).filter(Boolean);
     }
 
-    function updateBpmUI(nextVal) {
-      const info = bpmToInfo(nextVal ?? bpmTarget);
-      bpmTarget = info.bpm;
-      bpmInput.value = bpmTarget;
-      bpmNumber.value = bpmTarget;
-      bpmLabel.textContent = bpmTarget;
-
-      const squares = info.smallSquares.toFixed(1).replace(/\.0$/, "");
-      const pxText = info.px.toFixed(0);
-      const guideText = showGuide ? "Kılavuz çizgileri açık." : "Kılavuz çizgileri kapalı.";
-      bpmHint.innerHTML = `${bpmTarget} bpm ≈ ${(info.rrSeconds).toFixed(2)} sn R–R ≈ ${squares} küçük kare (5 mm gridde ≈ ${pxText}px). <strong>${guideText}</strong>`;
-      renderAll();
+    function buildAllPoints(){
+      const pts = [];
+      pts.push({x:0,y:baseline});
+      const interior = userPoints
+        .map(p=>({x:clamp(p.x,0,width), y:clamp(p.y,0,height)}))
+        .filter(p=>p.x>0 && p.x<width)
+        .sort((a,b)=>a.x-b.x);
+      interior.forEach(p=>pts.push(p));
+      pts.push({x:width,y:baseline});
+      return pts;
     }
 
-    function refreshJsonArea() {
-      const arr = Object.entries(rhythmStore).map(([name, data]) => ({
+    function pointsAttrFrom(pts){
+      return pts.map(p=>`${Math.round(p.x)},${Math.round(p.y)}`).join(" ");
+    }
+
+    function parseShapesText(text){
+      let t = String(text||"").trim();
+      t = t.replace(/^\s*(export\s+)?const\s+EKG_SHAPES\s*=\s*/i, "");
+      t = t.replace(/^\s*window\.EKG_SHAPES\s*=\s*/i, "");
+      t = t.replace(/^\s*EKG_SHAPES\s*=\s*/i, "");
+      t = t.replace(/;\s*$/, "");
+      if(!t.startsWith("{")){
+        const m = t.match(/\{[\s\S]*\}/);
+        if(m) t = m[0];
+      }
+      t = t.replace(/,\s*}/g, "}");
+      return JSON.parse(t);
+    }
+
+    function importFromShapesObject(shapesObj, {reset=true}={}){
+      if(!shapesObj || typeof shapesObj!=="object") return;
+
+      if(reset){
+        rhythmStore = {};
+        rhythmSelect.innerHTML = `<option value="">Ritim seç</option>`;
+      }
+
+      Object.entries(shapesObj).forEach(([name,str])=>{
+        const pts = parsePointsString(str);
+        if(!pts.length) return;
+
+        const maxX = Math.max(...pts.map(p=>p.x));
+        const maxY = Math.max(...pts.map(p=>p.y));
+        const w = Number.isFinite(maxX) && maxX>0 ? Math.round(maxX) : 240;
+        const h = Number.isFinite(maxY) && maxY>0 ? Math.max(60, Math.round(maxY)) : 60;
+
+        const start = pts.find(p=>p.x===0);
+        const bRaw = start ? start.y : 30;
+        const b = clamp(Math.round(bRaw), 0, h);
+
+        const interior = pts
+          .filter(p=>p.x>0 && p.x<w)
+          .map(p=>({x:clamp(p.x,0,w), y:clamp(p.y,0,h)}))
+          .sort((a,b)=>a.x-b.x);
+
+        rhythmStore[name] = { width:w, height:h, baseline:b, points: interior };
+        ensureRhythmOption(name);
+      });
+
+      // wpw -> af_wpw alias (store seviyesinde)
+      if(rhythmStore.wpw && !rhythmStore.af_wpw){
+        rhythmStore.af_wpw = JSON.parse(JSON.stringify(rhythmStore.wpw));
+        ensureRhythmOption("af_wpw");
+      }
+    }
+
+    function refreshJsonArea(){
+      const arr = Object.entries(rhythmStore).map(([name,data])=>({
         name,
-        width: data.width,
-        height: data.height,
-        baseline: data.baseline,
-        points: data.points
+        width:data.width,
+        height:data.height,
+        baseline:data.baseline,
+        points:data.points
       }));
       jsonArea.value = JSON.stringify(arr, null, 2);
-      refreshShapesOutput();
     }
 
-    function refreshShapesOutput(){
-      if(!shapesOutput) return;
+    function exportShapesFromStore(){
       const lines = Object.entries(rhythmStore).map(([name,data])=>{
-        const pts = buildPointsFromData(data)
-          .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
-          .join(" ");
-        return `  "${name}": "${pts}"`;
+        const w = Number(data.width)||width;
+        const h = Number(data.height)||height;
+        const b = clamp(Number(data.baseline ?? baseline), 0, h);
+
+        const pts = [{x:0,y:b}, ...(data.points||[]).filter(p=>p.x>0&&p.x<w).sort((a,b)=>a.x-b.x), {x:w,y:b}];
+        const s = pts.map(p=>`${Math.round(p.x)},${Math.round(p.y)}`).join(" ");
+        return `  "${name}": "${s}"`;
       });
-      shapesOutput.value = `const EKG_SHAPES = {\n${lines.join(",\n")}\n};`;
+      return `const EKG_SHAPES = {\n${lines.join(",\n")}\n};`;
     }
 
-    function loadRhythmIntoCanvas(name) {
-      if (!name) {
-        rhythmName.value = "";
-        userPoints = [];
-        renderAll();
-        return;
-      }
-
-      rhythmName.value = name;
-
-      const data = rhythmStore[name];
-      if (data) {
-        width = data.width ?? width;
-        height = data.height ?? height;
-        baseline = data.baseline ?? baseline;
-        userPoints = (data.points || []).map(p => ({ x: p.x, y: p.y }));
-
-        widthInput.value = width;
-        heightInput.value = height;
-        baselineInput.value = baseline;
-      } else {
-        userPoints = [];
-      }
-
-      renderAll();
-    }
-
-    function buildAllPoints() {
-      const pts = [];
-      // Sol kenar
-      pts.push({ x: 0, y: baseline });
-      // Orta noktalar
-      const interior = userPoints
-        .map(p => ({
-          x: clamp(p.x, 0, width),
-          y: clamp(p.y, 0, height)
-        }))
-        .filter(p => p.x > 0 && p.x < width);
-      interior.sort((a, b) => a.x - b.x);
-      interior.forEach(p => pts.push(p));
-      // Sağ kenar
-      pts.push({ x: width, y: baseline });
-      return pts;
-    }
-
-    function buildPointsFromData(data){
-      if(!data) return [];
-      const w = Number(data.width) || width;
-      const h = Number(data.height) || height;
-      const b = clamp(Number(data.baseline ?? baseline), 0, h);
-
-      const pts = [{ x:0, y:b }];
-      const interior = Array.isArray(data.points) ? data.points
-        .map(p => ({ x: clamp(Number(p.x) || 0, 0, w), y: clamp(Number(p.y) || 0, 0, h) }))
-        .filter(p => p.x > 0 && p.x < w) : [];
-      interior.sort((a,b)=>a.x-b.x);
-      interior.forEach(p=>pts.push(p));
-      pts.push({ x:w, y:b });
-      return pts;
-    }
-
-    function renderGrid(targetSvg, w, h) {
+    // ---------------------------
+    // 4) Render SVG grid + wave
+    // ---------------------------
+    function renderGrid(targetSvg, w, h){
       targetSvg.innerHTML = "";
       const ns = "http://www.w3.org/2000/svg";
 
       const bg = document.createElementNS(ns, "rect");
-      bg.setAttribute("x", 0);
-      bg.setAttribute("y", 0);
-      bg.setAttribute("width", w);
-      bg.setAttribute("height", h);
-      bg.setAttribute("fill", "#000000");
+      bg.setAttribute("x",0); bg.setAttribute("y",0);
+      bg.setAttribute("width",w); bg.setAttribute("height",h);
+      bg.setAttribute("fill","#000");
       targetSvg.appendChild(bg);
 
-      // Küçük grid
-      for (let x = 0; x <= w; x += 5) {
-        const line = document.createElementNS(ns, "line");
-        line.setAttribute("x1", x);
-        line.setAttribute("y1", 0);
-        line.setAttribute("x2", x);
-        line.setAttribute("y2", h);
-        line.setAttribute("class", "grid-lines");
-        targetSvg.appendChild(line);
+      for(let x=0; x<=w; x+=5){
+        const l = document.createElementNS(ns,"line");
+        l.setAttribute("x1",x); l.setAttribute("y1",0);
+        l.setAttribute("x2",x); l.setAttribute("y2",h);
+        l.setAttribute("class","grid-lines");
+        targetSvg.appendChild(l);
       }
-      for (let y = 0; y <= h; y += 5) {
-        const line = document.createElementNS(ns, "line");
-        line.setAttribute("x1", 0);
-        line.setAttribute("y1", y);
-        line.setAttribute("x2", w);
-        line.setAttribute("y2", y);
-        line.setAttribute("class", "grid-lines");
-        targetSvg.appendChild(line);
+      for(let y=0; y<=h; y+=5){
+        const l = document.createElementNS(ns,"line");
+        l.setAttribute("x1",0); l.setAttribute("y1",y);
+        l.setAttribute("x2",w); l.setAttribute("y2",y);
+        l.setAttribute("class","grid-lines");
+        targetSvg.appendChild(l);
       }
 
-      // 5 karede bir kalın çizgi
-      for (let x = 0; x <= w; x += 25) {
-        const line = document.createElementNS(ns, "line");
-        line.setAttribute("x1", x);
-        line.setAttribute("y1", 0);
-        line.setAttribute("x2", x);
-        line.setAttribute("y2", h);
-        line.setAttribute("class", "grid-lines-thick");
-        targetSvg.appendChild(line);
+      for(let x=0; x<=w; x+=25){
+        const l = document.createElementNS(ns,"line");
+        l.setAttribute("x1",x); l.setAttribute("y1",0);
+        l.setAttribute("x2",x); l.setAttribute("y2",h);
+        l.setAttribute("class","grid-lines-thick");
+        targetSvg.appendChild(l);
       }
-      for (let y = 0; y <= h; y += 25) {
-        const line = document.createElementNS(ns, "line");
-        line.setAttribute("x1", 0);
-        line.setAttribute("y1", y);
-        line.setAttribute("x2", w);
-        line.setAttribute("y2", y);
-        line.setAttribute("class", "grid-lines-thick");
-        targetSvg.appendChild(line);
+      for(let y=0; y<=h; y+=25){
+        const l = document.createElementNS(ns,"line");
+        l.setAttribute("x1",0); l.setAttribute("y1",y);
+        l.setAttribute("x2",w); l.setAttribute("y2",y);
+        l.setAttribute("class","grid-lines-thick");
+        targetSvg.appendChild(l);
       }
 
-      // Baseline
-      const base = document.createElementNS(ns, "line");
-      base.setAttribute("x1", 0);
-      base.setAttribute("y1", baseline);
-      base.setAttribute("x2", w);
-      base.setAttribute("y2", baseline);
-      base.setAttribute("class", "baseline");
+      const base = document.createElementNS(ns,"line");
+      base.setAttribute("x1",0); base.setAttribute("y1",baseline);
+      base.setAttribute("x2",w); base.setAttribute("y2",baseline);
+      base.setAttribute("class","baseline");
       targetSvg.appendChild(base);
 
       return ns;
     }
 
-    function renderGuideLines(targetSvg, ns, w, h) {
-      if (!showGuide) return;
-      const { px } = bpmToInfo(bpmTarget);
-      if (!px || !Number.isFinite(px) || px <= 0) return;
-
-      for (let x = px; x < w; x += px) {
-        const line = document.createElementNS(ns, "line");
-        line.setAttribute("x1", x);
-        line.setAttribute("y1", 0);
-        line.setAttribute("x2", x);
-        line.setAttribute("y2", h);
-        line.setAttribute("class", "guide-line");
-        targetSvg.appendChild(line);
-      }
-    }
-
-    function renderMain() {
+    function renderMain(){
       const ns = renderGrid(drawArea, width, height);
-      renderGuideLines(drawArea, ns, width, height);
-
-      if (overlayDataUrl && overlayVisible) {
-        const img = document.createElementNS(ns, "image");
-        img.setAttribute("href", overlayDataUrl);
-        img.setAttribute("width", width * overlayScale);
-        img.setAttribute("height", height * overlayScale);
-        img.setAttribute("x", overlayOffsetX);
-        img.setAttribute("y", overlayOffsetY);
-        img.setAttribute("opacity", overlayOpacity.toFixed(2));
-        drawArea.appendChild(img);
-      }
 
       const pts = buildAllPoints();
-      const pointsAttr = pts
-        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
-        .join(" ");
-
-      const poly = document.createElementNS(ns, "polyline");
-      poly.setAttribute("points", pointsAttr);
-      poly.setAttribute("class", "wave");
+      const poly = document.createElementNS(ns,"polyline");
+      poly.setAttribute("points", pointsAttrFrom(pts));
+      poly.setAttribute("class","wave");
       drawArea.appendChild(poly);
 
-      // Kullanıcı noktaları
-      userPoints.forEach((p, idx) => {
-        const c = document.createElementNS(ns, "circle");
-        c.setAttribute("cx", p.x);
-        c.setAttribute("cy", p.y);
-        c.setAttribute("r", 2.8);
-        c.setAttribute("class", "point");
+      userPoints.forEach((p,idx)=>{
+        const c = document.createElementNS(ns,"circle");
+        c.setAttribute("cx",p.x);
+        c.setAttribute("cy",p.y);
+        c.setAttribute("r", getComputedStyle(document.documentElement).getPropertyValue("--pointRadius").trim() || "1.9");
+        c.setAttribute("class","point");
         c.dataset.index = idx;
         drawArea.appendChild(c);
       });
     }
 
-    function renderPreview() {
-      const ns = renderGrid(previewArea, width * 3, height);
-      renderGuideLines(previewArea, ns, width * 3, height);
+    function renderPreview(){
+      const ns = renderGrid(previewArea, width*3, height);
       const pts = buildAllPoints();
-      const pointsAttr = pts
-        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
-        .join(" ");
 
-      // 3 kopya yan yana
-      for (let i = 0; i < 3; i++) {
-        const poly = document.createElementNS(ns, "polyline");
-        const shifted = pts
-          .map(p => `${Math.round(p.x + i * width)},${Math.round(p.y)}`)
-          .join(" ");
+      for(let i=0;i<3;i++){
+        const poly = document.createElementNS(ns,"polyline");
+        const shifted = pts.map(p=>`${Math.round(p.x + i*width)},${Math.round(p.y)}`).join(" ");
         poly.setAttribute("points", shifted);
         poly.setAttribute("class", "wave");
         previewArea.appendChild(poly);
       }
     }
 
-    function updateCodeOutputs() {
+    function updateCodeOutputs(){
       const pts = buildAllPoints();
-      const pointsAttr = pts
-        .map(p => `${Math.round(p.x)},${Math.round(p.y)}`)
-        .join(" ");
+      const pointsAttr = pointsAttrFrom(pts);
 
       const svgCode =
 `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
@@ -909,7 +916,6 @@
     stroke-linejoin="round"
     stroke-linecap="round" />
 </svg>`;
-
       svgOutput.value = svgCode;
 
       const polylineCode =
@@ -919,195 +925,144 @@
   stroke-width="2"
   stroke-linejoin="round"
   stroke-linecap="round" />`;
-
       polylineOutput.value = polylineCode;
     }
 
-    function renderAll() {
+    function renderAll(){
       drawArea.setAttribute("viewBox", `0 0 ${width} ${height}`);
-      previewArea.setAttribute("viewBox", `0 0 ${width * 3} ${height}`);
+      previewArea.setAttribute("viewBox", `0 0 ${width*3} ${height}`);
+
+      sizePill.textContent = `${width}×${height}`;
+      basePill.textContent = `${baseline}`;
+
       renderMain();
       renderPreview();
       updateCodeOutputs();
+
+      // Monitor tile metrics sync
+      syncMonitorSizing();
+      // Seam diagnostics update
+      updateSeamDiagnostics();
     }
 
-    // Çizim alanına tıklama
-    function getSvgCoords(evt) {
+    // ---------------------------
+    // 5) Editor interactions
+    // ---------------------------
+    function getSvgCoords(evt){
       const rect = drawArea.getBoundingClientRect();
       const x = ((evt.clientX - rect.left) / rect.width) * width;
       const y = ((evt.clientY - rect.top) / rect.height) * height;
-      return { x, y };
+      return {x,y};
     }
 
-    drawArea.addEventListener("click", (evt) => {
-      // Ctrl + click => nokta silme
-      if (evt.ctrlKey || evt.metaKey) {
-        const rect = drawArea.getBoundingClientRect();
-        const x = ((evt.clientX - rect.left) / rect.width) * width;
-        const y = ((evt.clientY - rect.top) / rect.height) * height;
-
-        let closestIdx = -1;
-        let closestDist = Infinity;
-        userPoints.forEach((p, idx) => {
-          const dx = p.x - x;
-          const dy = p.y - y;
-          const d2 = dx*dx + dy*dy;
-          if (d2 < closestDist) {
-            closestDist = d2;
-            closestIdx = idx;
-          }
+    drawArea.addEventListener("click",(evt)=>{
+      // Ctrl/Cmd: delete nearest
+      if(evt.ctrlKey || evt.metaKey){
+        const {x,y} = getSvgCoords(evt);
+        let closestIdx=-1, closestD=Infinity;
+        userPoints.forEach((p,idx)=>{
+          const dx=p.x-x, dy=p.y-y;
+          const d2=dx*dx+dy*dy;
+          if(d2<closestD){ closestD=d2; closestIdx=idx; }
         });
-        if (closestIdx >= 0 && closestDist < (width*width)/2000) { // kaba bir eşik
-          userPoints.splice(closestIdx, 1);
+        if(closestIdx>=0 && closestD < (width*width)/2500){
+          userPoints.splice(closestIdx,1);
           renderAll();
+          syncMonitorWaveFromEditor(); // editor dalgası monitöre yansıtılıyorsa
         }
         return;
       }
 
       const pt = getSvgCoords(evt);
       userPoints.push(pt);
-      userPoints.sort((a, b) => a.x - b.x);
+      userPoints.sort((a,b)=>a.x-b.x);
       renderAll();
+      syncMonitorWaveFromEditor();
     });
 
-    bpmInput.addEventListener("input", (e) => {
-      updateBpmUI(e.target.value);
+    applySizeBtn.addEventListener("click", ()=>{
+      const w = parseInt(widthInput.value,10);
+      const h = parseInt(heightInput.value,10);
+      const b = parseInt(baselineInput.value,10);
+      if(!Number.isFinite(w)||!Number.isFinite(h)||!Number.isFinite(b)) return;
+
+      width = clamp(w,40,800);
+      height = clamp(h,30,400);
+      baseline = clamp(b,0,height);
+
+      widthInput.value=width;
+      heightInput.value=height;
+      baselineInput.value=baseline;
+
+      // points clamp
+      userPoints = userPoints.map(p=>({x:clamp(p.x,0,width), y:clamp(p.y,0,height)}));
+      renderAll();
+      syncMonitorWaveFromEditor();
     });
 
-    bpmNumber.addEventListener("input", (e) => {
-      updateBpmUI(e.target.value);
+    clearBtn.addEventListener("click", ()=>{
+      if(!confirm("Tüm noktalar silinsin mi?")) return;
+      userPoints=[];
+      renderAll();
+      syncMonitorWaveFromEditor();
     });
 
-    presetBtns.forEach(btn => {
-      btn.addEventListener("click", () => {
-        const val = Number(btn.dataset.bpm);
-        updateBpmUI(val);
-      });
-    });
-
-    guideToggle.addEventListener("change", (e) => {
-      showGuide = e.target.checked;
-      updateBpmUI();
-    });
-
-    overlayUploadBtn.addEventListener("click", () => overlayFile.click());
-
-    overlayFile.addEventListener("change", (e) => {
-      const file = e.target.files?.[0];
-      if (!file) return;
-
-      const reader = new FileReader();
-      reader.onload = () => {
-        overlayDataUrl = reader.result;
-        overlayFileName = file.name || "";
-        overlayNameLbl.textContent = overlayFileName;
-        overlayToggle.checked = true;
-        overlayVisible = true;
+    // ---------------------------
+    // 6) Rhythm store (save/load)
+    // ---------------------------
+    function loadRhythmIntoCanvas(name){
+      if(!name){
+        rhythmName.value = "";
+        userPoints = [];
         renderAll();
-      };
-      reader.onerror = () => alert("Görsel okunamadı.");
-      reader.readAsDataURL(file);
-    });
-
-    overlayClearBtn.addEventListener("click", () => {
-      overlayDataUrl = "";
-      overlayFileName = "";
-      overlayNameLbl.textContent = "";
-      overlayFile.value = "";
-      renderAll();
-    });
-
-    overlayOpacityInp.addEventListener("input", (e) => {
-      setOverlayOpacity(e.target.value);
-      renderAll();
-    });
-
-    overlayToggle.addEventListener("change", (e) => {
-      overlayVisible = e.target.checked;
-      renderAll();
-    });
-
-    overlayScaleInp.addEventListener("input", (e) => {
-      setOverlayScale(e.target.value);
-      renderAll();
-    });
-
-    overlayOffsetXInp.addEventListener("input", (e) => {
-      setOverlayOffset("x", e.target.value);
-      renderAll();
-    });
-
-    overlayOffsetYInp.addEventListener("input", (e) => {
-      setOverlayOffset("y", e.target.value);
-      renderAll();
-    });
-
-    overlayResetBtn.addEventListener("click", () => {
-      setOverlayScale(100);
-      setOverlayOffset("x", 0);
-      setOverlayOffset("y", 0);
-      renderAll();
-    });
-
-    applySizeBtn.addEventListener("click", () => {
-      const w = parseInt(widthInput.value, 10);
-      const h = parseInt(heightInput.value, 10);
-      const b = parseInt(baselineInput.value, 10);
-
-      if (!Number.isFinite(w) || !Number.isFinite(h) || !Number.isFinite(b)) return;
-      width = clamp(w, 40, 800);
-      height = clamp(h, 30, 400);
-      baseline = clamp(b, 0, height);
-
-      setOverlayOffset("x", overlayOffsetX);
-      setOverlayOffset("y", overlayOffsetY);
-
-      widthInput.value = width;
-      heightInput.value = height;
-      baselineInput.value = baseline;
-
-      // Noktaları yeni boyuta göre biraz normalize edelim (x ölçeklemek istersek burada yaparız)
-      userPoints = userPoints.map(p => ({
-        x: clamp(p.x, 0, width),
-        y: clamp(p.y, 0, height)
-      }));
-
-      renderAll();
-    });
-
-    clearBtn.addEventListener("click", () => {
-      if (!confirm("Tüm noktaları temizlemek istiyor musun?")) return;
-      userPoints = [];
-      renderAll();
-    });
-
-    rhythmSelect.addEventListener("change", (evt) => {
-      const selected = evt.target.value;
-      loadRhythmIntoCanvas(selected);
-    });
-
-    saveRhythmBtn.addEventListener("click", () => {
-      const name = rhythmName.value.trim();
-      if (!name) {
-        alert("Önce ritim ismi gir.");
+        syncMonitorWaveFromEditor();
         return;
       }
 
-      rhythmStore[name] = {
-        width,
-        height,
-        baseline,
-        points: userPoints.map(p => ({ x: p.x, y: p.y }))
-      };
+      rhythmName.value = name;
+      const data = rhythmStore[name];
+      if(data){
+        width = Number(data.width)||width;
+        height = Number(data.height)||height;
+        baseline = clamp(Number(data.baseline ?? baseline), 0, height);
+        userPoints = (data.points||[]).map(p=>({x:Number(p.x), y:Number(p.y)}));
+        widthInput.value = width;
+        heightInput.value = height;
+        baselineInput.value = baseline;
+      }else{
+        userPoints = [];
+      }
 
+      // Monitor rhythm select ile uyum (varsa)
+      if([...monitorRhythmSelect.options].some(o=>o.value===name)){
+        monitorRhythmSelect.value = name;
+        applyMonitorRhythm(name);
+      }
+
+      renderAll();
+      syncMonitorWaveFromEditor();
+    }
+
+    rhythmSelect.addEventListener("change", e=>{
+      loadRhythmIntoCanvas(e.target.value);
+    });
+
+    saveRhythmBtn.addEventListener("click", ()=>{
+      const name = rhythmName.value.trim();
+      if(!name){ alert("Ritim ismi girin."); return; }
+
+      rhythmStore[name] = {
+        width, height, baseline,
+        points: userPoints.map(p=>({x:p.x,y:p.y}))
+      };
       ensureRhythmOption(name);
       rhythmSelect.value = name;
       refreshJsonArea();
     });
 
-    deleteRhythmBtn.addEventListener("click", () => {
+    deleteRhythmBtn.addEventListener("click", ()=>{
       const name = rhythmSelect.value || rhythmName.value.trim();
-      if (!name) return;
+      if(!name) return;
       delete rhythmStore[name];
       removeRhythmOption(name);
       rhythmSelect.value = "";
@@ -1115,50 +1070,286 @@
       refreshJsonArea();
     });
 
-    refreshJsonBtn.addEventListener("click", () => {
-      refreshJsonArea();
-    });
+    refreshJsonBtn.addEventListener("click", refreshJsonArea);
 
-    loadJsonBtn.addEventListener("click", () => {
-      let parsed = [];
-      try {
+    loadJsonBtn.addEventListener("click", ()=>{
+      let parsed=[];
+      try{
         parsed = JSON.parse(jsonArea.value || "[]");
-        if (!Array.isArray(parsed)) throw new Error("Array olmalı");
-      } catch (e) {
-        alert("Geçersiz JSON: " + e.message);
+        if(!Array.isArray(parsed)) throw new Error("Array olmalı");
+      }catch(e){
+        alert("Geçersiz JSON: "+e.message);
         return;
       }
-
       rhythmStore = {};
-      // İlk seçeneği koru
-      rhythmSelect.innerHTML = "<option value=\"\">Ritim seç</option>";
-
-      defaultRhythms.forEach(ensureRhythmOption);
-
-      parsed.forEach((item) => {
-        if (!item || !item.name) return;
+      rhythmSelect.innerHTML = `<option value="">Ritim seç</option>`;
+      parsed.forEach(item=>{
+        if(!item || !item.name) return;
         rhythmStore[item.name] = {
-          width: Number(item.width) || width,
-          height: Number(item.height) || height,
-          baseline: Number(item.baseline) || baseline,
-          points: Array.isArray(item.points) ? item.points.map(p => ({ x: Number(p.x), y: Number(p.y) })) : []
+          width: Number(item.width)||width,
+          height: Number(item.height)||height,
+          baseline: Number(item.baseline)||baseline,
+          points: Array.isArray(item.points) ? item.points.map(p=>({x:Number(p.x), y:Number(p.y)})) : []
         };
         ensureRhythmOption(item.name);
       });
-
+      // wpw -> af_wpw alias
+      if(rhythmStore.wpw && !rhythmStore.af_wpw){
+        rhythmStore.af_wpw = JSON.parse(JSON.stringify(rhythmStore.wpw));
+        ensureRhythmOption("af_wpw");
+      }
       refreshJsonArea();
-      rhythmSelect.value = "";
       loadRhythmIntoCanvas("");
     });
 
-    // Başlangıç
-    defaultRhythms.forEach(ensureRhythmOption);
-    setOverlayOpacity(overlayOpacity * 100);
-    setOverlayScale(overlayScale * 100);
-    setOverlayOffset("x", overlayOffsetX);
-    setOverlayOffset("y", overlayOffsetY);
-    updateBpmUI(bpmTarget);
+    // ---------------------------
+    // 7) EKG_SHAPES import/export
+    // ---------------------------
+    btnLoadShapes.addEventListener("click", ()=>{
+      try{
+        const txt = (shapesArea.value||"").trim();
+        const obj = txt ? parseShapesText(txt) : EKG_SHAPES_DEFAULT;
+        importFromShapesObject(obj, {reset:true});
+        refreshJsonArea();
+        // store’dan bir şey seçili değilse boş bırak
+        loadRhythmIntoCanvas("");
+        // monitor select sync
+        if(obj.af_wpw && !obj.wpw){
+          // nothing
+        }
+        alert("EKG_SHAPES içeri alındı. Ritim seçebilirsiniz.");
+      }catch(e){
+        alert("EKG_SHAPES parse hatası: "+(e?.message||e));
+      }
+    });
+
+    btnExportShapes.addEventListener("click", ()=>{
+      shapesArea.value = exportShapesFromStore();
+    });
+
+    // ---------------------------
+    // 8) Monitor preview logic
+    // ---------------------------
+    function setCssVar(name, value){
+      document.documentElement.style.setProperty(name, value);
+    }
+
+    function syncMonitorSizing(){
+      // tile width/height değişirse monitörü de senkronla
+      setCssVar("--tileWpx", `${width}px`);
+      tileWLabel.textContent = String(width);
+
+      // seam guide positions
+      seam1.style.left = `${width}px`;
+      seam2.style.left = `${width*2}px`;
+
+      // phase range max
+      phaseRange.max = String(width);
+      if(Number(phaseRange.value) > width){
+        phaseRange.value = String(width);
+      }
+      updatePhase(Number(phaseRange.value));
+
+      // monitor svg viewBox sync
+      [mPoly1,mPoly2,mPoly3].forEach((poly,i)=>{
+        const svg = poly.closest("svg");
+        svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
+        svg.setAttribute("preserveAspectRatio", "none");
+        svg.style.width = `${width}px`;
+        svg.style.height = `${height}px`;
+      });
+      monitorInner.style.height = `${height}px`;
+    }
+
+    function applyMonitorRhythm(key){
+      const k = key || "sinus";
+      // class swap for color
+      const cls = Array.from(monitorInner.classList).filter(c=>c.startsWith("rhythm-"));
+      cls.forEach(c=>monitorInner.classList.remove(c));
+      monitorInner.classList.add(`rhythm-${k}`);
+
+      // points: prefer EKG_SHAPES_DEFAULT / shapesArea imported? -> we can build a current map:
+      const shapeMap = buildCurrentShapeMap();
+      const pts = shapeMap[k] || shapeMap["sinus"] || "0,30 240,30";
+
+      mPoly1.setAttribute("points", pts);
+      mPoly2.setAttribute("points", pts);
+      mPoly3.setAttribute("points", pts);
+    }
+
+    function buildCurrentShapeMap(){
+      // Öncelik: rhythmStore varsa (export edilmemiş bile olabilir) -> build points string
+      // ama monitorRhythmSelect anahtarları için store yoksa default EKG_SHAPES kullan.
+      const map = {...EKG_SHAPES_DEFAULT};
+
+      // store’daki ritimler (varsa) override eder
+      Object.entries(rhythmStore).forEach(([name,data])=>{
+        const w = Number(data.width)||width;
+        const h = Number(data.height)||height;
+        const b = clamp(Number(data.baseline ?? baseline), 0, h);
+        const pts = [{x:0,y:b}, ...(data.points||[]).filter(p=>p.x>0&&p.x<w).sort((a,b)=>a.x-b.x), {x:w,y:b}];
+        map[name] = pts.map(p=>`${Math.round(p.x)},${Math.round(p.y)}`).join(" ");
+      });
+
+      // alias
+      if(map.wpw && !map.af_wpw) map.af_wpw = map.wpw;
+
+      return map;
+    }
+
+    function setMonitorPaused(paused){
+      if(paused) monitorInner.classList.add("paused");
+      else monitorInner.classList.remove("paused");
+    }
+
+    function updateDuration(sec){
+      const s = clamp(Number(sec)||1.2, 0.5, 3.0);
+      setCssVar("--animDur", `${s.toFixed(2)}s`);
+      durVal.textContent = `${s.toFixed(2)}s`;
+      durLabel.textContent = `${s.toFixed(2)}`;
+      durRange.value = String(s.toFixed(2));
+    }
+
+    function updatePhase(px){
+      const p = clamp(Number(px)||0, 0, width);
+      // phase: seam'leri dalganın üstüne "getirmek" için -px
+      setCssVar("--phasePx", `${(-p).toFixed(0)}px`);
+      phaseVal.textContent = `${p.toFixed(0)}px`;
+      phaseLabel.textContent = `${p.toFixed(0)}`;
+      phaseRange.value = String(p.toFixed(0));
+    }
+
+    function updateStrokeWidth(v){
+      const s = clamp(Number(v)||1.1, 0.6, 2.5);
+      setCssVar("--waveStroke", String(s.toFixed(2)));
+      strokeVal.textContent = s.toFixed(2);
+      strokeRange.value = String(s.toFixed(2));
+      renderAll(); // editor svg stroke da değişsin
+    }
+
+    function updatePointRadius(v){
+      const r = clamp(Number(v)||1.9, 0.9, 3.2);
+      setCssVar("--pointRadius", String(r.toFixed(1)));
+      pointVal.textContent = r.toFixed(1);
+      pointRange.value = String(r.toFixed(1));
+      renderAll();
+    }
+
+    function updateSeamDiagnostics(){
+      const pts = buildAllPoints();
+      if(pts.length < 3){
+        seamDyEl.textContent = "–";
+        seamDsEl.textContent = "–";
+        return;
+      }
+      const p0 = pts[0];
+      const p1 = pts[1];
+      const pN = pts[pts.length-1];
+      const pN1 = pts[pts.length-2];
+
+      const dy = (pN.y - p0.y);
+      const slopeStart = (p1.x !== p0.x) ? ((p1.y - p0.y) / (p1.x - p0.x)) : 0;
+      const slopeEnd   = (pN.x !== pN1.x) ? ((pN.y - pN1.y) / (pN.x - pN1.x)) : 0;
+      const ds = slopeEnd - slopeStart;
+
+      seamDyEl.textContent = dy.toFixed(0);
+      seamDsEl.textContent = ds.toFixed(2);
+    }
+
+    // Seam slope match helper:
+    // İlk interior noktaya göre, son interior noktasını (width - x1, 2*baseline - y1) yaparak slopeEnd = slopeStart hedeflenir.
+    function seamSlopeMatch(){
+      const pts = buildAllPoints();
+      if(pts.length < 3) return;
+
+      const firstInterior = pts[1];
+      if(!firstInterior || firstInterior.x <= 0 || firstInterior.x >= width) return;
+
+      const targetX = clamp(width - firstInterior.x, 1, width-1);
+      const targetY = clamp(2*baseline - firstInterior.y, 0, height);
+
+      // userPoints içinde targetX'e yakın bir nokta varsa güncelle, yoksa ekle
+      const eps = 2; // px
+      let idx = -1;
+      for(let i=0;i<userPoints.length;i++){
+        if(Math.abs(userPoints[i].x - targetX) <= eps){
+          idx = i; break;
+        }
+      }
+      if(idx>=0){
+        userPoints[idx] = { x: targetX, y: targetY };
+      }else{
+        userPoints.push({ x: targetX, y: targetY });
+      }
+      userPoints.sort((a,b)=>a.x-b.x);
+      renderAll();
+      syncMonitorWaveFromEditor();
+    }
+
+    btnSeamSlopeMatch.addEventListener("click", seamSlopeMatch);
+
+    function syncMonitorWaveFromEditor(){
+      // Eğer monitor seçili ritim "editor dalgası" olsun istenirse burada bağlarız.
+      // Şimdilik: monitor seçili ritim, ilgili EKG_SHAPES/rhythmStore points'ini gösterir.
+      // Bu fonksiyon şimdilik seçili ritmi tekrar uygular (store güncellenmiş olabilir).
+      applyMonitorRhythm(monitorRhythmSelect.value);
+    }
+
+    // Monitor controls
+    monitorRhythmSelect.addEventListener("change", e=>{
+      applyMonitorRhythm(e.target.value);
+    });
+
+    btnMonitorPlay.addEventListener("click", ()=>setMonitorPaused(false));
+    btnMonitorPause.addEventListener("click", ()=>setMonitorPaused(true));
+
+    durRange.addEventListener("input", e=>updateDuration(e.target.value));
+    btnPreset12.addEventListener("click", ()=>updateDuration(1.2));
+
+    // 25mm/sn preset:
+    // tileWidthPx / 5px = mm (1 küçük kare = 5px varsayımı). duration = mm / (mm/s).
+    // width=240px => 48mm. 48/25 = 1.92s
+    btnPreset25.addEventListener("click", ()=>{
+      const mm = width / 5;
+      const sec = mm / 25;
+      updateDuration(sec);
+    });
+
+    phaseRange.addEventListener("input", e=>updatePhase(e.target.value));
+    toggleSeams.addEventListener("change", e=>{
+      seamGuides.classList.toggle("show", !!e.target.checked);
+    });
+
+    strokeRange.addEventListener("input", e=>updateStrokeWidth(e.target.value));
+    pointRange.addEventListener("input", e=>updatePointRadius(e.target.value));
+
+    // ---------------------------
+    // 9) Init
+    // ---------------------------
+    // Populate rhythmSelect from defaults initially
+    Object.keys(EKG_SHAPES_DEFAULT).forEach(ensureRhythmOption);
+
+    // Put default EKG_SHAPES into textarea for convenience
+    shapesArea.value = `const EKG_SHAPES = ${JSON.stringify(EKG_SHAPES_DEFAULT, null, 2)};`;
+
+    // Import defaults into store once (so export/json works)
+    importFromShapesObject(EKG_SHAPES_DEFAULT, {reset:true});
     refreshJsonArea();
+
+    // Init monitor
+    applyMonitorRhythm(monitorRhythmSelect.value);
+    updateDuration(1.2);
+    updatePhase(0);
+
+    // Init sliders reflect CSS defaults
+    updateStrokeWidth(getComputedStyle(document.documentElement).getPropertyValue("--waveStroke"));
+    updatePointRadius(getComputedStyle(document.documentElement).getPropertyValue("--pointRadius"));
+
+    // Seam lines positions
+    seamGuides.classList.remove("show");
+    syncMonitorSizing();
+
+    // Render
     renderAll();
   </script>
 </body>
