@@ -19,8 +19,8 @@
       "stem": "Aşağıdakilerden hangisi ERC 2025’e göre şoklanabilir ritim grubundadır?",
       "options": [
         "Sinüs taşikardi",
-        "PEA",
-        "Pulssuz VT",
+        "NEA",
+        "Nabızsız VT",
         "Asistoli"
       ],
       "correctIndex": 2,
@@ -48,7 +48,7 @@
       "options": [
         "Her şoktan sonra ritim geri dönmese bile 12 derivasyon EKG çekilir.",
         "Ritim analizi bittikten hemen sonra KPR’ye devam edilir.",
-        "Her şoktan sonra 1 dakika beklenir, sonra KPR başlatılır.",
+        "Her şoktan sonra 1 dakika yanıt beklenir, sonra KPR başlatılır.",
         "Ritim analizi sırasında göğüs kompresyonu kesilmez."
       ],
       "correctIndex": 1,
@@ -60,33 +60,33 @@
       "title": "Şoklanamaz ritimler",
       "stem": "Aşağıdakilerden hangisi şoklanamaz ritimdir?",
       "options": [
-        "Pulssuz VT",
+        "Nabızsız VT",
         "VF",
         "Asistoli",
-        "Torsades de pointes"
+        "Torsades de Pointes"
       ],
       "correctIndex": 2,
       "timeLimitSec": 15,
-      "explanation": "Asistoli ve PEA şoklanamaz; VF ve pVT (torsades dahil) şoklanabilir ritimlerdir."
+      "explanation": "Asistoli ve NEA şoklanamaz; VF ve pVT (torsades dahil) şoklanabilir ritimlerdir."
     },
     {
       "id": 5,
-      "title": "PEA yaklaşımı",
-      "stem": "Nabızsız elektriksel aktivite (PEA) saptandığında ilk odaklanılması gereken yaklaşım hangisidir?",
+      "title": "NEA yaklaşımı",
+      "stem": "Nabızsız elektriksel aktivite (NEA) saptandığında ilk odaklanılması gereken yaklaşım hangisidir?",
       "options": [
         "Enerjiyi artırarak defibrilasyon",
         "Senkron kardiyoversiyon",
-        "Yüksek kaliteli KPR ve geri döndürülebilir nedenlerin (4H–4T) araştırılması",
+        "Yüksek kaliteli KPR ve geri döndürülebilir nedenlerin (5H–5T) araştırılması",
         "Transkutan pacing"
       ],
       "correctIndex": 2,
       "timeLimitSec": 15,
-      "explanation": "PEA’de defibrilasyon endike değildir. Yüksek kaliteli KPR, adrenalin ve geri döndürülebilir nedenlerin (4H–4T) agresif yönetimi esastır."
+      "explanation": "NEA’de defibrilasyon endike değildir. Yüksek kaliteli KPR, adrenalin ve geri döndürülebilir nedenlerin (5H–5T) agresif yönetimi esastır."
     },
     {
       "id": 6,
       "title": "SVT ve hemodinamik instabilite",
-      "stem": "Dar QRS SVT’de ağır hipotansiyon ve bilinç bozukluğu varsa ilk tercih nedir?",
+      "stem": "Dar QRS SVT’de derin hipotansiyon ve bilinç bozukluğu varsa ilk tercih nedir?",
       "options": [
         "Vagal manevra",
         "Adenozin bolus",
@@ -117,7 +117,7 @@
       "stem": "Torsades de pointes gelişmiş, nabızsız ve hipotansif bir hastada ilk yaklaşım hangisidir?",
       "options": [
         "Senkron kardiyoversiyon",
-        "Defibrilasyon (VF/pVT algoritması) + magnezyum",
+        "Defibrilasyon + magnezyum",
         "Sadece magnezyum sülfat",
         "Transkutan pacing"
       ],
@@ -131,13 +131,13 @@
       "stem": "Asistoli saptadığında, defibrilasyona karar vermeden önce aşağıdakilerden hangisi mutlaka yapılmalıdır?",
       "options": [
         "En az 3 kez defibrilasyon",
-        "Lead/ek oda kontrolü ve doğru ritim derivasyonunu doğrulama",
+        "Kablo kontrolü ve monitör lead doğrulama",
         "Ani senkron kardiyoversiyon",
         "Atropin uygulaması"
       ],
       "correctIndex": 1,
       "timeLimitSec": 15,
-      "explanation": "Asistoli gerçek bir ritim mi yoksa teknik artefakt mı (lead kopması, düşük gain vs.) mutlaka kontrol edilmelidir. Gerçek asistolide şoklanmaz."
+      "explanation": "Asistoli gerçek mi yoksa teknik artefakt mı (lead kopması, düşük gain vs.) mutlaka kontrol edilmelidir. Gerçek asistolide şoklanmaz."
     },
     {
       "id": 10,
@@ -158,10 +158,10 @@
       "title": "Defibrilatör ped pozisyonu",
       "stem": "Erişkinde defibrilatör pad yerleşimi açısından aşağıdakilerden hangisi doğru bir seçenek değildir?",
       "options": [
-        "Sağ parasternal – sol midaksiller (antero-lateral)",
-        "Sternum üstü – sol skapula (antero-posterior)",
+        "Sağ parasternal – sol midaksiller",
+        "Sternum üstü – sol skapula",
         "İki pad’i doğrudan sternum üzerine yan yana koyma",
-        "ICD/pacer cihazından mümkün olduğunca uzak yerleştirme"
+        "ICD cihazından mümkün olduğunca uzak yerleştirme"
       ],
       "correctIndex": 2,
       "timeLimitSec": 15,
@@ -186,10 +186,10 @@
       "title": "KPR sırasında ritim kontrolü",
       "stem": "KPR sırasında ritim analiz aralıkları için önerilen süre aşağıdakilerden hangisidir?",
       "options": [
-        "Her 30 sn’de bir",
-        "Her 1 dakikada bir",
-        "Her 2 dakikada bir",
-        "Her 10 dakikada bir"
+        "30 sn’de bir",
+        "1 dakikada bir",
+        "2 dakikada bir",
+        "10 dakikada bir"
       ],
       "correctIndex": 2,
       "timeLimitSec": 15,
