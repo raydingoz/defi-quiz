@@ -46,9 +46,9 @@
       "title": "Defibrilasyon sonrası hemen ne yapılır?",
       "stem": "Defibrilasyon sonrası monitörde ritim kontrolünde aşağıdakilerden hangisi doğrudur?",
       "options": [
-        "Her şoktan sonra ritim geri dönmese bile 12 derivasyon EKG çekilir.",
-        "Ritim analizi bittikten hemen sonra KPR’ye devam edilir.",
-        "Her şoktan sonra 1 dakika yanıt beklenir, sonra KPR başlatılır.",
+        "Her şoktan sonra 12 derivasyon EKG çekilir.",
+        "Ritim analizi sonrası KPR’ye devam edilir.",
+        "Şoktan sonra 1 dakika yanıt beklenir, sonra KPR başlatılır.",
         "Ritim analizi sırasında göğüs kompresyonu kesilmez."
       ],
       "correctIndex": 1,
@@ -58,7 +58,7 @@
     {
       "id": 4,
       "title": "Şoklanamaz ritimler",
-      "stem": "Aşağıdakilerden hangisi şoklanamaz ritimdir?",
+      "stem": "Hangisi şoklanamaz ritimdir?",
       "options": [
         "Nabızsız VT",
         "VF",
@@ -100,7 +100,7 @@
     {
       "id": 7,
       "title": "AF ve şok tablosu",
-      "stem": "Hızlı AF ve şok tablosu olan bir hastada tercih edilmesi gereken yaklaşım hangisidir?",
+      "stem": "Hızlı AF'ye bağlı şok tablosu olan bir hastada tercih edilmesi gereken yaklaşım hangisidir?",
       "options": [
         "Düşük doz beta bloker ile hız kontrolü",
         "Düşük doz digoksin",
@@ -113,8 +113,8 @@
     },
     {
       "id": 8,
-      "title": "Torsades de pointes",
-      "stem": "Torsades de pointes gelişmiş, nabızsız ve hipotansif bir hastada ilk yaklaşım hangisidir?",
+      "title": "Torsades de Pointes",
+      "stem": "Monitörde Torsades de pointes izlenen, nabızsız bir hastada ilk yaklaşım hangisidir?",
       "options": [
         "Senkron kardiyoversiyon",
         "Defibrilasyon + magnezyum",
@@ -127,7 +127,7 @@
     },
     {
       "id": 9,
-      "title": "Asistoli doğrulama",
+      "title": "Asistoli",
       "stem": "Asistoli saptadığında, defibrilasyona karar vermeden önce aşağıdakilerden hangisi mutlaka yapılmalıdır?",
       "options": [
         "En az 3 kez defibrilasyon",
