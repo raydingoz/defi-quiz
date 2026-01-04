@@ -290,9 +290,7 @@
           </div>
 
           <div class="question-title" id="questionTitle">Soru başlığı</div>
-          <div class="question-body" id="questionStem">
-            Config yükleniyor (defi-quiz-config.json)…
-          </div>
+          <div class="question-body" id="questionStem">Config yükleniyor…</div>
 
           <div id="optionsList" class="option-list"></div>
 
@@ -304,7 +302,7 @@
           <div class="btn-row">
             <button id="btnPrev" class="btn btn-ghost">⟵ Önceki</button>
             <button id="btnNext" class="btn btn-ghost">Sonraki ⟶</button>
-            <button id="btnStart" class="btn btn-main">▶ Quiz’i başlat</button>
+            <button id="btnStart" class="btn btn-main">▶ Başlat</button>
             <button id="btnReveal" class="btn btn-ghost">✅ Yanıtı göster</button>
           </div>
 
@@ -333,7 +331,7 @@
             </button>
           </div>
           <div class="meta-line small" style="margin-top:6px;">
-            QR açılışı başta otomatik gösterilir; gerektiğinde butondan açabilirsiniz.
+            QR başta otomatik açılır; gerekirse butondan aç.
           </div>
         </div>
       </aside>
@@ -370,6 +368,7 @@
 
     const db      = firebase.database();
     const rootRef = db.ref("defiQuiz");
+
     const CONFIG_URL = "defi-quiz-config.json";
 
     let CONFIG       = null;
@@ -379,20 +378,17 @@
 
     let sessionToken      = null;
     let currentIndex      = 0;
-
-    // DB mirrored state
-    let quizStarted       = false;
     let currentQuestionId = null;
     let questionActive    = false;
     let reveal            = false;
 
-    // Shared timer (server-synced)
-    let serverOffset       = 0;
-    let timerStartedAt     = null;
-    let timerDurationSec   = null;
-    let timerInterval      = null;
-    let timerExpiryWritten = false;
-    let timerBoundQid      = null; // race-proof: expiry writes only for this qid
+    // Server offset for embedding "server-ish" start time in questionId
+    let serverOffset = 0;
+
+    // Local timer
+    let timerInterval  = null;
+    let timerRemaining = 0;
+    let boundQid       = null;
 
     // DOM
     const questionTitleEl = document.getElementById("questionTitle");
@@ -445,58 +441,33 @@
       }
     }
 
-    function computeRemainingSec(){
-      if(!timerStartedAt || !timerDurationSec) return null;
-      const now = Date.now() + serverOffset;
-      const end = timerStartedAt + (timerDurationSec * 1000);
-      return Math.max(0, Math.ceil((end - now) / 1000));
-    }
-
-    function syncTimerLoop(){
+    function startLocalTimer(qid, seconds){
       stopTimer();
+      boundQid = qid;
+      timerRemaining = seconds || 10;
+      timerLabel.textContent = "Süre: " + timerRemaining + " sn";
 
-      if(!questionActive){
-        if(currentQuestionId) timerLabel.textContent = "Süre: 0 sn";
-        else timerLabel.textContent = "Süre: –";
-        return;
-      }
-
-      if(!timerStartedAt || !timerDurationSec){
-        timerLabel.textContent="Süre: –";
-        return;
-      }
-
-      timerExpiryWritten = false;
-      timerBoundQid = currentQuestionId;
-
-      const tick = () => {
-        // If question instance changed, stop without writing anything.
-        if(timerBoundQid && currentQuestionId && timerBoundQid !== currentQuestionId){
+      timerInterval = setInterval(()=>{
+        // If host moved to a new question instance, stop.
+        if(boundQid && currentQuestionId && boundQid !== currentQuestionId){
           stopTimer();
           return;
         }
 
-        const rem = computeRemainingSec();
-        if(rem === null){
-          timerLabel.textContent = "Süre: –";
-          return;
-        }
-        timerLabel.textContent = "Süre: " + rem + " sn";
-
-        if(rem <= 0 && !timerExpiryWritten){
-          timerExpiryWritten = true;
+        timerRemaining -= 1;
+        if(timerRemaining <= 0){
+          timerRemaining = 0;
           stopTimer();
           timerLabel.textContent = "Süre: 0 sn";
 
-          // Race-proof: write expiry only if we are still on the same question instance.
-          if(timerBoundQid && currentQuestionId === timerBoundQid){
+          // Only close if we are still on same question instance
+          if(boundQid && currentQuestionId === boundQid){
             rootRef.update({ questionActive:false });
           }
+          return;
         }
-      };
-
-      tick();
-      timerInterval = setInterval(tick, 250);
+        timerLabel.textContent = "Süre: " + timerRemaining + " sn";
+      },1000);
     }
 
     function updateProgress(){
@@ -527,7 +498,6 @@
         hideRevealModal(true);
         return;
       }
-
       revealTitle.textContent = formatCorrectAnswer(q);
       revealBody.textContent  = q.explanation || "Açıklama yok.";
       revealBox.style.display = "block";
@@ -542,8 +512,8 @@
         questionTitleEl.textContent = "Soru yok";
         questionStemEl.textContent  = "";
         optionsListEl.innerHTML     = "";
-        statusLine.textContent = "—";
-        btnStart.style.display = "none";
+        statusLine.textContent      = "—";
+        btnStart.disabled = true;
         updateProgress();
         return;
       }
@@ -555,8 +525,9 @@
       (q.options || []).forEach((opt,idx)=>{
         const row = document.createElement("div");
         row.className = "option-row";
-        if(reveal && idx === q.correctIndex) row.classList.add("correct");
-
+        if(reveal && idx === q.correctIndex){
+          row.classList.add("correct");
+        }
         const left = document.createElement("div");
         left.className = "option-label";
 
@@ -570,24 +541,24 @@
 
         left.appendChild(badge);
         left.appendChild(text);
-
         row.appendChild(left);
         optionsListEl.appendChild(row);
       });
 
-      // Start button: only visible before quiz started
-      btnStart.style.display = quizStarted ? "none" : "inline-flex";
-
-      // Minimal status
-      if(!quizStarted){
+      // Status (minimal)
+      if(!currentQuestionId){
         statusLine.textContent = "Bekleniyor";
         timerLabel.textContent = "Süre: –";
+        btnStart.disabled = false;
       }else if(reveal){
         statusLine.textContent = "Yanıt";
+        btnStart.disabled = true;
       }else if(questionActive){
         statusLine.textContent = "Açık";
+        btnStart.disabled = true;
       }else{
         statusLine.textContent = "Kapalı";
+        btnStart.disabled = true;
       }
 
       renderRevealBox();
@@ -608,92 +579,91 @@
     }
     initQR();
 
-    function startQuestionForIndex(idx){
+    function makeQuestionInstanceId(q){
+      const serverNow = Date.now() + (serverOffset || 0);
+      return "q_" + (q.id || (currentIndex+1)) + "_" + serverNow;
+    }
+
+    function startQuestionAtIndex(idx){
       if(!configLoaded) return;
       const q = safeQuestion(idx);
       if(!q) return;
 
-      stopTimer();
+      const newId = makeQuestionInstanceId(q);
 
-      const newId = "q_" + q.id + "_" + Date.now();
-
-      // update local immediately (UI shouldn't stick on "Kapalı")
+      // Local state immediate
       currentIndex      = idx;
       currentQuestionId = newId;
       questionActive    = true;
       reveal            = false;
-      quizStarted       = true;
 
+      // DB update (ONLY existing keys from original)
       const updates = {};
-      updates["quizStarted"]          = true;
       updates["currentQuestionIndex"] = idx;
       updates["currentQuestionId"]    = newId;
       updates["questionActive"]       = true;
       updates["reveal"]               = false;
-
-      // shared timer fields
-      updates["timerStartedAt"]       = firebase.database.ServerValue.TIMESTAMP;
-      updates["timerDurationSec"]     = (q.timeLimitSec || 10);
-
-      // reset ordering/answers for this instance
-      updates["answerOrder/"+newId] = 0;
-      updates["answers/"+newId]     = null;
-
+      updates["answerOrder/"+newId]   = 0;
+      updates["answers/"+newId]       = null;
       rootRef.update(updates);
+
+      // Start local timer
+      startLocalTimer(newId, q.timeLimitSec || 30);
+
       renderQuestion();
     }
 
     // Buttons
-    btnStart.addEventListener("click", ()=> startQuestionForIndex(currentIndex));
+    btnStart.addEventListener("click", ()=>{
+      // Start current index (waiting -> first question instance)
+      startQuestionAtIndex(currentIndex);
+    });
 
-    function gotoIndex(newIndex){
+    btnPrev.addEventListener("click", ()=>{
       if(!configLoaded) return;
-      const idx = Math.max(0, Math.min(TOTAL_Q-1, newIndex));
+      const nextIdx = Math.max(0, currentIndex-1);
+      currentIndex = nextIdx;
 
-      if(!quizStarted){
-        // preview mode (waiting)
-        stopTimer();
-        timerLabel.textContent = "Süre: –";
-        currentIndex = idx;
-        rootRef.update({
-          currentQuestionIndex: idx,
-          currentQuestionId: null,
-          questionActive: false,
-          reveal: false,
-          timerStartedAt: null,
-          timerDurationSec: null
-        });
+      // If waiting: just move pointer
+      if(!currentQuestionId){
+        rootRef.update({ currentQuestionIndex: nextIdx });
         renderQuestion();
         return;
       }
+      // If already started: auto start next question
+      startQuestionAtIndex(nextIdx);
+    });
 
-      // started: new question auto-start
-      startQuestionForIndex(idx);
-    }
+    btnNext.addEventListener("click", ()=>{
+      if(!configLoaded) return;
+      const nextIdx = Math.min(TOTAL_Q-1, currentIndex+1);
+      currentIndex = nextIdx;
 
-    btnPrev.addEventListener("click",()=> gotoIndex(currentIndex - 1));
-    btnNext.addEventListener("click",()=> gotoIndex(currentIndex + 1));
+      if(!currentQuestionId){
+        rootRef.update({ currentQuestionIndex: nextIdx });
+        renderQuestion();
+        return;
+      }
+      startQuestionAtIndex(nextIdx);
+    });
 
-    btnReveal.addEventListener("click",()=>{
+    btnReveal.addEventListener("click", ()=>{
       if(!currentQuestionId) return;
       stopTimer();
       rootRef.update({ reveal:true, questionActive:false });
       timerLabel.textContent = "Süre: 0 sn";
     });
 
-    btnReset.addEventListener("click",()=>{
+    btnReset.addEventListener("click", ()=>{
       if(!confirm("Tüm skorlar, yanıtlar ve nickler silinecek. Emin misin?")) return;
       stopTimer();
       const newToken = Date.now();
       const resetData = {
         sessionToken:newToken,
-        quizStarted:false,
         currentQuestionIndex:0,
         currentQuestionId:null,
         questionActive:false,
         reveal:false,
-        timerStartedAt:null,
-        timerDurationSec:null,
         players:null,
         answers:null,
         answerOrder:null
@@ -707,16 +677,11 @@
       currentQuestionId = null;
       questionActive    = false;
       reveal            = false;
-      quizStarted       = false;
 
-      timerStartedAt   = null;
-      timerDurationSec = null;
-      timerBoundQid    = null;
-
+      timerRemaining    = 0;
       timerLabel.textContent = "Süre: –";
-      scoreListEl.innerHTML = "";
-      playerCountEl.textContent = "0";
       statusLine.textContent = "Bekleniyor";
+
       renderQuestion();
     });
 
@@ -751,76 +716,65 @@
     revealModal?.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(false); });
 
     function attachDbListeners(){
-      // Server time offset
-      firebase.database().ref(".info/serverTimeOffset").on("value", snap => {
+      // server time offset (read-only)
+      firebase.database().ref(".info/serverTimeOffset").on("value", snap=>{
         serverOffset = snap.val() || 0;
-        syncTimerLoop();
       });
 
-      // Waiting gate
-      rootRef.child("quizStarted").on("value", snap=>{
-        quizStarted = !!snap.val();
-        renderQuestion();
-      });
-
-      // Timer fields
-      rootRef.child("timerStartedAt").on("value", snap=>{
-        timerStartedAt = snap.val() || null;
-        syncTimerLoop();
-      });
-      rootRef.child("timerDurationSec").on("value", snap=>{
-        timerDurationSec = snap.val() || null;
-        syncTimerLoop();
-      });
-
-      rootRef.child("sessionToken").on("value",snap=>{
+      rootRef.child("sessionToken").on("value", snap=>{
         const val = snap.val();
         if(val){
-          if(sessionToken && sessionToken !== val){
-            stopTimer();
-            timerLabel.textContent = "Süre: –";
-
-            currentQuestionId = null;
-            questionActive = false;
-            reveal = false;
-            quizStarted = false;
-
-            timerStartedAt = null;
-            timerDurationSec = null;
-            timerBoundQid = null;
-
-            statusLine.textContent = "Bekleniyor";
-          }
           sessionToken = val;
           sessionLabel.textContent = "#" + String(val).slice(-4);
         }
       });
 
-      rootRef.child("currentQuestionIndex").on("value",snap=>{
+      rootRef.child("currentQuestionIndex").on("value", snap=>{
         const idx = snap.val();
         if(idx === null || idx === undefined) return;
         currentIndex = idx;
         renderQuestion();
       });
 
-      rootRef.child("currentQuestionId").on("value",snap=>{
-        currentQuestionId = snap.val();
+      rootRef.child("currentQuestionId").on("value", snap=>{
+        const id = snap.val();
+        currentQuestionId = id;
+        // When a new question instance arrives from DB, bind timer to it if active.
+        // Host only: timer is driven locally when we call startQuestionAtIndex.
         renderQuestion();
       });
 
-      rootRef.child("questionActive").on("value",snap=>{
+      rootRef.child("questionActive").on("value", snap=>{
         questionActive = !!snap.val();
-        syncTimerLoop();
+        if(questionActive){
+          // If host refreshed mid-question, restart local timer based on embedded time
+          const q = safeQuestion(currentIndex);
+          const dur = (q && q.timeLimitSec) ? q.timeLimitSec : 30;
+          // parse start from id
+          const parts = (currentQuestionId||"").split("_");
+          const startMs = parseInt(parts[parts.length-1],10);
+          if(Number.isFinite(startMs)){
+            const serverNow = Date.now() + (serverOffset || 0);
+            const rem = Math.max(0, Math.ceil((startMs + dur*1000 - serverNow)/1000));
+            startLocalTimer(currentQuestionId, rem);
+          }else{
+            startLocalTimer(currentQuestionId, dur);
+          }
+        }else{
+          stopTimer();
+          if(currentQuestionId) timerLabel.textContent = "Süre: 0 sn";
+          else timerLabel.textContent = "Süre: –";
+        }
         renderQuestion();
       });
 
-      rootRef.child("reveal").on("value",snap=>{
+      rootRef.child("reveal").on("value", snap=>{
         reveal = !!snap.val();
         if(reveal) revealModalDismissed = false;
         renderQuestion();
       });
 
-      rootRef.child("players").on("value",snap=>{
+      rootRef.child("players").on("value", snap=>{
         const val = snap.val() || {};
         const arr = Object.entries(val).map(([id,p])=>({
           id,
@@ -888,7 +842,6 @@
       try{
         const res = await fetch(CONFIG_URL,{cache:"no-store"});
         if(!res.ok) throw new Error("HTTP "+res.status);
-
         CONFIG    = await res.json();
         QUESTIONS = (CONFIG.questions || []).slice();
         TOTAL_Q   = QUESTIONS.length;
@@ -897,31 +850,24 @@
         attachDbListeners();
         renderQuestion();
 
-        // Init defaults in DB if missing
-        rootRef.child("currentQuestionIndex").once("value",s=>{
+        // Init defaults
+        rootRef.child("currentQuestionIndex").once("value", s=>{
           if(!s.exists()) rootRef.update({ currentQuestionIndex:0 });
         });
-        rootRef.child("sessionToken").once("value",snap=>{
-          if(!snap.exists()){
+        rootRef.child("sessionToken").once("value", s=>{
+          if(!s.exists()){
             const t = Date.now();
             rootRef.update({ sessionToken:t });
             sessionToken = t;
             sessionLabel.textContent = "#" + String(t).slice(-4);
           }
         });
-        rootRef.child("quizStarted").once("value",s=>{
-          if(!s.exists()) rootRef.update({ quizStarted:false });
-        });
-        rootRef.child("timerStartedAt").once("value",s=>{
-          if(!s.exists()) rootRef.update({ timerStartedAt:null, timerDurationSec:null });
-        });
-
       }catch(e){
         console.error(e);
-        questionTitleEl.textContent = "Config yüklenemedi";
-        questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koy.";
+        questionTitleEl.textContent = "Config yok";
+        questionStemEl.textContent  = "defi-quiz-config.json aynı klasörde olmalı.";
         statusLine.textContent = "—";
-        btnStart.style.display = "none";
+        btnStart.disabled = true;
       }
     }
 
