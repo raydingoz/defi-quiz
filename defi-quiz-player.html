@@ -87,11 +87,6 @@
       white-space:pre-wrap;
       margin-bottom:6px;
     }
-    .meta-line{
-      font-size:0.8rem;
-      color:var(--muted);
-      margin-top:2px;
-    }
 
     .input-row{
       display:flex;
@@ -121,9 +116,7 @@
       box-shadow:0 10px 18px rgba(22,163,74,0.25);
     }
 
-    .option-list{
-      margin-top:4px;
-    }
+    .option-list{ margin-top:4px; }
     .option-btn{
       width:100%;
       border-radius:14px;
@@ -141,15 +134,8 @@
       transition:all .15s ease-out;
       box-shadow:0 8px 18px rgba(15,23,42,0.08);
     }
-    .option-btn.disabled{
-      opacity:0.55;
-      cursor:default;
-    }
-    .option-main{
-      display:flex;
-      gap:6px;
-      align-items:flex-start;
-    }
+    .option-btn.disabled{ opacity:0.55; cursor:default; }
+    .option-main{ display:flex; gap:6px; align-items:flex-start; }
     .option-badge{
       width:20px;
       height:20px;
@@ -162,9 +148,7 @@
       color:var(--muted);
       flex-shrink:0;
     }
-    .option-text{
-      text-align:left;
-    }
+    .option-text{ text-align:left; }
     .option-btn.selected{
       outline:2px solid #22c55e;
       outline-offset:1px;
@@ -280,16 +264,14 @@
     <!-- Quiz kartı -->
     <section class="card" id="quizCard" style="display:none;">
       <div class="card-inner">
-        <div class="question-title" id="questionTitle">Soru başlığı</div>
-        <div class="question-body" id="questionStem">
-          Soru açıldığında metin burada görünecek.
-        </div>
+        <div class="question-title" id="questionTitle">Bekleniyor</div>
+        <div class="question-body" id="questionStem"></div>
 
         <div id="optionsList" class="option-list"></div>
 
         <span id="timerLabel" class="timer-pill">Süre: –</span>
         <div id="answerStatus" class="feedback">
-          Süre açıldığında 5–15 sn içinde yanıtla.
+          Eğitmeni bekle.
         </div>
       </div>
     </section>
@@ -344,17 +326,21 @@
     let nickname       = null;
 
     let currentIndex      = null;
+    let quizStarted       = false;
     let currentQuestionId = null;
     let questionActive    = false;
     let reveal            = false;
 
     let answeredQuestions = {};
     let answerOutcomes    = {};
-    let shownExplanation  = {};
     let selectedChoiceIdx = null;
 
     let timerInterval     = null;
-    let timerRemaining    = 0;
+
+    // --- server-synced timer fields ---
+    let serverOffset = 0;
+    let timerStartedAt = null;
+    let timerDurationSec = null;
 
     // DOM
     const joinCard      = document.getElementById("joinCard");
@@ -397,67 +383,129 @@
       }
     }
 
-    function startTimerForCurrent(){
+    function computeRemainingSecPlayer(){
+      if(!timerStartedAt || !timerDurationSec) return null;
+      const now = Date.now() + serverOffset;
+      const end = timerStartedAt + (timerDurationSec * 1000);
+      return Math.max(0, Math.ceil((end - now) / 1000));
+    }
+
+    function isTimeUpPlayer(){
+      const rem = computeRemainingSecPlayer();
+      return (rem !== null && rem <= 0);
+    }
+
+    function syncTimerLoopPlayer(){
       stopTimer();
-      if(!configLoaded || currentIndex==null){
+
+      // Quiz başlamadıysa timer yok.
+      if(!quizStarted){
+        timerLabel.textContent = "Süre: –";
+        return;
+      }
+
+      if(!currentQuestionId){
         timerLabel.textContent="Süre: –";
         return;
       }
-      const q = safeQuestion(currentIndex);
-      if(!q){
+
+      if(!questionActive){
+        timerLabel.textContent="Süre: 0 sn";
+        return;
+      }
+
+      if(!timerStartedAt || !timerDurationSec){
         timerLabel.textContent="Süre: –";
         return;
       }
-      timerRemaining = q.timeLimitSec || 10;
-      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
-      timerInterval = setInterval(()=>{
-        timerRemaining -= 1;
-        if(timerRemaining <= 0){
-          stopTimer();
-          timerLabel.textContent="Süre: 0 sn";
+
+      const tick = ()=>{
+        const rem = computeRemainingSecPlayer();
+        if(rem === null){
+          timerLabel.textContent="Süre: –";
           return;
         }
-        timerLabel.textContent="Süre: "+timerRemaining+" sn";
-      },1000);
+        timerLabel.textContent="Süre: " + rem + " sn";
+
+        if(rem <= 0){
+          stopTimer();
+          timerLabel.textContent="Süre: 0 sn";
+          updateButtonsState();
+          if(currentQuestionId && !answeredQuestions[currentQuestionId]){
+            answerStatus.textContent = "Süre bitti; bu soruyu artık yanıtlayamazsın.";
+            answerStatus.className = "feedback";
+          }
+        }
+      };
+
+      tick();
+      timerInterval = setInterval(tick, 250);
     }
 
     function updateButtonsState(){
-      const canAnswer = configLoaded && currentQuestionId && questionActive && !reveal && playerId;
+      const timeUp = isTimeUpPlayer();
+
+      // Quiz başlamadıysa kilitli
+      const canAnswer = configLoaded && quizStarted && currentQuestionId && questionActive && !reveal && playerId && !timeUp;
       const already   = currentQuestionId && answeredQuestions[currentQuestionId];
       const disabled  = !canAnswer || already;
 
       const children = optionsListEl.querySelectorAll(".option-btn");
       children.forEach(btn=>{
-        if(disabled){
-          btn.classList.add("disabled");
-        }else{
-          btn.classList.remove("disabled");
-        }
+        if(disabled) btn.classList.add("disabled");
+        else btn.classList.remove("disabled");
       });
     }
 
+    function renderWaiting(){
+      questionTitleEl.textContent = "Bekleniyor";
+      questionStemEl.textContent  = "Eğitmen quiz’i başlatınca soru otomatik açılacak.";
+      optionsListEl.innerHTML     = "";
+
+      timerLabel.textContent      = "Süre: –";
+      answerStatus.textContent    = "Hazır ol: Quiz başlayınca süre anlık akacak.";
+      answerStatus.className      = "feedback";
+      updateButtonsState();
+    }
+
     function renderQuestion(){
-      if(!configLoaded || currentIndex==null){
-        questionTitleEl.textContent = "Soru bekleniyor";
+      if(!configLoaded){
+        questionTitleEl.textContent = "Yükleniyor";
         questionStemEl.textContent  = "";
         optionsListEl.innerHTML     = "";
         return;
       }
+
+      // Bekleme kapısı
+      if(!quizStarted){
+        renderWaiting();
+        return;
+      }
+
+      // Quiz başladı ama soru instance henüz gelmediyse
+      if(currentIndex==null || !currentQuestionId){
+        questionTitleEl.textContent = "Soru bekleniyor";
+        questionStemEl.textContent  = "";
+        optionsListEl.innerHTML     = "";
+        timerLabel.textContent      = "Süre: –";
+        answerStatus.textContent    = "Eğitmen yeni soruyu açıyor.";
+        answerStatus.className      = "feedback";
+        updateButtonsState();
+        return;
+      }
+
       const q = safeQuestion(currentIndex);
       if(!q){
         questionTitleEl.textContent = "Soru yok";
         questionStemEl.textContent  = "";
         optionsListEl.innerHTML     = "";
+        updateButtonsState();
         return;
       }
 
       questionTitleEl.textContent = q.title || ("Soru " + (currentIndex+1));
       questionStemEl.textContent  = q.stem  || "";
 
-      const questionChanged = currentQuestionId !== renderQuestion.lastQuestionId;
-      if(questionChanged){
-        exModal.classList.remove("show");
-      }
       optionsListEl.innerHTML = "";
 
       (q.options || []).forEach((opt,idx)=>{
@@ -497,9 +545,6 @@
       if(existingSummary){
         answerStatus.textContent = existingSummary.text;
         answerStatus.className   = existingSummary.className;
-      }else if(!currentQuestionId){
-        answerStatus.textContent = "Süre açıldığında yanıt verebilirsin.";
-        answerStatus.className   = "feedback";
       }else if(!questionActive && !reveal){
         answerStatus.textContent = "Bu soru şu anda pasif. Yeni soru için eğitmeni bekle.";
         answerStatus.className   = "feedback";
@@ -516,7 +561,6 @@
       }
 
       updateButtonsState();
-      renderQuestion.lastQuestionId = currentQuestionId;
     }
 
     function computePoints(orderPosition){
@@ -554,8 +598,10 @@
 
     function sendAnswer(choiceIndex){
       if(!playerId || !configLoaded || currentIndex==null || !currentQuestionId) return;
+      if(!quizStarted) return;
       if(!questionActive || reveal) return;
       if(answeredQuestions[currentQuestionId]) return;
+      if(isTimeUpPlayer()) return;
 
       const q = safeQuestion(currentIndex);
       if(!q) return;
@@ -632,7 +678,18 @@
         playerId = "p_" + Math.random().toString(36).substr(2,9);
       }
       const playerRef = rootRef.child("players").child(playerId);
-      playerRef.update({ nickname:nickname, score:0 });
+
+      // Score sıfırlama davranışı: ilk katılımda 0 yazar; tekrar girişte mevcut skor kalır.
+      // (Firebase update ile score undefined ise dokunmaz; ilk sefer set ediyoruz.)
+      playerRef.child("score").once("value").then(s=>{
+        if(!s.exists()){
+          playerRef.update({ nickname:nickname, score:0 });
+        }else{
+          playerRef.update({ nickname:nickname });
+        }
+      }).catch(()=>{
+        playerRef.update({ nickname:nickname, score:0 });
+      });
 
       if(sessionToken){
         localStorage.setItem("defiQuizSessionToken", String(sessionToken));
@@ -645,10 +702,11 @@
       joinCard.style.display = "none";
       quizCard.style.display = "block";
       joinFeedback.textContent = "";
-      answerStatus.textContent = "Süre açıldığında yanıt verebilirsin.";
+
       attachScoreListener();
       renderQuestion();
       updateButtonsState();
+      syncTimerLoopPlayer();
     }
     joinBtn.addEventListener("click", joinSession);
     nicknameInput.addEventListener("keydown", e=>{ if(e.key==="Enter") joinSession(); });
@@ -667,10 +725,10 @@
         nickname = storedNick;
         joinCard.style.display = "none";
         quizCard.style.display = "block";
-        answerStatus.textContent = "Süre açıldığında yanıt verebilirsin.";
         attachScoreListener();
         renderQuestion();
         updateButtonsState();
+        syncTimerLoopPlayer();
       }else{
         joinCard.style.display = "block";
         quizCard.style.display = "none";
@@ -688,11 +746,16 @@
         nickname = null;
         answeredQuestions = {};
         answerOutcomes    = {};
-        shownExplanation  = {};
         selectedChoiceIdx = null;
         stopTimer();
         timerLabel.textContent = "Süre: –";
         myScoreEl.textContent  = "0";
+
+        quizStarted = false;
+        currentIndex = null;
+        currentQuestionId = null;
+        questionActive = false;
+        reveal = false;
 
         localStorage.removeItem("defiQuizPlayerId");
         localStorage.removeItem("defiQuizNickname");
@@ -707,6 +770,27 @@
     }
 
     function attachDbListeners(){
+      firebase.database().ref(".info/serverTimeOffset").on("value", snap=>{
+        serverOffset = snap.val() || 0;
+        syncTimerLoopPlayer();
+      });
+
+      rootRef.child("timerStartedAt").on("value", snap=>{
+        timerStartedAt = snap.val() || null;
+        syncTimerLoopPlayer();
+      });
+      rootRef.child("timerDurationSec").on("value", snap=>{
+        timerDurationSec = snap.val() || null;
+        syncTimerLoopPlayer();
+      });
+
+      rootRef.child("quizStarted").on("value", snap=>{
+        quizStarted = !!snap.val();
+        renderQuestion();
+        updateButtonsState();
+        syncTimerLoopPlayer();
+      });
+
       rootRef.child("sessionToken").on("value",snap=>{
         const val = snap.val();
         if(val) handleSessionTokenChange(val);
@@ -723,30 +807,31 @@
         const newId = snap.val();
         if(newId !== currentQuestionId){
           currentQuestionId = newId;
-          renderQuestion.lastQuestionId = null;
           stopTimer();
           timerLabel.textContent = currentQuestionId ? "Süre: –" : "Süre: –";
           selectedChoiceIdx = null;
           renderQuestion();
+          syncTimerLoopPlayer();
         }
       });
 
       rootRef.child("questionActive").on("value",snap=>{
         questionActive = !!snap.val();
-        if(questionActive){
-          startTimerForCurrent();
+        syncTimerLoopPlayer();
+
+        if(quizStarted && questionActive){
           if(currentQuestionId && !answeredQuestions[currentQuestionId]){
             answerStatus.textContent = "5–15 sn içinde yanıt ver.";
             answerStatus.className   = "feedback";
           }
-        }else{
-          stopTimer();
-          if(currentQuestionId && !answeredQuestions[currentQuestionId]){
+        }else if(quizStarted && !questionActive){
+          if(currentQuestionId && !answeredQuestions[currentQuestionId] && !reveal){
             timerLabel.textContent = "Süre: 0 sn";
             answerStatus.textContent = "Süre bitti; bu soruyu artık yanıtlayamazsın.";
             answerStatus.className   = "feedback";
           }
         }
+
         renderQuestion();
         updateButtonsState();
       });
@@ -754,10 +839,11 @@
       rootRef.child("reveal").on("value",snap=>{
         const prev = reveal;
         reveal = !!snap.val();
+
         renderQuestion();
         updateButtonsState();
 
-        if(reveal && !prev && configLoaded && currentIndex!=null){
+        if(reveal && !prev && configLoaded && quizStarted && currentIndex!=null){
           const q = safeQuestion(currentIndex);
           const info = currentQuestionId ? answerOutcomes[currentQuestionId] : null;
           if(q) openExplanationModal(!!(info && info.isCorrect), q);
@@ -773,6 +859,7 @@
         QUESTIONS = (CONFIG.questions || []).slice();
         configLoaded = true;
         attachDbListeners();
+        renderQuestion();
       }catch(e){
         console.error(e);
         questionTitleEl.textContent = "Config yüklenemedi";

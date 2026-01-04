@@ -125,9 +125,7 @@
       box-shadow:0 0 14px rgba(251,191,36,0.5);
     }
 
-    .option-list{
-      margin-top:6px;
-    }
+    .option-list{ margin-top:6px; }
     .option-row{
       border-radius:14px;
       border:1px solid #e2e8f0;
@@ -140,11 +138,7 @@
       font-size:1.05rem;
       margin-bottom:6px;
     }
-    .option-label{
-      display:flex;
-      gap:6px;
-      align-items:flex-start;
-    }
+    .option-label{ display:flex; gap:6px; align-items:flex-start; }
     .option-badge{
       width:22px;
       height:22px;
@@ -157,9 +151,7 @@
       color:var(--muted);
       flex-shrink:0;
     }
-    .option-text{
-      color:var(--text);
-    }
+    .option-text{ color:var(--text); }
     .option-row.correct{
       border-color:#22c55e;
       box-shadow:0 0 0 1px rgba(34,197,94,0.5);
@@ -185,11 +177,7 @@
       font-variant-numeric:tabular-nums;
       background:#f1f5f9;
     }
-
-    .meta-line{
-      font-size:1rem;
-      color:var(--muted);
-    }
+    .meta-line{ font-size:1rem; color:var(--muted); }
 
     .reveal-box{
       margin-top:10px;
@@ -206,11 +194,11 @@
       align-items:center;
       gap:8px;
     }
-    .reveal-body{font-size:1.1rem;color:var(--text);white-space:pre-wrap;}
+    .reveal-body{ font-size:1.1rem; color:var(--text); white-space:pre-wrap; }
 
-    .btn-row{margin-top:12px;display:flex;gap:10px;flex-wrap:nowrap;align-items:center;}
-    .btn-row .btn{flex:1;justify-content:center;min-width:0;}
-    @media(max-width:1100px){.btn-row{flex-wrap:wrap;}}
+    .btn-row{ margin-top:12px; display:flex; gap:10px; flex-wrap:nowrap; align-items:center; }
+    .btn-row .btn{ flex:1; justify-content:center; min-width:0; }
+    @media(max-width:1100px){ .btn-row{ flex-wrap:wrap; } }
     .btn{
       border-radius:14px;
       border:1px solid #e2e8f0;
@@ -225,8 +213,9 @@
       cursor:pointer;
       transition:all .15s ease-out;
       box-shadow:0 8px 18px rgba(15,23,42,0.08);
+      user-select:none;
     }
-    .btn:hover{transform:translateY(-1px);box-shadow:0 12px 22px rgba(15,23,42,0.12);}
+    .btn:hover{ transform:translateY(-1px); box-shadow:0 12px 22px rgba(15,23,42,0.12); }
     .btn-main{
       background:linear-gradient(90deg,#16a34a,#22c55e);
       border:none;
@@ -238,35 +227,44 @@
       color:#0f172a;
       border-color:#e2e8f0;
     }
-    .btn[disabled]{opacity:0.45;cursor:default;box-shadow:none;}
-    .btn-danger{color:var(--danger);border-color:#e2e8f0;background:#fff;}
+    .btn[disabled]{ opacity:0.45; cursor:default; box-shadow:none; }
+    .btn-danger{ color:var(--danger); border-color:#e2e8f0; background:#fff; }
 
-    .score-list{margin-top:10px;font-size:1.15rem;max-height:360px;overflow-y:auto;}
-    .score-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed #e2e8f0;gap:10px;font-weight:800;}
-    .score-row .label{display:flex;align-items:center;gap:12px;max-width:240px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
-    .score-row .medal{font-size:1.1rem;}
-    .score-row .name{flex:1;overflow:hidden;text-overflow:ellipsis;}
-    .score-row .score{font-weight:800;color:#0f172a;font-size:1.1rem;}
-    .score-row.rank-1 .medal,.score-row.rank-1 .name{color:#d4af37;}
-    .score-row.rank-2 .medal,.score-row.rank-2 .name{color:#c0c0c0;}
-    .score-row.rank-3 .medal,.score-row.rank-3 .name{color:#cd7f32;}
+    .score-list{ margin-top:10px; font-size:1.15rem; max-height:360px; overflow-y:auto; }
+    .score-row{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 0;
+      border-bottom:1px dashed #e2e8f0;
+      gap:10px;
+      font-weight:800;
+    }
+    .score-row .label{ display:flex; align-items:center; gap:12px; max-width:240px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+    .score-row .medal{ font-size:1.1rem; }
+    .score-row .name{ flex:1; overflow:hidden; text-overflow:ellipsis; }
+    .score-row .score{ font-weight:800; color:#0f172a; font-size:1.1rem; }
+    .score-row.rank-1 .medal,.score-row.rank-1 .name{ color:#d4af37; }
+    .score-row.rank-2 .medal,.score-row.rank-2 .name{ color:#c0c0c0; }
+    .score-row.rank-3 .medal,.score-row.rank-3 .name{ color:#cd7f32; }
 
-    .qr-cta{margin-top:10px;display:flex;gap:10px;align-items:center;}
+    .qr-cta{ margin-top:10px; display:flex; gap:10px; align-items:center; }
 
-    .qr-modal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:9999;}
-    .qr-modal.show{display:flex;}
-    .qr-card{background:#fff;border-radius:20px;padding:18px;box-shadow:0 20px 48px rgba(0,0,0,0.28);max-width:520px;text-align:center;}
-    #qrcodeQuizLarge{width:420px;height:420px;margin:0 auto;}
-    .qr-link{margin-top:8px;font-weight:700;color:#0f172a;word-break:break-all;}
-    .modal-close{margin-top:12px;border:none;background:#0f172a;color:#e2e8f0;padding:12px 16px;border-radius:14px;font-weight:800;cursor:pointer;}
+    .qr-modal{ position:fixed; inset:0; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; z-index:9999; }
+    .qr-modal.show{ display:flex; }
+    .qr-card{ background:#fff; border-radius:20px; padding:18px; box-shadow:0 20px 48px rgba(0,0,0,0.28); max-width:520px; text-align:center; }
+    #qrcodeQuizLarge{ width:420px; height:420px; margin:0 auto; }
+    .qr-link{ margin-top:8px; font-weight:700; color:#0f172a; word-break:break-all; }
+    .modal-close{ margin-top:12px; border:none; background:#0f172a; color:#e2e8f0; padding:12px 16px; border-radius:14px; font-weight:800; cursor:pointer; }
 
-    .reveal-modal{position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:9998;}
-    .reveal-modal.show{display:flex;}
-    .reveal-modal .modal-card{background:#ffffff;border-radius:20px;padding:20px;max-width:860px;width:90%;box-shadow:0 22px 50px rgba(0,0,0,0.28);}
-    .reveal-modal .modal-title{font-size:1.3rem;font-weight:800;margin-bottom:10px;color:var(--heading);}
-    .reveal-modal .modal-body{font-size:1.15rem;line-height:1.8;color:var(--text);white-space:pre-wrap;}
+    .reveal-modal{ position:fixed; inset:0; background:rgba(0,0,0,0.65); display:none; align-items:center; justify-content:center; z-index:9998; }
+    .reveal-modal.show{ display:flex; }
+    .reveal-modal .modal-card{ background:#ffffff; border-radius:20px; padding:20px; max-width:860px; width:90%; box-shadow:0 22px 50px rgba(0,0,0,0.28); }
+    .reveal-modal .modal-title{ font-size:1.3rem; font-weight:800; margin-bottom:10px; color:var(--heading); }
+    .reveal-modal .modal-body{ font-size:1.15rem; line-height:1.8; color:var(--text); white-space:pre-wrap; }
   </style>
 </head>
+
 <body>
   <div class="app">
     <header class="top-bar">
@@ -301,14 +299,14 @@
           <div class="timer-status-row">
             <span class="timer-pill" id="timerLabel">Süre: –</span>
             <span class="meta-line" id="statusLine">
-              Hazırsan süreyi başlat, odak ekranda kalsın.
+              QR açıldıktan sonra Quiz’i başlat.
             </span>
           </div>
 
           <div class="btn-row">
             <button id="btnPrev" class="btn btn-ghost">⟵ Önceki</button>
             <button id="btnNext" class="btn btn-ghost">Sonraki ⟶</button>
-            <button id="btnStart" class="btn btn-main">▶ Süreyi başlat</button>
+            <button id="btnStart" class="btn btn-main">▶ Quiz’i başlat</button>
             <button id="btnReveal" class="btn btn-ghost">✅ Yanıtı göster</button>
           </div>
 
@@ -385,12 +383,19 @@
 
     let sessionToken      = null;
     let currentIndex      = 0;
+
+    // Host state mirrored from DB
+    let quizStarted      = false;
     let currentQuestionId = null;
     let questionActive    = false;
     let reveal            = false;
 
+    // --- Shared timer (server-synced) ---
+    let serverOffset = 0;
+    let timerStartedAt = null;
+    let timerDurationSec = null;
     let timerInterval = null;
-    let timerRemaining = 0;
+    let timerExpiryWritten = false;
 
     // DOM
     const questionTitleEl = document.getElementById("questionTitle");
@@ -443,25 +448,47 @@
       }
     }
 
-    function startTimerForCurrent(){
+    function computeRemainingSec(){
+      if(!timerStartedAt || !timerDurationSec) return null;
+      const now = Date.now() + serverOffset;
+      const end = timerStartedAt + (timerDurationSec * 1000);
+      return Math.max(0, Math.ceil((end - now) / 1000));
+    }
+
+    function syncTimerLoop(){
       stopTimer();
-      const q = safeQuestion(currentIndex);
-      if(!q){
+
+      if(!questionActive){
+        if(currentQuestionId) timerLabel.textContent = "Süre: 0 sn";
+        else timerLabel.textContent = "Süre: –";
+        return;
+      }
+
+      if(!timerStartedAt || !timerDurationSec){
         timerLabel.textContent="Süre: –";
         return;
       }
-      timerRemaining = q.timeLimitSec || 30;
-      timerLabel.textContent = "Süre: "+timerRemaining+" sn";
-      timerInterval = setInterval(()=>{
-        timerRemaining -= 1;
-        if(timerRemaining <= 0){
-          stopTimer();
-          timerLabel.textContent="Süre: 0 sn";
-          rootRef.update({ questionActive:false });
-        }else{
-          timerLabel.textContent = "Süre: "+timerRemaining+" sn";
+
+      timerExpiryWritten = false;
+
+      const tick = () => {
+        const rem = computeRemainingSec();
+        if(rem === null){
+          timerLabel.textContent = "Süre: –";
+          return;
         }
-      },1000);
+        timerLabel.textContent = "Süre: " + rem + " sn";
+
+        if(rem <= 0 && !timerExpiryWritten){
+          timerExpiryWritten = true;
+          stopTimer();
+          timerLabel.textContent = "Süre: 0 sn";
+          rootRef.update({ questionActive:false });
+        }
+      };
+
+      tick();
+      timerInterval = setInterval(tick, 250);
     }
 
     function updateProgress(){
@@ -501,11 +528,15 @@
 
     function renderQuestion(){
       if(!configLoaded) return;
+
       const q = safeQuestion(currentIndex);
       if(!q){
         questionTitleEl.textContent = "Soru yok";
         questionStemEl.textContent  = "";
         optionsListEl.innerHTML     = "";
+        statusLine.textContent = "Config boş ya da hatalı.";
+        btnStart.style.display = "none";
+        updateProgress();
         return;
       }
 
@@ -537,10 +568,17 @@
         optionsListEl.appendChild(row);
       });
 
-      if(!currentQuestionId){
-        statusLine.textContent = "Süre otomatik başlayacak (30 sn).";
+      // UI state for start button:
+      // - Quiz henüz başlamadıysa göster (bekleniyor / QR sonrası).
+      // - Başladıktan sonra gizle (sonraki sorular auto).
+      btnStart.style.display = quizStarted ? "none" : "inline-flex";
+
+      // Status line
+      if(!quizStarted){
+        statusLine.textContent = "Beklemede: QR paylaş. Hazır olunca “Quiz’i başlat”.";
+        timerLabel.textContent = "Süre: –";
       }else if(!questionActive && !reveal){
-        statusLine.textContent = "Pasif. Aynı soruyu ya da yenisini başlat.";
+        statusLine.textContent = "Pasif. Yeni soru otomatik başlar (Önceki/Sonraki).";
       }else if(questionActive){
         statusLine.textContent = "Soru açık, yanıtlar geliyor.";
       }else if(reveal){
@@ -549,7 +587,6 @@
 
       renderRevealBox();
       updateProgress();
-      autoStartIfIdle();
     }
 
     function initQR(){
@@ -560,50 +597,13 @@
         renderQrModal();
         if(!qrModalShown){
           qrModalShown = true;
-          setTimeout(()=>openQrModal(true), 200);
+          setTimeout(()=>openQrModal(), 200);
         }
-      }catch(e){console.error(e);}  
+      }catch(e){console.error(e);}
     }
     initQR();
 
-    // Butonlar
-    btnPrev.addEventListener("click",()=>{
-      if(!configLoaded) return;
-      currentIndex = Math.max(0, currentIndex-1);
-      currentQuestionId = null;
-      questionActive = false;
-      reveal = false;
-      stopTimer();
-      timerRemaining = 0;
-      timerLabel.textContent = "Süre: –";
-      rootRef.update({
-        currentQuestionIndex: currentIndex,
-        currentQuestionId: null,
-        questionActive: false,
-        reveal: false
-      });
-      renderQuestion();
-    });
-
-    btnNext.addEventListener("click",()=>{
-      if(!configLoaded) return;
-      currentIndex = Math.min(TOTAL_Q-1, currentIndex+1);
-      currentQuestionId = null;
-      questionActive = false;
-      reveal = false;
-      stopTimer();
-      timerRemaining = 0;
-      timerLabel.textContent = "Süre: –";
-      rootRef.update({
-        currentQuestionIndex: currentIndex,
-        currentQuestionId: null,
-        questionActive: false,
-        reveal: false
-      });
-      renderQuestion();
-    });
-
-    function startQuestion(auto=false){
+    function startQuestion(){
       if(!configLoaded) return;
       const q = safeQuestion(currentIndex);
       if(!q) return;
@@ -614,29 +614,55 @@
       reveal            = false;
 
       stopTimer();
-      startTimerForCurrent();
 
       const updates = {};
-      updates["currentQuestionIndex"]    = currentIndex;
-      updates["currentQuestionId"]       = currentQuestionId;
-      updates["questionActive"]          = true;
-      updates["reveal"]                  = false;
+      updates["quizStarted"]         = true;
+      updates["currentQuestionIndex"] = currentIndex;
+      updates["currentQuestionId"]    = currentQuestionId;
+      updates["questionActive"]       = true;
+      updates["reveal"]               = false;
+
+      // Shared timer fields
+      updates["timerStartedAt"]       = firebase.database.ServerValue.TIMESTAMP;
+      updates["timerDurationSec"]     = (q.timeLimitSec || 10);
+
+      // Reset ordering/answers for this question instance
       updates["answerOrder/"+currentQuestionId] = 0;
       updates["answers/"+currentQuestionId]     = null;
-      rootRef.update(updates);
 
-      if(auto){
-        statusLine.textContent = "Süre otomatik başladı.";
-      }
+      rootRef.update(updates);
       renderQuestion();
     }
-    btnStart.addEventListener("click", ()=>startQuestion(false));
 
-    function autoStartIfIdle(){
+    // Butonlar
+    btnStart.addEventListener("click", startQuestion);
+
+    function gotoIndex(newIndex){
       if(!configLoaded) return;
-      if(questionActive || currentQuestionId || reveal) return;
-      startQuestion(true);
+      currentIndex = Math.max(0, Math.min(TOTAL_Q-1, newIndex));
+
+      // Eğer quiz başlamadıysa sadece index değiştir. Player'lar "Bekleniyor" görür.
+      if(!quizStarted){
+        stopTimer();
+        timerLabel.textContent = "Süre: –";
+        rootRef.update({
+          currentQuestionIndex: currentIndex,
+          currentQuestionId: null,
+          questionActive: false,
+          reveal: false,
+          timerStartedAt: null,
+          timerDurationSec: null
+        });
+        renderQuestion();
+        return;
+      }
+
+      // Quiz başladıysa yeni soruya geçerken otomatik başlat
+      startQuestion();
     }
+
+    btnPrev.addEventListener("click",()=> gotoIndex(currentIndex - 1));
+    btnNext.addEventListener("click",()=> gotoIndex(currentIndex + 1));
 
     btnReveal.addEventListener("click",()=>{
       if(!currentQuestionId) return;
@@ -651,10 +677,19 @@
       const newToken = Date.now();
       const resetData = {
         sessionToken:newToken,
+
+        // waiting gate
+        quizStarted:false,
+
         currentQuestionIndex:0,
         currentQuestionId:null,
         questionActive:false,
         reveal:false,
+
+        // shared timer fields
+        timerStartedAt:null,
+        timerDurationSec:null,
+
         players:null,
         answers:null,
         answerOrder:null
@@ -667,25 +702,88 @@
       currentQuestionId = null;
       questionActive    = false;
       reveal            = false;
-      timerRemaining    = 0;
+      quizStarted       = false;
+
+      timerStartedAt = null;
+      timerDurationSec = null;
+
       timerLabel.textContent = "Süre: –";
       scoreListEl.innerHTML   = "";
       playerCountEl.textContent = "0";
-      statusLine.textContent = "Yeni quiz oturumu başlatıldı.";
+      statusLine.textContent = "Yeni oturum: QR paylaş, sonra Quiz’i başlat.";
       renderQuestion();
     });
 
+    // --- QR modal ---
+    function renderQrModal(){
+      if(!playerUrl || !qrLargeBox) return;
+      qrLargeBox.innerHTML = "";
+      new QRCode(qrLargeBox,{ text: playerUrl, width:420, height:420 });
+    }
+    function openQrModal(){
+      renderQrModal();
+      qrModal?.classList.add("show");
+    }
+    function closeQrModal(){ qrModal?.classList.remove("show"); }
+    btnShowQr?.addEventListener("click", openQrModal);
+    qrModalClose?.addEventListener("click", closeQrModal);
+    qrModal?.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
+
+    // --- Reveal modal ---
+    function showRevealModal(){
+      if(!reveal || !currentQuestionId) return;
+      revealModalTitle.textContent = revealTitle.textContent;
+      revealModalBody.textContent  = revealBody.textContent;
+      if(!revealModalDismissed){
+        revealModal.classList.add("show");
+      }
+    }
+    function hideRevealModal(fromState){
+      if(!fromState){
+        revealModalDismissed = true;
+      }
+      revealModal.classList.remove("show");
+    }
+    revealModal?.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(false); });
+
     function attachDbListeners(){
+      // Server time offset
+      firebase.database().ref(".info/serverTimeOffset").on("value", snap => {
+        serverOffset = snap.val() || 0;
+        syncTimerLoop();
+      });
+
+      // Waiting gate
+      rootRef.child("quizStarted").on("value", snap=>{
+        quizStarted = !!snap.val();
+        renderQuestion();
+      });
+
+      // Timer fields
+      rootRef.child("timerStartedAt").on("value", snap=>{
+        timerStartedAt = snap.val() || null;
+        syncTimerLoop();
+      });
+      rootRef.child("timerDurationSec").on("value", snap=>{
+        timerDurationSec = snap.val() || null;
+        syncTimerLoop();
+      });
+
       rootRef.child("sessionToken").on("value",snap=>{
         const val = snap.val();
         if(val){
           if(sessionToken && sessionToken !== val){
             stopTimer();
-            timerRemaining = 0;
             timerLabel.textContent = "Süre: –";
+
             currentQuestionId = null;
             questionActive = false;
             reveal = false;
+            quizStarted = false;
+
+            timerStartedAt = null;
+            timerDurationSec = null;
+
             statusLine.textContent = "Yeni oturum algılandı.";
           }
           sessionToken = val;
@@ -707,16 +805,7 @@
 
       rootRef.child("questionActive").on("value",snap=>{
         questionActive = !!snap.val();
-        if(questionActive){
-          startTimerForCurrent();
-        }else{
-          stopTimer();
-          if(currentQuestionId){
-            timerLabel.textContent = "Süre: 0 sn";
-          }else{
-            timerLabel.textContent = "Süre: –";
-          }
-        }
+        syncTimerLoop();
         renderQuestion();
       });
 
@@ -801,6 +890,7 @@
         attachDbListeners();
         renderQuestion();
 
+        // Init defaults in DB if missing
         rootRef.child("currentQuestionIndex").once("value",s=>{
           if(!s.exists()){
             rootRef.update({ currentQuestionIndex:0 });
@@ -814,45 +904,27 @@
             sessionLabel.textContent = "#" + String(t).slice(-4);
           }
         });
+        rootRef.child("quizStarted").once("value",s=>{
+          if(!s.exists()){
+            rootRef.update({ quizStarted:false });
+          }
+        });
+        rootRef.child("timerStartedAt").once("value",s=>{
+          if(!s.exists()){
+            rootRef.update({ timerStartedAt:null, timerDurationSec:null });
+          }
+        });
+
       }catch(e){
         console.error(e);
         questionTitleEl.textContent = "Config yüklenemedi";
         questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koyduğundan emin ol.";
+        statusLine.textContent = "Config yüklenemedi.";
+        btnStart.style.display = "none";
       }
     }
 
     loadConfig();
-
-    function renderQrModal(){
-      if(!playerUrl || !qrLargeBox) return;
-      qrLargeBox.innerHTML = "";
-      new QRCode(qrLargeBox,{ text: playerUrl, width:420, height:420 });
-    }
-    function openQrModal(){
-      renderQrModal();
-      qrModal?.classList.add("show");
-    }
-    function closeQrModal(){ qrModal?.classList.remove("show"); }
-    btnShowQr?.addEventListener("click", openQrModal);
-    qrModalClose?.addEventListener("click", closeQrModal);
-    qrModal?.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
-
-    function showRevealModal(){
-      if(!reveal || !currentQuestionId) return;
-      revealModalTitle.textContent = revealTitle.textContent;
-      revealModalBody.textContent  = revealBody.textContent;
-      if(!revealModalDismissed){
-        revealModal.classList.add("show");
-      }
-    }
-    function hideRevealModal(fromState){
-      if(!fromState){
-        revealModalDismissed = true;
-      }
-      revealModal.classList.remove("show");
-    }
-    revealModal?.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(false); });
-
   </script>
 </body>
 </html>
