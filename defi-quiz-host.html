@@ -646,7 +646,7 @@
     });
 
     btnReset.addEventListener("click",()=>{
-      if(!confirm("Tüm skorlar, yanıtlar ve eski nickler silinecek. Emin misin?")) return;
+      if(!confirm("Tüm skorlar, ve eski nickler silinecek. Emin misin?")) return;
       stopTimer();
       const newToken = Date.now();
       const resetData = {
