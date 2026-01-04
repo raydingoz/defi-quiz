@@ -298,9 +298,7 @@
 
           <div class="timer-status-row">
             <span class="timer-pill" id="timerLabel">Süre: –</span>
-            <span class="meta-line" id="statusLine">
-              QR açıldıktan sonra Quiz’i başlat.
-            </span>
+            <span class="meta-line" id="statusLine">Bekleniyor</span>
           </div>
 
           <div class="btn-row">
@@ -368,12 +366,10 @@
       appId: "1:642741899462:web:bcc787a87d0ec69c9b47c7",
       measurementId: "G-SY348RPCVZ"
     };
-    if (!firebase.apps.length) {
-      firebase.initializeApp(firebaseConfig);
-    }
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+
     const db      = firebase.database();
     const rootRef = db.ref("defiQuiz");
-
     const CONFIG_URL = "defi-quiz-config.json";
 
     let CONFIG       = null;
@@ -384,18 +380,19 @@
     let sessionToken      = null;
     let currentIndex      = 0;
 
-    // Host state mirrored from DB
-    let quizStarted      = false;
+    // DB mirrored state
+    let quizStarted       = false;
     let currentQuestionId = null;
     let questionActive    = false;
     let reveal            = false;
 
-    // --- Shared timer (server-synced) ---
-    let serverOffset = 0;
-    let timerStartedAt = null;
-    let timerDurationSec = null;
-    let timerInterval = null;
+    // Shared timer (server-synced)
+    let serverOffset       = 0;
+    let timerStartedAt     = null;
+    let timerDurationSec   = null;
+    let timerInterval      = null;
     let timerExpiryWritten = false;
+    let timerBoundQid      = null; // race-proof: expiry writes only for this qid
 
     // DOM
     const questionTitleEl = document.getElementById("questionTitle");
@@ -419,9 +416,9 @@
     const qrModalClose    = document.getElementById("qrModalClose");
     const qrLargeBox      = document.getElementById("qrcodeQuizLarge");
 
-    const revealModal     = document.getElementById("revealModal");
-    const revealModalTitle= document.getElementById("revealModalTitle");
-    const revealModalBody = document.getElementById("revealModalBody");
+    const revealModal      = document.getElementById("revealModal");
+    const revealModalTitle = document.getElementById("revealModalTitle");
+    const revealModalBody  = document.getElementById("revealModalBody");
 
     const progressLabel   = document.getElementById("progressLabel");
     const progressFill    = document.getElementById("progressFill");
@@ -470,8 +467,15 @@
       }
 
       timerExpiryWritten = false;
+      timerBoundQid = currentQuestionId;
 
       const tick = () => {
+        // If question instance changed, stop without writing anything.
+        if(timerBoundQid && currentQuestionId && timerBoundQid !== currentQuestionId){
+          stopTimer();
+          return;
+        }
+
         const rem = computeRemainingSec();
         if(rem === null){
           timerLabel.textContent = "Süre: –";
@@ -483,7 +487,11 @@
           timerExpiryWritten = true;
           stopTimer();
           timerLabel.textContent = "Süre: 0 sn";
-          rootRef.update({ questionActive:false });
+
+          // Race-proof: write expiry only if we are still on the same question instance.
+          if(timerBoundQid && currentQuestionId === timerBoundQid){
+            rootRef.update({ questionActive:false });
+          }
         }
       };
 
@@ -521,7 +529,7 @@
       }
 
       revealTitle.textContent = formatCorrectAnswer(q);
-      revealBody.textContent  = q.explanation || "Açıklama henüz eklenmemiş.";
+      revealBody.textContent  = q.explanation || "Açıklama yok.";
       revealBox.style.display = "block";
       showRevealModal();
     }
@@ -534,7 +542,7 @@
         questionTitleEl.textContent = "Soru yok";
         questionStemEl.textContent  = "";
         optionsListEl.innerHTML     = "";
-        statusLine.textContent = "Config boş ya da hatalı.";
+        statusLine.textContent = "—";
         btnStart.style.display = "none";
         updateProgress();
         return;
@@ -547,9 +555,8 @@
       (q.options || []).forEach((opt,idx)=>{
         const row = document.createElement("div");
         row.className = "option-row";
-        if(reveal && idx === q.correctIndex){
-          row.classList.add("correct");
-        }
+        if(reveal && idx === q.correctIndex) row.classList.add("correct");
+
         const left = document.createElement("div");
         left.className = "option-label";
 
@@ -568,21 +575,19 @@
         optionsListEl.appendChild(row);
       });
 
-      // UI state for start button:
-      // - Quiz henüz başlamadıysa göster (bekleniyor / QR sonrası).
-      // - Başladıktan sonra gizle (sonraki sorular auto).
+      // Start button: only visible before quiz started
       btnStart.style.display = quizStarted ? "none" : "inline-flex";
 
-      // Status line
+      // Minimal status
       if(!quizStarted){
-        statusLine.textContent = "Beklemede: QR paylaş. Hazır olunca “Quiz’i başlat”.";
+        statusLine.textContent = "Bekleniyor";
         timerLabel.textContent = "Süre: –";
-      }else if(!questionActive && !reveal){
-        statusLine.textContent = "Pasif. Yeni soru otomatik başlar (Önceki/Sonraki).";
-      }else if(questionActive){
-        statusLine.textContent = "Soru açık, yanıtlar geliyor.";
       }else if(reveal){
-        statusLine.textContent = "Doğru yanıt ekranda.";
+        statusLine.textContent = "Yanıt";
+      }else if(questionActive){
+        statusLine.textContent = "Açık";
+      }else{
+        statusLine.textContent = "Kapalı";
       }
 
       renderRevealBox();
@@ -599,54 +604,59 @@
           qrModalShown = true;
           setTimeout(()=>openQrModal(), 200);
         }
-      }catch(e){console.error(e);}
+      }catch(e){ console.error(e); }
     }
     initQR();
 
-    function startQuestion(){
+    function startQuestionForIndex(idx){
       if(!configLoaded) return;
-      const q = safeQuestion(currentIndex);
+      const q = safeQuestion(idx);
       if(!q) return;
-
-      const newId = "q_" + q.id + "_" + Date.now();
-      currentQuestionId = newId;
-      questionActive    = true;
-      reveal            = false;
 
       stopTimer();
 
+      const newId = "q_" + q.id + "_" + Date.now();
+
+      // update local immediately (UI shouldn't stick on "Kapalı")
+      currentIndex      = idx;
+      currentQuestionId = newId;
+      questionActive    = true;
+      reveal            = false;
+      quizStarted       = true;
+
       const updates = {};
-      updates["quizStarted"]         = true;
-      updates["currentQuestionIndex"] = currentIndex;
-      updates["currentQuestionId"]    = currentQuestionId;
+      updates["quizStarted"]          = true;
+      updates["currentQuestionIndex"] = idx;
+      updates["currentQuestionId"]    = newId;
       updates["questionActive"]       = true;
       updates["reveal"]               = false;
 
-      // Shared timer fields
+      // shared timer fields
       updates["timerStartedAt"]       = firebase.database.ServerValue.TIMESTAMP;
       updates["timerDurationSec"]     = (q.timeLimitSec || 10);
 
-      // Reset ordering/answers for this question instance
-      updates["answerOrder/"+currentQuestionId] = 0;
-      updates["answers/"+currentQuestionId]     = null;
+      // reset ordering/answers for this instance
+      updates["answerOrder/"+newId] = 0;
+      updates["answers/"+newId]     = null;
 
       rootRef.update(updates);
       renderQuestion();
     }
 
-    // Butonlar
-    btnStart.addEventListener("click", startQuestion);
+    // Buttons
+    btnStart.addEventListener("click", ()=> startQuestionForIndex(currentIndex));
 
     function gotoIndex(newIndex){
       if(!configLoaded) return;
-      currentIndex = Math.max(0, Math.min(TOTAL_Q-1, newIndex));
+      const idx = Math.max(0, Math.min(TOTAL_Q-1, newIndex));
 
-      // Eğer quiz başlamadıysa sadece index değiştir. Player'lar "Bekleniyor" görür.
       if(!quizStarted){
+        // preview mode (waiting)
         stopTimer();
         timerLabel.textContent = "Süre: –";
+        currentIndex = idx;
         rootRef.update({
-          currentQuestionIndex: currentIndex,
+          currentQuestionIndex: idx,
           currentQuestionId: null,
           questionActive: false,
           reveal: false,
@@ -657,8 +667,8 @@
         return;
       }
 
-      // Quiz başladıysa yeni soruya geçerken otomatik başlat
-      startQuestion();
+      // started: new question auto-start
+      startQuestionForIndex(idx);
     }
 
     btnPrev.addEventListener("click",()=> gotoIndex(currentIndex - 1));
@@ -666,35 +676,30 @@
 
     btnReveal.addEventListener("click",()=>{
       if(!currentQuestionId) return;
-      rootRef.update({ reveal:true, questionActive:false });
       stopTimer();
+      rootRef.update({ reveal:true, questionActive:false });
       timerLabel.textContent = "Süre: 0 sn";
     });
 
     btnReset.addEventListener("click",()=>{
-      if(!confirm("Tüm skorlar, yanıtlar ve eski nickler silinecek. Emin misin?")) return;
+      if(!confirm("Tüm skorlar, yanıtlar ve nickler silinecek. Emin misin?")) return;
       stopTimer();
       const newToken = Date.now();
       const resetData = {
         sessionToken:newToken,
-
-        // waiting gate
         quizStarted:false,
-
         currentQuestionIndex:0,
         currentQuestionId:null,
         questionActive:false,
         reveal:false,
-
-        // shared timer fields
         timerStartedAt:null,
         timerDurationSec:null,
-
         players:null,
         answers:null,
         answerOrder:null
       };
       rootRef.set(resetData);
+
       sessionToken = newToken;
       sessionLabel.textContent = "#" + String(newToken).slice(-4);
 
@@ -704,17 +709,18 @@
       reveal            = false;
       quizStarted       = false;
 
-      timerStartedAt = null;
+      timerStartedAt   = null;
       timerDurationSec = null;
+      timerBoundQid    = null;
 
       timerLabel.textContent = "Süre: –";
-      scoreListEl.innerHTML   = "";
+      scoreListEl.innerHTML = "";
       playerCountEl.textContent = "0";
-      statusLine.textContent = "Yeni oturum: QR paylaş, sonra Quiz’i başlat.";
+      statusLine.textContent = "Bekleniyor";
       renderQuestion();
     });
 
-    // --- QR modal ---
+    // QR modal
     function renderQrModal(){
       if(!playerUrl || !qrLargeBox) return;
       qrLargeBox.innerHTML = "";
@@ -729,7 +735,7 @@
     qrModalClose?.addEventListener("click", closeQrModal);
     qrModal?.addEventListener("click", e=>{ if(e.target===qrModal) closeQrModal(); });
 
-    // --- Reveal modal ---
+    // Reveal modal
     function showRevealModal(){
       if(!reveal || !currentQuestionId) return;
       revealModalTitle.textContent = revealTitle.textContent;
@@ -739,9 +745,7 @@
       }
     }
     function hideRevealModal(fromState){
-      if(!fromState){
-        revealModalDismissed = true;
-      }
+      if(!fromState) revealModalDismissed = true;
       revealModal.classList.remove("show");
     }
     revealModal?.addEventListener("click", e=>{ if(e.target===revealModal) hideRevealModal(false); });
@@ -783,8 +787,9 @@
 
             timerStartedAt = null;
             timerDurationSec = null;
+            timerBoundQid = null;
 
-            statusLine.textContent = "Yeni oturum algılandı.";
+            statusLine.textContent = "Bekleniyor";
           }
           sessionToken = val;
           sessionLabel.textContent = "#" + String(val).slice(-4);
@@ -811,9 +816,7 @@
 
       rootRef.child("reveal").on("value",snap=>{
         reveal = !!snap.val();
-        if(reveal){
-          revealModalDismissed = false;
-        }
+        if(reveal) revealModalDismissed = false;
         renderQuestion();
       });
 
@@ -853,24 +856,27 @@
         ranked.forEach(p=>{
           const row  = document.createElement("div");
           row.className = "score-row";
-          if(p.rank <= 3){
-            row.classList.add("rank-"+p.rank);
-          }
+          if(p.rank <= 3) row.classList.add("rank-"+p.rank);
+
           const label = document.createElement("div");
           label.className = "label";
+
           const medal = document.createElement("span");
           medal.className = "medal";
           const tieMark = scoreCounts[p.score]>1 ? "↔ " : "";
           medal.textContent = tieMark + p.rank + ".";
+
           const name  = document.createElement("span");
           name.className = "name";
           name.textContent  = p.nickname;
+
           label.appendChild(medal);
           label.appendChild(name);
 
           const score = document.createElement("span");
           score.className = "score";
           score.textContent = p.score+" p";
+
           row.appendChild(label);
           row.appendChild(score);
           scoreListEl.appendChild(row);
@@ -882,6 +888,7 @@
       try{
         const res = await fetch(CONFIG_URL,{cache:"no-store"});
         if(!res.ok) throw new Error("HTTP "+res.status);
+
         CONFIG    = await res.json();
         QUESTIONS = (CONFIG.questions || []).slice();
         TOTAL_Q   = QUESTIONS.length;
@@ -892,9 +899,7 @@
 
         // Init defaults in DB if missing
         rootRef.child("currentQuestionIndex").once("value",s=>{
-          if(!s.exists()){
-            rootRef.update({ currentQuestionIndex:0 });
-          }
+          if(!s.exists()) rootRef.update({ currentQuestionIndex:0 });
         });
         rootRef.child("sessionToken").once("value",snap=>{
           if(!snap.exists()){
@@ -905,21 +910,17 @@
           }
         });
         rootRef.child("quizStarted").once("value",s=>{
-          if(!s.exists()){
-            rootRef.update({ quizStarted:false });
-          }
+          if(!s.exists()) rootRef.update({ quizStarted:false });
         });
         rootRef.child("timerStartedAt").once("value",s=>{
-          if(!s.exists()){
-            rootRef.update({ timerStartedAt:null, timerDurationSec:null });
-          }
+          if(!s.exists()) rootRef.update({ timerStartedAt:null, timerDurationSec:null });
         });
 
       }catch(e){
         console.error(e);
         questionTitleEl.textContent = "Config yüklenemedi";
-        questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koyduğundan emin ol.";
-        statusLine.textContent = "Config yüklenemedi.";
+        questionStemEl.textContent  = "defi-quiz-config.json dosyasını aynı klasöre koy.";
+        statusLine.textContent = "—";
         btnStart.style.display = "none";
       }
     }
